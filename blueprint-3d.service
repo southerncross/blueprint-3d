@@ -1,0 +1,16 @@
+[Unit]
+Description=Gallery-3d App Service
+
+[Service]
+PIDFile=/opt/pids/blueprint-3d.pid
+Environment=NODE_ENV=production PORT=4000
+ExecStart=/usr/bin/node /opt/app/index.js
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=blueprint-3d
+User=lishunyang
+Group=wheel
+
+[Install]
+WantedBy=multi-user.target
