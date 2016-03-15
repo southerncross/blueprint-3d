@@ -30,7 +30,7 @@ export default {
 </script>
 
 <style lang="stylus">
-nav-column-width = 200px
+nav-column-width = 80px
 
 .app
   &__nav-column

@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div class="avatar z-depth-1">{{name.substr(0, 1)}}</div>
+    <a class="avatar z-depth-1" v-link="{ path: '/' }">
+      {{name.substr(0, 1)}}
+    </a>
   </div>
 </template>
 

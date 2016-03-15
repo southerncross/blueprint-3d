@@ -19,9 +19,14 @@
         </div>
       </div>
       <div class="nav-column__link__container">
-        <div class="nav-column__link waves-effect" v-link="{ name: 'create-blueprint' }">
-          <span class="icon-local_restaurant"></span>
-          新建户型
+        <div
+          class="nav-column__link waves-effect tooltipped"
+          data-position="right"
+          data-delay="50"
+          data-tooltip="新建蓝图"
+          v-link="{ name: 'create-blueprint' }"
+        >
+          <i class="icon-format_paint"></i>
         </div>
       </div>
     </div>
@@ -112,13 +117,15 @@ export default {
     display block
     height 50px
     line-height 50px
-    font-size 18px
+    font-size 27px
     color white
     background-color color-cyan
     &:hover
       background-color color-cyan-darken-1
     &.v-link-active
-      background-color color-cyan-darken-1
+      background-color color-cyan-darken-2
     &__container
       margin-top 100px
+    & i
+      vertical-align middle
 </style>

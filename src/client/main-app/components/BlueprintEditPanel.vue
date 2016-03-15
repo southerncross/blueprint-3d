@@ -1,20 +1,49 @@
 <template>
 <div class="blueprint-edit-panel__container">
-  <div class="blueprint-edit-panel__menu">
-    <div class="range-field">
-      <input type="range" min="50" max="1000" value="600" @input="onCanvasSizeChange"/>
-      <label>画布大小</label>
-    </div>
-    <div class="range-field">
-      <input type="range" min="50" max="1000" value="600" @input="onBackgroundSizeChange"/>
-      <label>户型图大小</label>
-    </div>
-  </div>
   <div id="blueprint-edit-panel__svg-container">
     <div>
       {{'x=' + mousePos.x + ', y=' + mousePos.y}}
     </div>
   </div>
+  <div class="fixed-action-btn vertical click-to-toggle">
+    <a class="btn-floating btn-large cyan">
+      <i class="large mdi-navigation-menu"></i>
+    </a>
+    <ul>
+      <li>
+        <div
+          class="btn-floating red tooltipped"
+          data-position="left"
+          data-delay="50"
+          data-tooltip="背景"
+          @click="loadBackgroundImg"
+        >
+          <i class="icon-now_wallpaper"></i>
+        </div>
+      </li>
+      <li>
+        <div class="btn-floating yellow darken-1 tooltipped" data-position="left" data-delay="50" data-tooltip="墙">
+          <i class="icon-border_style"></i>
+        </div>
+      </li>
+      <li>
+        <div class="btn-floating green tooltipped" data-position="left" data-delay="50" data-tooltip="门">
+          <i class="icon-directions_walk"></i>
+        </div>
+      </li>
+      <li>
+        <div class="btn-floating blue tooltipped" data-position="left" data-delay="50" data-tooltip="窗户">
+          <i class="icon-wb_sunny"></i>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <input
+    class="hidden"
+    id="blueprint-edit-panel__background-input"
+    type="file"
+    @change="onBackgroundImgChange"
+  />
 </div>
 </template>
 
@@ -27,12 +56,20 @@ export default {
   props: {
     svg: {
       type: Object
+    },
+    width: {
+      type: String,
+      required: true
+    },
+    height: {
+      type: String,
+      required: true
     }
   },
 
   data() {
     return {
-      backgroundUrl: '/images/blueprint-demo.jpg',
+      backgroundUrl: '',
       background: null,
       mousePos: { x: -1, y: -1 },
       drawingLine: null
@@ -40,17 +77,18 @@ export default {
   },
 
   methods: {
-    onCanvasSizeChange(event) {
-      this.svg.attr({
-        width: event.target.value,
-        height: event.target.value
-      })
+    loadBackgroundImg() {
+      const input = document.getElementById('blueprint-edit-panel__background-input')
+      input.click()
     },
 
-    onBackgroundSizeChange(event) {
-      this.background.attr({
-        width: event.target.value,
-        height: event.target.value
+    onBackgroundImgChange(event) {
+      const that = this
+      const file = event.target.files[0]
+      const url = window.URL.createObjectURL(file)
+      this.svg.image(url).attr({
+        id: 'blueprint-background',
+        opacity: 0.3
       })
     },
 
@@ -115,16 +153,6 @@ export default {
     document.getElementById('blueprint-edit-panel__svg-container').appendChild(this.svg.node)
     this.svg.click(this.onDrawLine)
     this.svg.mousemove(this.onMousemove)
-    const background = this.svg.select('#blueprint-background')
-    if (background) {
-      this.background = background
-    } else {
-      this.background = this.svg.image(this.backgroundUrl).attr({
-        width: DEFAULT_SIZE,
-        id: 'blueprint-background',
-        opacity: 0.3
-      })
-    }
     document.addEventListener('keydown', this.onKeydown)
   },
 
@@ -138,9 +166,15 @@ export default {
 
 <style lang="stylus">
 svg
-  //width canvas-width
-  //height canvas-height
+  display block
   margin 0 auto
   border 1px solid grey
   box-sizing border-box
+
+.hidden
+  display none
+
+.blueprint-edit-panel
+  &__container
+    position relative
 </style>
