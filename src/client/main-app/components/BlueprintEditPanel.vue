@@ -86,7 +86,8 @@ export default {
       mode: 'select',
       background: null,
       mousePos: { x: -1, y: -1 },
-      drawingLine: null
+      drawingLine: null,
+      wallCount: 0
     }
   },
 
@@ -124,28 +125,42 @@ export default {
       desc.after(this.background)
     },
 
+    onWallClick(event) {
+      const wall = this.svg.select(`#${event.target.id}`)
+      wall.attr({
+        stroke: 'red'
+      })
+      const radius = 5
+      const x1 = wall.attr('x1')
+      const y1 = wall.attr('y1')
+      const x2 = wall.attr('x2')
+      const y2 = wall.attr('y2')
+      this.svg.circle(x1, y1, radius).attr({ fill: 'red' })
+      this.svg.circle(x2, y2, radius).attr({ fill: 'red' })
+    },
+
     onClick(event) {
       switch (this.mode) {
         case 'select':
           if (this.background) {
-            this.background.drag()
+            // this.background.drag()
             this.background.attr({ selected: false })
           }
           break
         case 'wall':
           this.onDrawLine(event)
           if (this.background) {
-            this.background.undrag()
+            // this.background.undrag()
           }
           break
         case 'door':
           if (this.background) {
-            this.background.undrag()
+            // this.background.undrag()
           }
           break
         case 'window':
           if (this.background) {
-            this.background.undrag()
+            // this.background.undrag()
           }
           break
         default:
@@ -220,6 +235,7 @@ export default {
         drawingLine.attr({
           stroke: '#006064'
         })
+        .click(this.onWallClick)
         x1 = Number(drawingLine.attr('x2'))
         y1 = Number(drawingLine.attr('y2'))
       }
@@ -229,8 +245,10 @@ export default {
         stroke: '#00bcd4',
         strokeWidth: 5,
         strokeLinecap: 'round',
-        'class': 'wall'
+        'class': 'wall',
+        id: `wall-${this.wallCount}`
       })
+      this.wallCount++
     }
   },
 
