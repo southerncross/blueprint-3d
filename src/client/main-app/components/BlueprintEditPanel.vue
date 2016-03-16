@@ -84,7 +84,6 @@ export default {
   data() {
     return {
       mode: 'select',
-      backgroundUrl: '',
       background: null,
       mousePos: { x: -1, y: -1 },
       drawingLine: null
@@ -110,30 +109,44 @@ export default {
         return
       }
 
-      const oldBackground = this.svg.select('#blueprint-background')
-      if (oldBackground) {
-        oldBackground.remove()
+      if (this.background) {
+        this.background.remove()
       }
 
       const url = window.URL.createObjectURL(file)
       const desc = this.svg.select('desc')
-      const newBackground = this.svg.image(url).attr({
+      this.background = this.svg.image(url)
+      .attr({
         id: 'blueprint-background',
         opacity: 0.3
       })
-      desc.after(newBackground)
+      .click(this.onBackgroundClick)
+      desc.after(this.background)
     },
 
     onClick(event) {
       switch (this.mode) {
         case 'select':
+          if (this.background) {
+            this.background.drag()
+            this.background.attr({ selected: false })
+          }
           break
         case 'wall':
           this.onDrawLine(event)
+          if (this.background) {
+            this.background.undrag()
+          }
           break
         case 'door':
+          if (this.background) {
+            this.background.undrag()
+          }
           break
         case 'window':
+          if (this.background) {
+            this.background.undrag()
+          }
           break
         default:
           break
@@ -173,6 +186,29 @@ export default {
       }
     },
 
+    onBackgroundClick() {
+      this.background.attr({ selected: true })
+      const bbox = this.background.getBBox()
+      const depth = 5
+      this.svg.line(bbox.x, bbox.y, bbox.x2, bbox.y)
+      .attr({ stroke: 'red', strokeWidth: depth, 'class': 'resize--n' })
+      this.svg.line(bbox.x2, bbox.y, bbox.x2, bbox.y2)
+      .attr({ stroke: 'red', strokeWidth: depth, 'class': 'resize--e' })
+      this.svg.line(bbox.x2, bbox.y2, bbox.x, bbox.y2)
+      .attr({ stroke: 'red', strokeWidth: depth, 'class': 'resize--s' })
+      this.svg.line(bbox.x, bbox.y2, bbox.x, bbox.y)
+      .attr({ stroke: 'red', strokeWidth: depth, 'class': 'resize--w' })
+      this.svg.circle(bbox.x, bbox.y, depth * 2)
+      .attr({ stroke: 'red', fill: 'red', 'class': 'resize--nw' })
+      this.svg.circle(bbox.x2, bbox.y, depth * 2)
+      .attr({ stroke: 'red', fill: 'red', 'class': 'resize--ne' })
+      this.svg.circle(bbox.x2, bbox.y2, depth * 2)
+      .attr({ stroke: 'red', fill: 'red', 'class': 'resize--se' })
+      this.svg.circle(bbox.x, bbox.y2, depth * 2)
+      .attr({ stroke: 'red', fill: 'red', 'class': 'resize--sw' })
+      console.error('boring', bbox)
+    },
+
     onDrawLine() {
       const { mousePos, svg, drawingLine } = this
       let x1 = mousePos.x
@@ -192,6 +228,7 @@ export default {
       .attr({
         stroke: '#00bcd4',
         strokeWidth: 5,
+        strokeLinecap: 'round',
         'class': 'wall'
       })
     }
@@ -199,7 +236,7 @@ export default {
 
   ready() {
     document.getElementById('blueprint-edit-panel__svg__container').appendChild(this.svg.node)
-    this.svg.attr({ 'class': 'card' })
+    this.svg.attr({ 'class': 'card blue-grey lighten-5' })
     this.svg.click(this.onClick)
     this.svg.mousemove(this.onMousemove)
     document.addEventListener('keydown', this.onKeydown)
@@ -220,6 +257,24 @@ export default {
   &__svg__container
     display inline-block
     vertical-align top
+
+.resize
+  &--n
+    cursor n-resize
+  &--e
+    cursor e-resize
+  &--s
+    cursor s-resize
+  &--w
+    cursor w-resize
+  &--nw
+    cursor nw-resize
+  &--ne
+    cursor ne-resize
+  &--se
+    cursor se-resize
+  &--sw
+    cursor sw-resize
 
 .blueprint-edit-panel
   &__container
