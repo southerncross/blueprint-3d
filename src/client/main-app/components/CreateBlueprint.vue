@@ -1,5 +1,5 @@
 <template>
-<div class="create-blueprint__container container">
+<div class="create-blueprint__container">
   <div class="switch">
     <label>
       立体图
@@ -75,6 +75,8 @@ canvas-height = 680px
 
 .create-blueprint
   &__container
-    margin-top 3%
+    width 90%
+    min-width 960px
+    margin 3% auto
     color color-grey-darken-2
 </style>
