@@ -1,5 +1,5 @@
 <template>
-<div class="create-blueprint__view-panel">
+<div class="blueprint-view-panel__container">
   <div id="create-blueprint__canvas--3d"></div>
 </div>
 </template>
@@ -8,6 +8,9 @@
 import THREE from 'THREE'
 
 import '../../vendors/OrbitControls'
+
+const CANVAS_WIDTH = 800
+const CANVAS_HEIGHT = 600
 
 export default {
   name: 'BlueprintViewPanel',
@@ -73,8 +76,9 @@ export default {
 
     const renderer = new THREE.WebGLRenderer()
     renderer.setClearColor(new THREE.Color(0x000000, 1.0))
-    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setSize(CANVAS_WIDTH, CANVAS_HEIGHT)
     renderer.shadowMap.enabled = true
+    renderer.domElement.className = 'card'
     canvasDom.appendChild(renderer.domElement)
     this.renderer = renderer
 
@@ -130,6 +134,9 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="stylus">
+.blueprint-view-panel
+  &__container
+    width 900px
+    margin auto
 </style>
