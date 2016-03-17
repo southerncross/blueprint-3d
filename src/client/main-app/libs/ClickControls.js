@@ -1,3 +1,5 @@
+import Snap from 'Snap'
+
 class ClickControls {
   constructor() {
     this.elements = []
@@ -25,11 +27,15 @@ class ClickControls {
       this.reset()
     }
 
+    elem.data('colorBackup', elem.attr('color'))
     elem.drag(this.__onElementMove, this.__onElementDragStart, this.__onElementDragEnd)
     this.__addResizers(elem)
   }
 
-  __onElementMove() {
+  __onElementMove(dx, dy, x, y) {
+    const matrix = new Snap.Matrix()
+    matrix.translate(dx, dy)
+    this.elements.forEach((elem) => elem.transform(matrix))
   }
 
   __onElementDragStart() {
@@ -43,7 +49,11 @@ class ClickControls {
   }
 
   __clearElements() {
-    this.elements.forEach((elem) => elem.undrag())
+    this.elements.forEach((elem) => {
+      elem.undrag()
+      elem.attr({ color: elem.data('colorBackup') })
+      elem.removeData('colorBackup')
+    })
     this.elements = []
   }
 
