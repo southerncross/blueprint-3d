@@ -64,8 +64,12 @@
 </template>
 
 <script>
+import ClickControls from '../libs/ClickControls'
+
 export default {
   name: 'BlueprintEditPanel',
+
+  clickControls: null,
 
   props: {
     svg: {
@@ -87,7 +91,8 @@ export default {
       background: null,
       mousePos: { x: -1, y: -1 },
       drawingLine: null,
-      wallCount: 0
+      wallCount: 0,
+      clickedElement: null
     }
   },
 
@@ -121,7 +126,8 @@ export default {
         id: 'blueprint-background',
         opacity: 0.3
       })
-      .click(this.onBackgroundClick)
+      .drag(function(dx, dy, x, y) { console.error('boring', dx, dy, x, y, JSON.parse(JSON.stringify(this))) })
+      // .click(this.onBackgroundClick)
       desc.after(this.background)
     },
 
@@ -253,6 +259,7 @@ export default {
   },
 
   ready() {
+    this.clickControls = new ClickControls(this.svg)
     document.getElementById('blueprint-edit-panel__svg__container').appendChild(this.svg.node)
     this.svg.attr({ 'class': 'card blue-grey lighten-5' })
     this.svg.click(this.onClick)
