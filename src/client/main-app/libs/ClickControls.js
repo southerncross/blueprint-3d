@@ -1,5 +1,3 @@
-import Snap from 'Snap'
-
 class ClickControls {
   constructor(svg) {
     this.svg = svg
@@ -8,15 +6,16 @@ class ClickControls {
 
     this.__multiClick = this.__multiClick.bind(this)
     this.__singleClick = this.__singleClick.bind(this)
-    this.__onElementMove = this.__onElementMove.bind(this)
-    this.__onElementDragStart = this.__onElementDragStart.bind(this)
-    this.__onElementDragEnd = this.__onElementDragEnd.bind(this)
     this.__addElement = this.__addElement.bind(this)
     this.__clearElements = this.__clearElements.bind(this)
     this.__clearResizers = this.__clearResizers.bind(this)
     this.__addResizers = this.__addResizers.bind(this)
     this.__addLineResizers = this.__addLineResizers.bind(this)
     this.__addImageResizers = this.__addImageResizers.bind(this)
+
+    this.__onElementMoveCreator = this.__onElementMoveCreator.bind(this)
+    this.__onElementDragStartCreator = this.__onElementDragStartCreator.bind(this)
+    this.__onElementDragEndCreator = this.__onElementDragEndCreator.bind(this)
   }
 
   reset() {
@@ -41,24 +40,42 @@ class ClickControls {
     }
 
     elem.data('colorBackup', elem.attr('color'))
-    elem.drag(this.__onElementMove, this.__onElementDragStart, this.__onElementDragEnd)
+    elem.drag(this.__onElementMoveCreator(), this.__onElementDragStartCreator(), this.__onElementDragEndCreator())
     this.__addResizers(elem)
     this.__addElement(elem)
   }
 
-  __onElementMove(dx, dy, x, y) {
-    const matrix = new Snap.Matrix()
-    matrix.translate(dx, dy)
-    this.elements.forEach((elem) => elem.transform(matrix))
+  __onElementMoveCreator() {
+    const that = this
+    return function(dx, dy, x, y) {
+      if (that.multiMode && that.elements.length > 0) {
+        // TODO
+      } else {
+        this.attr({
+          transform: this.data('transform') + (this.data('transform') ? 'T' : 't') + [dx, dy]
+        })
+      }
+    }
   }
 
-  __onElementDragStart() {
-    this.__clearResizers()
+  __onElementDragStartCreator() {
+    const that = this
+    return function() {
+      if (that.multiMode && that.elements.length > 0) {
+        // TODO
+      } else {
+        that.__clearResizers()
+        this.data('transform', this.transform().local)
+      }
+    }
   }
 
-  __onElementDragEnd() {
-    if (!this.multiMode) {
-      this.__addResizers(this.elements[0])
+  __onElementDragEndCreator() {
+    const that = this
+    return function() {
+      if (!that.multiMode) {
+        that.__addResizers(this)
+      }
     }
   }
 
