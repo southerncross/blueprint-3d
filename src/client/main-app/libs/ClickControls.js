@@ -1,3 +1,5 @@
+import Snap from 'Snap'
+
 class ClickControls {
   constructor(svg) {
     this.svg = svg
@@ -51,9 +53,9 @@ class ClickControls {
       if (that.multiMode && that.elements.length > 0) {
         // TODO
       } else {
-        this.attr({
-          transform: this.data('transform') + (this.data('transform') ? 'T' : 't') + [dx, dy]
-        })
+        const matrix = this.data('matrix').clone()
+        matrix.add(new Snap.Matrix().translate(dx, dy))
+        this.transform(matrix)
       }
     }
   }
@@ -65,7 +67,7 @@ class ClickControls {
         // TODO
       } else {
         that.__clearResizers()
-        this.data('transform', this.transform().local)
+        this.data('matrix', this.transform().localMatrix)
       }
     }
   }
@@ -102,6 +104,11 @@ class ClickControls {
   }
 
   __onEdgeResizerDragStartCreator() {
+    const that = this
+    return function() {
+      that.__clearResizers()
+      that.data('transform')
+    }
   }
 
   __onEdgeResizerDragMoveCreator() {
