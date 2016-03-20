@@ -92,6 +92,24 @@ class ClickControls {
     this.elements = []
   }
 
+  __onCornerResizerDragStartCreator() {
+  }
+
+  __onCornerResizerDragMoveCreator() {
+  }
+
+  __onCornerResizerDragEndCreator() {
+  }
+
+  __onEdgeResizerDragStartCreator() {
+  }
+
+  __onEdgeResizerDragMoveCreator() {
+  }
+
+  __onEdgeResizerDragEndCreator() {
+  }
+
   __clearResizers() {
     this.resizers.forEach((resizer) => resizer.remove())
     this.resizers = []
