@@ -45,8 +45,8 @@
       </div>
     </div>
   </div>
+  <div>{{'x=' + mousePos.x + ', y=' + mousePos.y}}</div>
   <div>
-    {{'x=' + mousePos.x + ', y=' + mousePos.y}}
     <button
       class="btn-large waves-effect waves-light red tooltipped"
       data-position="right" data-delay="0" data-tooltip="加载背景"
@@ -264,4 +264,24 @@ export default {
       vertical-align top
     &__item
       margin-top 30px
+
+.corner-resizer
+  &--nw
+    cursor nw-resize
+  &--ne
+    cursor ne-resize
+  &--se
+    cursor se-resize
+  &--sw
+    cursor sw-resize
+
+.edge-resizer
+  &--n
+    cursor n-resize
+  &--e
+    cursor e-resize
+  &--s
+    cursor s-resize
+  &--w
+    cursor w-resize
 </style>
