@@ -162,7 +162,9 @@ export default {
     },
 
     onElementClick(event) {
-      this.clickControls.click(this.svg.select(`#${event.target.id}`))
+      if (this.mode === 'select') {
+        this.clickControls.click(this.svg.select(`#${event.target.id}`))
+      }
     },
 
     onMousemove(event) {
