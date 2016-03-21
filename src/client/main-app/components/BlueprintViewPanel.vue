@@ -47,7 +47,7 @@ export default {
     return {
       keepRendering: false,
       isFullscreen: false,
-      isPointerLocked: false,
+      isPointerLocked: false
     }
   },
 
@@ -79,6 +79,8 @@ export default {
     drawWalls() {
       const wallGeo = new THREE.Geometry()
       this.svg.selectAll('.wall').forEach((wall, idx) => {
+        const scale = 5
+        const planeSize = 200
         const height = 30
         let depth = 1
         let width = 1
@@ -86,16 +88,16 @@ export default {
         const y1 = Number(wall.attr('y1'))
         const x2 = Number(wall.attr('x2'))
         const y2 = Number(wall.attr('y2'))
-        const x = (x1 + x2) / 20
-        const y = (y1 + y2) / 20
+        const x = (x1 + x2) / 2 / scale
+        const y = (y1 + y2) / 2 / scale
         if (x1 === x2) {
-          depth = Math.abs(y1 - y2) / 10 + width
+          depth = Math.abs(y1 - y2) / scale + width
         } else {
-          width = Math.abs(x1 - x2) / 10 + depth
+          width = Math.abs(x1 - x2) / scale + depth
         }
 
         const boxGeo = new THREE.BoxGeometry(width, height, depth)
-        boxGeo.translate(x, height / 2, y)
+        boxGeo.translate(x - planeSize / 2 / scale, height / 2, y - planeSize / 2 / scale)
         const wallMesh = new THREE.Mesh(boxGeo)
         wallMesh.updateMatrix()
         wallGeo.merge(wallMesh.geometry, wallMesh.matrix)
@@ -205,7 +207,7 @@ export default {
     scene.add(axes)
 
     const planeMesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(200, 200),
+      new THREE.PlaneGeometry(500, 500),
       new THREE.MeshBasicMaterial({ color: 0xcccccc })
     )
     planeMesh.receiveShadow = true

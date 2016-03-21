@@ -135,10 +135,7 @@ export default {
     onCanvasClick(event) {
       switch (this.mode) {
         case 'select':
-          if (this.background) {
-            // this.background.drag()
-            this.background.attr({ selected: false })
-          }
+          this.clickControls.reset()
           break
         case 'wall':
           this.onDrawLine(event)
@@ -162,6 +159,7 @@ export default {
     },
 
     onElementClick(event) {
+      event.stopPropagation()
       if (this.mode === 'select') {
         this.clickControls.click(this.svg.select(`#${event.target.id}`))
       }

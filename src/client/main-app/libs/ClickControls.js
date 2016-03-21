@@ -45,7 +45,6 @@ class ClickControls {
     }
 
     elem.data('colorBackup', elem.attr('color'))
-    elem.data('matrix', elem.transform().localMatrix.clone())
     elem.drag(this.__onElementMoveCreator(), this.__onElementDragStartCreator(), this.__onElementDragEndCreator())
     this.__addResizers(elem)
     this.__addElement(elem)
@@ -57,9 +56,7 @@ class ClickControls {
       if (that.multiMode && that.elements.length > 0) {
         // TODO
       } else {
-        const matrix = this.data('matrix').clone()
-        matrix.add(new Snap.Matrix().translate(dx, dy))
-        this.transform(matrix)
+        this.transform(new Snap.Matrix().translate(dx, dy))
       }
     }
   }
@@ -71,7 +68,6 @@ class ClickControls {
         // TODO
       } else {
         that.__clearResizers()
-        // this.data('matrix', this.transform().localMatrix)
       }
     }
   }
@@ -81,7 +77,12 @@ class ClickControls {
     return function() {
       if (!that.multiMode) {
         that.__addResizers(this)
-        this.data('matrix', this.transform().localMatrix.clone())
+        const bbox = this.getBBox()
+        this.attr({
+          x: bbox.x,
+          y: bbox.y
+        })
+        this.transform('')
       }
     }
   }
@@ -110,41 +111,70 @@ class ClickControls {
 
   __onEdgeResizerDragMoveCreator() {
     return function(dx, dy) {
-      const elem = this.data('element')
-      let xr = 0
-      let yr = 0
-      // console.error('boring', bbox.x, bbox.y)
-      switch (this.data('direction')) {
+      const elem = this.data('elem')
+      // const x = elem.data('bbox').x
+      const { x, y, width, height } = elem.data('originPosition')
+      // const width = elem.data('bbox').width
+      const direction = this.data('direction')
+      let matrix = new Snap.Matrix()
+
+      switch (direction) {
         case 'N':
-          xr = 1
-          yr = 1 + dy / 100
-          break
-        case 'E':
-          xr = 1 + dx / 100
-          yr = 1
+          matrix.add(new Snap.Matrix().scale(1, 1 - dy / height, x, y + height))
           break
         case 'S':
-          xr = 1
-          yr = 1 + dy / 100
+          matrix = new Snap.Matrix().scale(1, 1 + dy / height, x, y)
+          break
+        case 'E':
+          matrix = new Snap.Matrix().scale(1 + dx / width, 1, x, y)
           break
         case 'W':
-          xr = 1 + dx / 100
-          yr = 1
-          break
-        default:
-          console.warn('Unknown resizer direction: ', this.data('direction'))
+          matrix = new Snap.Matrix().scale(1 - dx / width, 1, x + width, y)
           break
       }
-      const matrix = elem.data('matrix').clone()
-      matrix.add(new Snap.Matrix().scale(xr, yr))
+      // let xr = 0
+      // let yr = 0
+      // // console.error('boring', bbox.x, bbox.y)
+      // switch (this.data('direction')) {
+      //   case 'N':
+      //     xr = 1
+      //     yr = 1 + dy / 100
+      //     break
+      //   case 'E':
+      //     xr = 1 + dx / 100
+      //     yr = 1
+      //     break
+      //   case 'S':
+      //     xr = 1
+      //     yr = 1 + dy / 100
+      //     break
+      //   case 'W':
+      //     xr = 1 + dx / 100
+      //     yr = 1
+      //     break
+      //   default:
+      //     console.warn('Unknown resizer direction: ', this.data('direction'))
+      //     break
+      // }
+      // const matrix = elem.data('matrix').clone()
+      // matrix.add(new Snap.Matrix().scale(xr, yr))
       elem.transform(matrix)
+      // console.error('boring', elem.getBBox().y)
     }
   }
 
   __onEdgeResizerDragStartCreator() {
     const that = this
     return function() {
+      const elem = this.data('elem')
       that.__clearResizers()
+      const bbox = elem.getBBox()
+      elem.data('originPosition', {
+        x: bbox.x,
+        y: bbox.y,
+        width: bbox.width,
+        height: bbox.height
+      })
     }
   }
 
@@ -152,8 +182,15 @@ class ClickControls {
     const that = this
     return function() {
       if (!that.multiMode) {
-        const elem = this.data('element')
-        this.data('matrix', elem.transform().localMatrix.clone())
+        const elem = this.data('elem')
+        const bbox = elem.getBBox()
+        elem.attr({
+          x: bbox.x,
+          y: bbox.y,
+          width: bbox.width,
+          height: bbox.height
+        })
+        elem.transform('')
         that.__addResizers(elem)
       }
     }
@@ -213,7 +250,7 @@ class ClickControls {
     ]
 
     cornerResizers.forEach((resizer) => {
-      resizer.data('element', elem)
+      resizer.data('elem', elem)
     })
 
     this.resizers.push(...cornerResizers)
@@ -226,7 +263,7 @@ class ClickControls {
     ]
 
     edgeResizers.forEach((resizer) => {
-      resizer.data('element', elem)
+      resizer.data('elem', elem)
       resizer.drag(
         this.__onEdgeResizerDragMoveCreator(),
         this.__onEdgeResizerDragStartCreator(),
