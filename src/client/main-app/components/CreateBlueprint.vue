@@ -9,7 +9,7 @@
     </label>
   </div>
   <edit-panel
-    v-if="editMode"
+    v-show="editMode"
     class="create-blueprint__edit-panel"
     :svg="svg"
     width="800"
@@ -17,7 +17,7 @@
   >
   </edit-panel>
   <view-panel
-    v-else
+    v-show="!editMode"
     class="create-blueprint__view-panel"
     :svg="svg"
   >

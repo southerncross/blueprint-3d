@@ -1,12 +1,12 @@
 <template>
 <div class="blueprint-edit-panel__container">
-  <div>
+  <div class="blueprint-edit-panel__main">
     <div id="blueprint-edit-panel__svg__container"></div>
     <div class="blueprint-edit-panel__utils__container">
       <div class="blueprint-edit-panel__utils__item">
         <button
           class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="right" data-delay="0" data-tooltip="选择模式"
+          data-position="left" data-delay="0" data-tooltip="选择模式"
           :class="mode === 'select' ? 'purple' : 'white'"
           @click="mode = 'select'"
         >
@@ -16,17 +16,30 @@
       <div class="blueprint-edit-panel__utils__item">
         <button
           class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="right" data-delay="0" data-tooltip="加载背景"
+          data-position="left" data-delay="0" data-tooltip="背景"
           :class="mode === 'background' ? 'red' : 'white'"
           @click="mode = 'background'"
         >
           <i class="icon-now_wallpaper" :class="mode === 'background' ? 'white-text' : 'black-text'"></i>
         </button>
+        <div
+          v-show="mode === 'background'"
+          class="blueprint-edit-panel__utils__item__sub-utils"
+          transition="slide-right-to-left"
+        >
+          <button
+            class="waves-effect waves-teal btn-flat tooltipped"
+            data-position="top" data-delay="0" data-tooltip="添加背景"
+            @click="loadBackgroundImg"
+          >
+            <i class="icon-image"></i>
+          </button>
+        </div>
       </div>
       <div class="blueprint-edit-panel__utils__item">
         <button
           class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="right" data-delay="0" data-tooltip="画墙模式"
+          data-position="left" data-delay="0" data-tooltip="画墙模式"
           :class="mode === 'wall' ? 'yellow darken-2' : 'white'"
           @click="mode = 'wall'"
         >
@@ -36,7 +49,7 @@
       <div class="blueprint-edit-panel__utils__item">
         <button
           class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="right" data-delay="0" data-tooltip="画门模式"
+          data-position="left" data-delay="0" data-tooltip="画门模式"
           :class="mode === 'door' ? 'green' : 'white'"
           @click="mode = 'door'"
         >
@@ -46,7 +59,7 @@
       <div class="blueprint-edit-panel__utils__item">
         <button
           class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="right" data-delay="0" data-tooltip="画窗模式"
+          data-position="left" data-delay="0" data-tooltip="画窗模式"
           :class="mode === 'window' ? 'blue' : 'white'"
           @click="mode = 'window'"
         >
@@ -56,20 +69,11 @@
     </div>
   </div>
   <div>{{'x=' + mousePos.x + ', y=' + mousePos.y}}</div>
-  <div class="blueprint-edit-panel__sub-utils__container">
-    <div v-show="mode === 'background'" transition="slide-bottom-to-top">
-      <div class="blueprint-edit-panel__sub-utils__item">
-        <button
-          class="waves-effect waves-teal btn-flat tooltipped"
-          data-position="top" data-delay="0" data-tooltip="背景图"
-          @click="loadBackgroundImg"
-        >
-          <i class="icon-image"></i>
-        </button>
-      </div>
+  <div class="blueprint-edit-panel__element-utils__container">
+    <div v-show="elementUtilsType === 'background'" transition="slide-bottom-to-top">
       <div
         v-if="configs.background.element"
-        class="blueprint-edit-panel__sub-utils__item"
+        class="blueprint-edit-panel__element-utils__item"
         transition="fade"
       >
         <button
@@ -82,7 +86,7 @@
       </div>
       <div
         v-if="configs.background.element"
-        class="blueprint-edit-panel__sub-utils__item"
+        class="blueprint-edit-panel__element-utils__item"
         transition="fade"
       >
         <button
@@ -95,7 +99,7 @@
       </div>
       <div
         v-if="configs.background.element"
-        class="blueprint-edit-panel__sub-utils__item"
+        class="blueprint-edit-panel__element-utils__item"
         transition="fade"
       >
         <span class="range-field">
@@ -151,6 +155,7 @@ export default {
           opacity: 30
         }
       },
+      elementUtilsType: null,
       mousePos: { x: -1, y: -1 },
       drawingLine: null,
       wallCount: 0,
@@ -164,6 +169,10 @@ export default {
         return
       }
       this.mode = nextMode
+    },
+
+    showElementUtils(elem) {
+      this.elementUtilsType = elem.data('elementType')
     },
 
     loadBackgroundImg() {
@@ -200,6 +209,7 @@ export default {
         id: 'blueprint-background',
         opacity: parseFloat(background.opacity) / 100
       })
+      .data({ elementType: 'background' })
       .click(this.onElementClick)
       desc.after(background.element)
     },
@@ -222,10 +232,18 @@ export default {
     },
 
     onElementClick(event) {
-      event.stopPropagation()
-      if (this.mode === 'select') {
-        this.clickControls.click(this.svg.select(`#${event.target.id}`))
+      if (this.mode !== 'select') {
+        return
       }
+
+      const element = this.svg.select(`#${event.target.id}`)
+      if (element.data('locked')) {
+        return
+      }
+
+      event.stopPropagation()
+      this.clickControls.click(element)
+      this.showElementUtils(element)
     },
 
     onMousemove(event) {
@@ -323,6 +341,15 @@ export default {
     margin-top 50px
     opacity 0
 
+.slide-right-to-left
+  &-transition
+    transition all .3s ease
+    margin-left 0
+    opacity 1
+  &-enter, &-leave
+    margin-left 50px
+    opacity 0
+
 #blueprint-edit-panel
   &__background-input
     display none
@@ -334,16 +361,24 @@ export default {
   &__container
     width 900px
     margin auto
+  &__main
+    position relative
   &__utils
     &__container
-      display inline-block
-      width 80px
-      height 90%
+      position absolute
+      top 0
+      left 820px
       text-align center
       vertical-align top
     &__item
+      position relative
       margin-top 30px
-  &__sub-utils
+      &__sub-utils
+        position absolute
+        top 50%
+        left 60px
+        transform translateY(-50%)
+  &__element-utils
     &__container
       width 800px
     &__item

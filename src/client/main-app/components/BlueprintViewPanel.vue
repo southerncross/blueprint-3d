@@ -216,8 +216,8 @@ export default {
 
     this.drawWalls()
 
-    this.keepRendering = true
-    this.render()
+    // this.keepRendering = true
+    // this.render()
   },
 
   beforeDestroy() {
