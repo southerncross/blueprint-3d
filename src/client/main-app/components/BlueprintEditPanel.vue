@@ -72,7 +72,6 @@
   <div class="blueprint-edit-panel__element-utils__container">
     <div v-show="elementUtilsType === 'background'" transition="slide-bottom-to-top">
       <div
-        v-if="configs.background.element"
         class="blueprint-edit-panel__element-utils__item"
         transition="fade"
       >
@@ -85,7 +84,6 @@
         </button>
       </div>
       <div
-        v-if="configs.background.element"
         class="blueprint-edit-panel__element-utils__item"
         transition="fade"
       >
@@ -98,7 +96,6 @@
         </button>
       </div>
       <div
-        v-if="configs.background.element"
         class="blueprint-edit-panel__element-utils__item"
         transition="fade"
       >
@@ -128,8 +125,6 @@ import ClickControls from '../libs/ClickControls'
 export default {
   name: 'BlueprintEditPanel',
 
-  clickControls: null,
-
   props: {
     svg: {
       type: Object
@@ -149,7 +144,7 @@ export default {
       mode: 'select',
       configs: {
         background: {
-          element: null,
+          elem: null,
           visibility: 'visible',
           locked: false,
           opacity: 30
@@ -175,6 +170,10 @@ export default {
       this.elementUtilsType = elem.data('elementType')
     },
 
+    hideElementUtils() {
+      this.elementUtilsType = null
+    },
+
     loadBackgroundImg() {
       const input = document.getElementById('blueprint-edit-panel__background-input')
       input.click()
@@ -183,12 +182,12 @@ export default {
     onBackgroundImgVisibilityChange() {
       const { background } = this.configs
       background.visibility = background.visibility === 'visible' ? 'hidden' : 'visible'
-      background.element.attr({ visibility: background.visibility })
+      background.elem.attr({ visibility: background.visibility })
     },
 
     onBackgroundImgOpacityChange(event) {
       const { background } = this.configs
-      background.element.attr({ opacity: parseFloat(event.target.value) / 100 })
+      background.elem.attr({ opacity: parseFloat(event.target.value) / 100 })
     },
 
     onBackgroundImgChange(event) {
@@ -198,26 +197,29 @@ export default {
       }
 
       const { background } = this.configs
-      if (background.element) {
-        background.element.remove()
+      if (background.elem) {
+        background.elem.remove()
       }
 
       const url = window.URL.createObjectURL(file)
       const desc = this.svg.select('desc')
-      background.element = this.svg.image(url)
+      background.elem = this.svg.image(url)
       .attr({
         id: 'blueprint-background',
         opacity: parseFloat(background.opacity) / 100
       })
       .data({ elementType: 'background' })
       .click(this.onElementClick)
-      desc.after(background.element)
+      desc.after(background.elem)
+      this.mode = 'select'
+      this.clickControls.click(background.elem)
     },
 
     onCanvasClick(event) {
       switch (this.mode) {
         case 'select':
           this.clickControls.reset()
+          this.hideElementUtils()
           break
         case 'wall':
           this.onDrawLine(event)
@@ -236,14 +238,14 @@ export default {
         return
       }
 
-      const element = this.svg.select(`#${event.target.id}`)
-      if (element.data('locked')) {
+      const elem = this.svg.select(`#${event.target.id}`)
+      if (elem.data('locked')) {
         return
       }
 
       event.stopPropagation()
-      this.clickControls.click(element)
-      this.showElementUtils(element)
+      this.clickControls.click(elem)
+      this.showElementUtils(elem)
     },
 
     onMousemove(event) {
@@ -308,6 +310,7 @@ export default {
   },
 
   ready() {
+    $('.tooltipped').tooltip()
     this.clickControls = new ClickControls(this.svg)
     document.getElementById('blueprint-edit-panel__svg__container').appendChild(this.svg.node)
     this.svg.attr({ 'class': 'card blue-grey lighten-5' })
