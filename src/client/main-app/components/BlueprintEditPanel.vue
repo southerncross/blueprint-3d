@@ -16,6 +16,16 @@
       <div class="blueprint-edit-panel__utils__item">
         <button
           class="btn-floating btn-large waves-effect waves-light tooltipped"
+          data-position="right" data-delay="0" data-tooltip="加载背景"
+          :class="mode === 'background' ? 'red' : 'white'"
+          @click="mode = 'background'"
+        >
+          <i class="icon-now_wallpaper" :class="mode === 'background' ? 'white-text' : 'black-text'"></i>
+        </button>
+      </div>
+      <div class="blueprint-edit-panel__utils__item">
+        <button
+          class="btn-floating btn-large waves-effect waves-light tooltipped"
           data-position="right" data-delay="0" data-tooltip="画墙模式"
           :class="mode === 'wall' ? 'yellow darken-2' : 'white'"
           @click="mode = 'wall'"
@@ -46,14 +56,46 @@
     </div>
   </div>
   <div>{{'x=' + mousePos.x + ', y=' + mousePos.y}}</div>
-  <div>
-    <button
-      class="btn-large waves-effect waves-light red tooltipped"
-      data-position="right" data-delay="0" data-tooltip="加载背景"
-      @click="loadBackgroundImg"
-    >
-      <i class="icon-now_wallpaper"></i>
-    </button>
+  <div class="blueprint-edit-panel__sub-utils__container">
+    <div v-show="mode === 'background'">
+      <div class="blueprint-edit-panel__sub-utils__item">
+        <button
+          class="waves-effect waves-teal btn-flat tooltipped"
+          data-position="top" data-delay="0" data-tooltip="背景图"
+          @click="loadBackgroundImg"
+        >
+          <i class="icon-image"></i>
+        </button>
+      </div>
+      <div v-if="configs.background.element" class="blueprint-edit-panel__sub-utils__item">
+        <button
+          class="waves-effect waves-teal btn-flat tooltipped"
+          data-position="top" data-delay="0" data-tooltip="可见性"
+          @click="onBackgroundImgVisibilityChange"
+        >
+          <i class="{{configs.background.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off'}}"></i>
+        </button>
+      </div>
+      <div v-if="configs.background.element" class="blueprint-edit-panel__sub-utils__item">
+        <button
+          class="waves-effect waves-teal btn-flat tooltipped"
+          data-position="top" data-delay="0" data-tooltip="编辑锁定"
+          @click="configs.background.locked = !configs.background.locked"
+        >
+          <i class="{{configs.background.locked ? 'icon-lock' : 'icon-lock_open'}}"></i>
+        </button>
+      </div>
+      <div v-if="configs.background.element" class="blueprint-edit-panel__sub-utils__item">
+        <span class="range-field">
+          <input
+            id="blueprint-edit-panel__background__opacity"
+            type="range"
+            min="0" max="100"
+            :value="configs.background.opacity"
+          />
+        </span>
+      </div>
+    </div>
   </div>
   <input
     id="blueprint-edit-panel__background-input"
@@ -88,6 +130,14 @@ export default {
   data() {
     return {
       mode: 'select',
+      configs: {
+        background: {
+          element: null,
+          visibility: 'visible',
+          locked: false,
+          opacity: 30
+        }
+      },
       background: null,
       mousePos: { x: -1, y: -1 },
       drawingLine: null,
@@ -109,27 +159,32 @@ export default {
       input.click()
     },
 
+    onBackgroundImgVisibilityChange() {
+      const { background } = this.configs
+      background.visibility = background.visibility === 'visible' ? 'hidden' : 'visible'
+      background.element.attr({ visibility: background.visibility })
+    },
+
     onBackgroundImgChange(event) {
       const file = event.target.files[0]
       if (!file) {
         return
       }
 
-      if (this.background) {
-        this.background.remove()
+      const { background } = this.configs
+      if (background.element) {
+        background.element.remove()
       }
 
       const url = window.URL.createObjectURL(file)
       const desc = this.svg.select('desc')
-      this.background = this.svg.image(url)
+      background.element = this.svg.image(url)
       .attr({
         id: 'blueprint-background',
-        opacity: 0.3
+        opacity: background.opacity
       })
       .click(this.onElementClick)
-      // .drag(function(dx, dy, x, y) { console.error('boring', dx, dy, x, y, JSON.parse(JSON.stringify(this))) })
-      // .click(this.onBackgroundClick)
-      desc.after(this.background)
+      desc.after(background.element)
     },
 
     onCanvasClick(event) {
@@ -264,6 +319,11 @@ export default {
       vertical-align top
     &__item
       margin-top 30px
+  &__sub-utils
+    &__container
+      width 800px
+    &__item
+      display inline-block
 
 .corner-resizer
   &--nw

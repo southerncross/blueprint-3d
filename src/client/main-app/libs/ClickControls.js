@@ -18,9 +18,9 @@ class ClickControls {
     this.__onElementMoveCreator = this.__onElementMoveCreator.bind(this)
     this.__onElementDragStartCreator = this.__onElementDragStartCreator.bind(this)
     this.__onElementDragEndCreator = this.__onElementDragEndCreator.bind(this)
-    this.__onEdgeResizerDragMoveCreator = this.__onEdgeResizerDragMoveCreator.bind(this)
-    this.__onEdgeResizerDragStartCreator = this.__onEdgeResizerDragStartCreator.bind(this)
-    this.__onEdgeResizerDragEndCreator = this.__onEdgeResizerDragEndCreator.bind(this)
+    this.__onResizerDragMoveCreator = this.__onResizerDragMoveCreator.bind(this)
+    this.__onResizerDragStartCreator = this.__onResizerDragStartCreator.bind(this)
+    this.__onResizerDragEndCreator = this.__onResizerDragEndCreator.bind(this)
   }
 
   reset() {
@@ -100,70 +100,41 @@ class ClickControls {
     this.elements = []
   }
 
-  __onCornerResizerDragStartCreator() {
-  }
-
-  __onCornerResizerDragMoveCreator() {
-  }
-
-  __onCornerResizerDragEndCreator() {
-  }
-
-  __onEdgeResizerDragMoveCreator() {
+  __onResizerDragMoveCreator() {
     return function(dx, dy) {
       const elem = this.data('elem')
-      // const x = elem.data('bbox').x
       const { x, y, width, height } = elem.data('originPosition')
-      // const width = elem.data('bbox').width
       const direction = this.data('direction')
-      let matrix = new Snap.Matrix()
+      let xRate = 1
+      let yRate = 1
+      let xCenter = x
+      let yCenter = y
 
-      switch (direction) {
-        case 'N':
-          matrix.add(new Snap.Matrix().scale(1, 1 - dy / height, x, y + height))
-          break
-        case 'S':
-          matrix = new Snap.Matrix().scale(1, 1 + dy / height, x, y)
-          break
-        case 'E':
-          matrix = new Snap.Matrix().scale(1 + dx / width, 1, x, y)
-          break
-        case 'W':
-          matrix = new Snap.Matrix().scale(1 - dx / width, 1, x + width, y)
-          break
+      for (const dir of direction) {
+        switch (dir) {
+          case 'N':
+            yRate = 1 - dy / height
+            yCenter = y + height
+            break
+          case 'S':
+            yRate = 1 + dy / height
+            yCenter = y
+            break
+          case 'E':
+            xRate = 1 + dx / width
+            xCenter = x
+            break
+          case 'W':
+            xRate = 1 - dx / width
+            xCenter = x + width
+            break
+        }
       }
-      // let xr = 0
-      // let yr = 0
-      // // console.error('boring', bbox.x, bbox.y)
-      // switch (this.data('direction')) {
-      //   case 'N':
-      //     xr = 1
-      //     yr = 1 + dy / 100
-      //     break
-      //   case 'E':
-      //     xr = 1 + dx / 100
-      //     yr = 1
-      //     break
-      //   case 'S':
-      //     xr = 1
-      //     yr = 1 + dy / 100
-      //     break
-      //   case 'W':
-      //     xr = 1 + dx / 100
-      //     yr = 1
-      //     break
-      //   default:
-      //     console.warn('Unknown resizer direction: ', this.data('direction'))
-      //     break
-      // }
-      // const matrix = elem.data('matrix').clone()
-      // matrix.add(new Snap.Matrix().scale(xr, yr))
-      elem.transform(matrix)
-      // console.error('boring', elem.getBBox().y)
+      elem.transform(new Snap.Matrix().scale(xRate, yRate, xCenter, yCenter))
     }
   }
 
-  __onEdgeResizerDragStartCreator() {
+  __onResizerDragStartCreator() {
     const that = this
     return function() {
       const elem = this.data('elem')
@@ -178,7 +149,7 @@ class ClickControls {
     }
   }
 
-  __onEdgeResizerDragEndCreator() {
+  __onResizerDragEndCreator() {
     const that = this
     return function() {
       if (!that.multiMode) {
@@ -233,44 +204,51 @@ class ClickControls {
     const y1 = bbox.y
     const x2 = bbox.x2
     const y2 = bbox.y2
-    const radius = 5
+    const radius = 7
     const edgeResizerStyle = {
       stroke: 'red',
-      strokeWidth: 2
+      strokeWidth: 4
     }
     const cornerResizerStyle = {
       fill: 'red'
     }
 
     const cornerResizers = [
-      this.svg.circle(x1, y1, radius).data('direction', 'NW').attr(cornerResizerStyle).attr({ class: 'corner-resizer--nw' }),
-      this.svg.circle(x2, y1, radius).data('direction', 'NE').attr(cornerResizerStyle).attr({ class: 'corner-resizer--ne' }),
-      this.svg.circle(x2, y2, radius).data('direction', 'SE').attr(cornerResizerStyle).attr({ class: 'corner-resizer--se' }),
-      this.svg.circle(x1, y2, radius).data('direction', 'SW').attr(cornerResizerStyle).attr({ class: 'corner-resizer--sw' })
+      this.svg.circle(x1, y1, radius).data('direction', 'NW').attr({ class: 'corner-resizer--nw' }),
+      this.svg.circle(x2, y1, radius).data('direction', 'NE').attr({ class: 'corner-resizer--ne' }),
+      this.svg.circle(x2, y2, radius).data('direction', 'SE').attr({ class: 'corner-resizer--se' }),
+      this.svg.circle(x1, y2, radius).data('direction', 'SW').attr({ class: 'corner-resizer--sw' })
     ]
 
     cornerResizers.forEach((resizer) => {
-      resizer.data('elem', elem)
+      resizer
+      .attr(cornerResizerStyle)
+      .data('elem', elem)
+      .drag(
+        this.__onResizerDragMoveCreator(),
+        this.__onResizerDragStartCreator(),
+        this.__onResizerDragEndCreator()
+      )
     })
-
     this.resizers.push(...cornerResizers)
 
     const edgeResizers = [
-      this.svg.line(x1, y1, x2, y1).data('direction', 'N').attr(edgeResizerStyle).attr({ class: 'edge-resizer--n' }),
-      this.svg.line(x2, y1, x2, y2).data('direction', 'E').attr(edgeResizerStyle).attr({ class: 'edge-resizer--e' }),
-      this.svg.line(x2, y2, x1, y2).data('direction', 'S').attr(edgeResizerStyle).attr({ class: 'edge-resizer--s' }),
-      this.svg.line(x1, y2, x1, y1).data('direction', 'W').attr(edgeResizerStyle).attr({ class: 'edge-resizer--w' })
+      this.svg.line(x1, y1, x2, y1).data('direction', 'N').attr({ class: 'edge-resizer--n' }),
+      this.svg.line(x2, y1, x2, y2).data('direction', 'E').attr({ class: 'edge-resizer--e' }),
+      this.svg.line(x2, y2, x1, y2).data('direction', 'S').attr({ class: 'edge-resizer--s' }),
+      this.svg.line(x1, y2, x1, y1).data('direction', 'W').attr({ class: 'edge-resizer--w' })
     ]
 
     edgeResizers.forEach((resizer) => {
-      resizer.data('elem', elem)
-      resizer.drag(
-        this.__onEdgeResizerDragMoveCreator(),
-        this.__onEdgeResizerDragStartCreator(),
-        this.__onEdgeResizerDragEndCreator()
+      resizer
+      .attr(edgeResizerStyle)
+      .data('elem', elem)
+      .drag(
+        this.__onResizerDragMoveCreator(),
+        this.__onResizerDragStartCreator(),
+        this.__onResizerDragEndCreator()
       )
     })
-
     this.resizers.push(...edgeResizers)
   }
 }
