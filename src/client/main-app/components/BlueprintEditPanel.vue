@@ -57,7 +57,7 @@
   </div>
   <div>{{'x=' + mousePos.x + ', y=' + mousePos.y}}</div>
   <div class="blueprint-edit-panel__sub-utils__container">
-    <div v-show="mode === 'background'">
+    <div v-show="mode === 'background'" transition="slide-bottom-to-top">
       <div class="blueprint-edit-panel__sub-utils__item">
         <button
           class="waves-effect waves-teal btn-flat tooltipped"
@@ -67,7 +67,11 @@
           <i class="icon-image"></i>
         </button>
       </div>
-      <div v-if="configs.background.element" class="blueprint-edit-panel__sub-utils__item">
+      <div
+        v-if="configs.background.element"
+        class="blueprint-edit-panel__sub-utils__item"
+        transition="fade"
+      >
         <button
           class="waves-effect waves-teal btn-flat tooltipped"
           data-position="top" data-delay="0" data-tooltip="可见性"
@@ -76,7 +80,11 @@
           <i class="{{configs.background.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off'}}"></i>
         </button>
       </div>
-      <div v-if="configs.background.element" class="blueprint-edit-panel__sub-utils__item">
+      <div
+        v-if="configs.background.element"
+        class="blueprint-edit-panel__sub-utils__item"
+        transition="fade"
+      >
         <button
           class="waves-effect waves-teal btn-flat tooltipped"
           data-position="top" data-delay="0" data-tooltip="编辑锁定"
@@ -85,13 +93,18 @@
           <i class="{{configs.background.locked ? 'icon-lock' : 'icon-lock_open'}}"></i>
         </button>
       </div>
-      <div v-if="configs.background.element" class="blueprint-edit-panel__sub-utils__item">
+      <div
+        v-if="configs.background.element"
+        class="blueprint-edit-panel__sub-utils__item"
+        transition="fade"
+      >
         <span class="range-field">
           <input
             id="blueprint-edit-panel__background__opacity"
             type="range"
             min="0" max="100"
-            :value="configs.background.opacity"
+            v-model="configs.background.opacity"
+            @input="onBackgroundImgOpacityChange"
           />
         </span>
       </div>
@@ -138,7 +151,6 @@ export default {
           opacity: 30
         }
       },
-      background: null,
       mousePos: { x: -1, y: -1 },
       drawingLine: null,
       wallCount: 0,
@@ -165,6 +177,11 @@ export default {
       background.element.attr({ visibility: background.visibility })
     },
 
+    onBackgroundImgOpacityChange(event) {
+      const { background } = this.configs
+      background.element.attr({ opacity: parseFloat(event.target.value) / 100 })
+    },
+
     onBackgroundImgChange(event) {
       const file = event.target.files[0]
       if (!file) {
@@ -181,7 +198,7 @@ export default {
       background.element = this.svg.image(url)
       .attr({
         id: 'blueprint-background',
-        opacity: background.opacity
+        opacity: parseFloat(background.opacity) / 100
       })
       .click(this.onElementClick)
       desc.after(background.element)
@@ -194,19 +211,10 @@ export default {
           break
         case 'wall':
           this.onDrawLine(event)
-          if (this.background) {
-            // this.background.undrag()
-          }
           break
         case 'door':
-          if (this.background) {
-            // this.background.undrag()
-          }
           break
         case 'window':
-          if (this.background) {
-            // this.background.undrag()
-          }
           break
         default:
           break
@@ -299,6 +307,22 @@ export default {
 </script>
 
 <style lang="stylus">
+.fade
+  &-transition
+    transition all .6s ease
+    opacity 1
+  &-enter, &-leave
+    opacity 0
+
+.slide-bottom-to-top
+  &-transition
+    transition all .3s ease
+    margin-top 0
+    opacity 1
+  &-enter, &-leave
+    margin-top 50px
+    opacity 0
+
 #blueprint-edit-panel
   &__background-input
     display none
