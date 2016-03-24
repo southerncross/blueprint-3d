@@ -18,7 +18,7 @@
           class="btn-floating btn-large waves-effect waves-light tooltipped"
           data-position="left" data-delay="0" data-tooltip="背景"
           :class="mode === 'background' ? 'red' : 'white'"
-          @click="mode = 'background'"
+          @click="changeMode('background')"
         >
           <i class="icon-now_wallpaper" :class="mode === 'background' ? 'white-text' : 'black-text'"></i>
         </button>
@@ -41,7 +41,7 @@
           class="btn-floating btn-large waves-effect waves-light tooltipped"
           data-position="left" data-delay="0" data-tooltip="画墙模式"
           :class="mode === 'wall' ? 'yellow darken-2' : 'white'"
-          @click="mode = 'wall'"
+          @click="changeMode('wall')"
         >
           <i class="icon-border_style" :class="mode === 'wall' ? 'white-text' : 'black-text'"></i>
         </button>
@@ -51,7 +51,7 @@
           class="btn-floating btn-large waves-effect waves-light tooltipped"
           data-position="left" data-delay="0" data-tooltip="画门模式"
           :class="mode === 'door' ? 'green' : 'white'"
-          @click="mode = 'door'"
+          @click="changeMode('door')"
         >
           <i class="icon-directions_run" :class="mode === 'door' ? 'white-text' : 'black-text'"></i>
         </button>
@@ -61,7 +61,7 @@
           class="btn-floating btn-large waves-effect waves-light tooltipped"
           data-position="left" data-delay="0" data-tooltip="画窗模式"
           :class="mode === 'window' ? 'blue' : 'white'"
-          @click="mode = 'window'"
+          @click="changeMode('window')"
         >
           <i class="icon-wb_sunny" :class="mode === 'window' ? 'white-text' : 'black-text'"></i>
         </button>
@@ -148,6 +148,11 @@ export default {
           visibility: 'visible',
           locked: false,
           opacity: 30
+        },
+        wall: {
+          stroke: '#00bcd4',
+          strokeWidth: 5,
+          strokeLinecap: 'round'
         }
       },
       elementUtilsType: null,
@@ -164,6 +169,8 @@ export default {
         return
       }
       this.mode = nextMode
+      console.error('boring')
+      this.clickControls.reset()
     },
 
     showElementUtils(elem) {
@@ -282,7 +289,7 @@ export default {
     },
 
     onDrawLine() {
-      const { mousePos, svg, drawingLine } = this
+      const { mousePos, svg, drawingLine, configs } = this
       let x1 = mousePos.x
       let y1 = mousePos.y
       let x2 = mousePos.x
@@ -299,9 +306,7 @@ export default {
 
       this.drawingLine = svg.line(x1, y1, x2, y2)
       .attr({
-        stroke: '#00bcd4',
-        strokeWidth: 5,
-        strokeLinecap: 'round',
+        ...configs.wall,
         'class': 'wall',
         id: `wall-${this.wallCount}`
       })
