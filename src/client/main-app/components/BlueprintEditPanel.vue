@@ -16,6 +16,36 @@
       <div class="blueprint-edit-panel__utils__item">
         <button
           class="btn-floating btn-large waves-effect waves-light tooltipped"
+          data-position="left" data-delay="0" data-tooltip="画墙模式"
+          :class="mode === 'wall' ? 'yellow darken-2' : 'white'"
+          @click="changeMode('wall')"
+        >
+          <i class="icon-border_style" :class="mode === 'wall' ? 'white-text' : 'black-text'"></i>
+        </button>
+      </div>
+      <div class="blueprint-edit-panel__utils__item">
+        <button
+          class="btn-floating btn-large waves-effect waves-light tooltipped"
+          data-position="left" data-delay="0" data-tooltip="画门模式"
+          :class="mode === 'door' ? 'green' : 'white'"
+          @click="changeMode('door')"
+        >
+          <i class="icon-directions_run" :class="mode === 'door' ? 'white-text' : 'black-text'"></i>
+        </button>
+      </div>
+      <div class="blueprint-edit-panel__utils__item">
+        <button
+          class="btn-floating btn-large waves-effect waves-light tooltipped"
+          data-position="left" data-delay="0" data-tooltip="画窗模式"
+          :class="mode === 'window' ? 'blue' : 'white'"
+          @click="changeMode('window')"
+        >
+          <i class="icon-wb_sunny" :class="mode === 'window' ? 'white-text' : 'black-text'"></i>
+        </button>
+      </div>
+      <div class="blueprint-edit-panel__utils__item">
+        <button
+          class="btn-floating btn-large waves-effect waves-light tooltipped"
           data-position="left" data-delay="0" data-tooltip="背景"
           :class="mode === 'background' ? 'red' : 'white'"
           @click="changeMode('background')"
@@ -51,36 +81,6 @@
             <i class="{{ configs.background.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off' }}"></i>
           </button>
         </div>
-      </div>
-      <div class="blueprint-edit-panel__utils__item">
-        <button
-          class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="left" data-delay="0" data-tooltip="画墙模式"
-          :class="mode === 'wall' ? 'yellow darken-2' : 'white'"
-          @click="changeMode('wall')"
-        >
-          <i class="icon-border_style" :class="mode === 'wall' ? 'white-text' : 'black-text'"></i>
-        </button>
-      </div>
-      <div class="blueprint-edit-panel__utils__item">
-        <button
-          class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="left" data-delay="0" data-tooltip="画门模式"
-          :class="mode === 'door' ? 'green' : 'white'"
-          @click="changeMode('door')"
-        >
-          <i class="icon-directions_run" :class="mode === 'door' ? 'white-text' : 'black-text'"></i>
-        </button>
-      </div>
-      <div class="blueprint-edit-panel__utils__item">
-        <button
-          class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="left" data-delay="0" data-tooltip="画窗模式"
-          :class="mode === 'window' ? 'blue' : 'white'"
-          @click="changeMode('window')"
-        >
-          <i class="icon-wb_sunny" :class="mode === 'window' ? 'white-text' : 'black-text'"></i>
-        </button>
       </div>
     </div>
   </div>
