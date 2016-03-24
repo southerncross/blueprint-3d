@@ -29,10 +29,26 @@
         >
           <button
             class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="top" data-delay="0" data-tooltip="添加背景"
+            data-position="right" data-delay="0" data-tooltip="添加背景"
             @click="loadBackgroundImg"
           >
             <i class="icon-image"></i>
+          </button>
+          <button
+            v-show="configs.background.elem"
+            class="waves-effect waves-teal btn-flat tooltipped"
+            data-position="right" data-delay="0" data-tooltip="锁定"
+            @click="onToggleBackgroundImgLockStatus"
+          >
+            <i class="{{ configs.background.locked ? 'icon-lock' : 'icon-lock_open' }}"></i>
+          </button>
+          <button
+            v-show="configs.background.elem"
+            class="waves-effect waves-teal btn-flat tooltipped"
+            data-position="right" data-delay="0" data-tooltip="可见性"
+            @click="onToggleBackgroundImgVisibility"
+          >
+            <i class="{{ configs.background.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off' }}"></i>
           </button>
         </div>
       </div>
@@ -71,30 +87,6 @@
   <div>{{'x=' + mousePos.x + ', y=' + mousePos.y}}</div>
   <div class="blueprint-edit-panel__element-utils__container">
     <div v-show="elementUtilsType === 'background'" transition="slide-bottom-to-top">
-      <div
-        class="blueprint-edit-panel__element-utils__item"
-        transition="fade"
-      >
-        <button
-          class="waves-effect waves-teal btn-flat tooltipped"
-          data-position="top" data-delay="0" data-tooltip="可见性"
-          @click="onBackgroundImgVisibilityChange"
-        >
-          <i class="{{configs.background.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off'}}"></i>
-        </button>
-      </div>
-      <div
-        class="blueprint-edit-panel__element-utils__item"
-        transition="fade"
-      >
-        <button
-          class="waves-effect waves-teal btn-flat tooltipped"
-          data-position="top" data-delay="0" data-tooltip="编辑锁定"
-          @click="configs.background.locked = !configs.background.locked"
-        >
-          <i class="{{configs.background.locked ? 'icon-lock' : 'icon-lock_open'}}"></i>
-        </button>
-      </div>
       <div
         class="blueprint-edit-panel__element-utils__item"
         transition="fade"
@@ -170,6 +162,7 @@ export default {
         return
       }
       this.mode = nextMode
+      this.elementUtilsType = null
       this.clickControls.reset()
     },
 
@@ -186,10 +179,16 @@ export default {
       input.click()
     },
 
-    onBackgroundImgVisibilityChange() {
+    onToggleBackgroundImgVisibility() {
       const { background } = this.configs
       background.visibility = background.visibility === 'visible' ? 'hidden' : 'visible'
       background.elem.attr({ visibility: background.visibility })
+    },
+
+    onToggleBackgroundImgLockStatus() {
+      const { background } = this.configs
+      background.locked = !background.locked
+      background.elem.data({ 'locked': background.locked })
     },
 
     onBackgroundImgOpacityChange(event) {
@@ -217,9 +216,10 @@ export default {
       })
       .data({ elementType: 'background' })
       .click(this.onElementClick)
+
       desc.after(background.elem)
-      this.mode = 'select'
-      this.clickControls.click(background.elem)
+
+      this.changeMode('select')
     },
 
     onCanvasClick(event) {
