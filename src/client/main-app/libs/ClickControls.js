@@ -1,7 +1,7 @@
 import Snap from 'Snap'
 
 class ClickControls {
-  constructor(svg) {
+  constructor({ svg }) {
     this.svg = svg
     this.elements = []
     this.resizers = []

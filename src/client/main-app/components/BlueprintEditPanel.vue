@@ -22,6 +22,28 @@
         >
           <i class="icon-border_style" :class="mode === 'wall' ? 'white-text' : 'black-text'"></i>
         </button>
+        <div
+          v-show="mode === 'wall'"
+          class="blueprint-edit-panel__utils__item__sub-utils"
+          transition="slide-right-to-left"
+        >
+          <button
+            v-show="configs.wall.elems.length > 0"
+            class="waves-effect waves-teal btn-flat tooltipped"
+            data-position="right" data-delay="0" data-tooltip="锁定"
+            @click="onToggleWallLockStatus"
+          >
+            <i class="{{ configs.wall.locked ? 'icon-lock' : 'icon-lock_open' }}"></i>
+          </button>
+          <button
+            v-show="configs.wall.elems.length > 0"
+            class="waves-effect waves-teal btn-flat tooltipped"
+            data-position="right" data-delay="0" data-tooltip="可见性"
+            @click="onToggleWallVisibility"
+          >
+            <i class="{{ configs.wall.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off' }}"></i>
+          </button>
+        </div>
       </div>
       <div class="blueprint-edit-panel__utils__item">
         <button
@@ -84,7 +106,6 @@
       </div>
     </div>
   </div>
-  <div>{{'x=' + mousePos.x + ', y=' + mousePos.y}}</div>
   <div class="blueprint-edit-panel__element-utils__container">
     <div v-show="elementUtilsType === 'background'" transition="slide-bottom-to-top">
       <div
@@ -113,7 +134,9 @@
 
 <script>
 import $ from 'jquery'
+
 import ClickControls from '../libs/ClickControls'
+import WallPainter from '../libs/WallPainter'
 
 export default {
   name: 'BlueprintEditPanel',
@@ -143,9 +166,9 @@ export default {
           opacity: 30
         },
         wall: {
-          stroke: '#00bcd4',
-          strokeWidth: 5,
-          strokeLinecap: 'round'
+          elems: [],
+          visibility: 'visible',
+          locked: false
         }
       },
       elementUtilsType: null,
@@ -164,6 +187,7 @@ export default {
       this.mode = nextMode
       this.elementUtilsType = null
       this.clickControls.reset()
+      this.wallPainter.cancel()
     },
 
     showElementUtils(elem) {
@@ -181,7 +205,7 @@ export default {
 
     onToggleBackgroundImgVisibility() {
       const { background } = this.configs
-      background.visibility = background.visibility === 'visible' ? 'hidden' : 'visible'
+      background.visibility = (background.visibility === 'visible') ? 'hidden' : 'visible'
       background.elem.attr({ visibility: background.visibility })
     },
 
@@ -222,15 +246,34 @@ export default {
       this.changeMode('select')
     },
 
+    onToggleWallVisibility() {
+      const { wall } = this.configs
+      wall.visibility = (wall.visibility === 'visible') ? 'hidden' : 'visible'
+      wall.elems.forEach((elem) => {
+        elem.attr({ visibility: wall.visibility })
+      })
+    },
+
+    onToggleWallLockStatus() {
+      const { wall } = this.configs
+      wall.locked = !wall.locked
+      wall.elems.forEach((elem) => {
+        elem.data({ 'locked': wall.locked })
+      })
+    },
+
     onCanvasClick(event) {
       switch (this.mode) {
-        case 'select':
+        case 'select': {
           this.clickControls.reset()
           this.hideElementUtils()
           break
-        case 'wall':
-          this.onDrawLine(event)
+        }
+        case 'wall': {
+          const wall = this.wallPainter.draw().click(this.onElementClick)
+          this.configs.wall.elems.push(wall)
           break
+        }
         case 'door':
           break
         case 'window':
@@ -253,80 +296,31 @@ export default {
       event.stopPropagation()
       this.clickControls.click(elem)
       this.showElementUtils(elem)
-    },
-
-    onMousemove(event) {
-      const { mousePos, drawingLine } = this
-      mousePos.x = event.offsetX
-      mousePos.y = event.offsetY
-      if (drawingLine) {
-        const x1 = Number(drawingLine.attr('x1'))
-        const y1 = Number(drawingLine.attr('y1'))
-        const deltaX = Math.abs(mousePos.x - x1)
-        const deltaY = Math.abs(mousePos.y - y1)
-        if (deltaX > deltaY) {
-          drawingLine.attr({
-            x2: mousePos.x,
-            y2: y1
-          })
-        } else {
-          drawingLine.attr({
-            x2: x1,
-            y2: mousePos.y
-          })
-        }
-      }
-    },
-
-    onKeydown(event) {
-      // Esc
-      if (event.keyCode === 27) {
-        if (this.drawingLine) {
-          this.drawingLine.remove()
-          this.drawingLine = null
-        }
-      }
-    },
-
-    onDrawLine() {
-      const { mousePos, svg, drawingLine, configs } = this
-      let x1 = mousePos.x
-      let y1 = mousePos.y
-      let x2 = mousePos.x
-      let y2 = mousePos.y
-
-      if (drawingLine) {
-        drawingLine.attr({
-          stroke: '#006064'
-        })
-        .click(this.onElementClick)
-        x1 = Number(drawingLine.attr('x2'))
-        y1 = Number(drawingLine.attr('y2'))
-      }
-
-      this.drawingLine = svg.line(x1, y1, x2, y2)
-      .attr(Object.assign({}, JSON.parse(JSON.stringify(configs.wall)), {
-        class: 'wall',
-        id: `wall-${this.wallCount}`
-      }))
-      this.wallCount++
     }
   },
 
   ready() {
+    // Init materializeCss tooltip
     $('.tooltipped').tooltip()
-    this.clickControls = new ClickControls(this.svg)
+
+    // Init SVG canvas
+    this.svg.attr({ 'class': 'card blue-grey lighten-5' }).click(this.onCanvasClick)
     document.getElementById('blueprint-edit-panel__svg__container').appendChild(this.svg.node)
-    this.svg.attr({ 'class': 'card blue-grey lighten-5' })
-    this.svg.click(this.onCanvasClick)
-    this.svg.mousemove(this.onMousemove)
-    document.addEventListener('keydown', this.onKeydown)
+
+    // Init ClickControls
+    this.clickControls = new ClickControls({ svg: this.svg })
+
+    // Init WallPainter
+    this.wallPainter = new WallPainter({ svg: this.svg })
+    this.wallPainter.init()
   },
 
   beforeDestroy() {
-    document.removeEventListener('keydown', this.onKeydown)
+    // Uninit SVG canvas
     this.svg.unclick(this.onDrawLine)
-    this.svg.unmousemove(this.onMousemove)
+
+    // Uninit WallPainter
+    this.wallPainter.uninit()
   }
 }
 </script>
