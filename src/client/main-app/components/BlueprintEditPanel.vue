@@ -12,6 +12,28 @@
         >
           <i class="icon-call_made" :class="mode === 'select' ? 'white-text' : 'black-text'"></i>
         </button>
+        <div
+          v-show="mode === 'select'"
+          class="blueprint-edit-panel__utils__item__sub-utils"
+          transition="slide-right-to-left"
+        >
+          <button
+            v-show="configs.wall.elems.length > 0"
+            class="waves-effect waves-teal btn-flat tooltipped"
+            data-position="right" data-delay="0" data-tooltip="选中所有墙面"
+            @click="onSelectAllWalls"
+          >
+            <i class="icon-apps white-text yellow darken-2"></i>
+          </button>
+          <button
+            v-show="configs.background.elem"
+            class="waves-effect waves-teal btn-flat tooltipped"
+            data-position="right" data-delay="0" data-tooltip="选中背景图"
+            @click="onSelectBackgroundImg"
+          >
+            <i class="icon-apps white-text red"></i>
+          </button>
+        </div>
       </div>
       <div class="blueprint-edit-panel__utils__item">
         <button
@@ -123,6 +145,13 @@
         </span>
       </div>
     </div>
+    <div v-show="elementUtilsType === 'line'" transition="slide-bottom-to-top">
+      <div
+        class="blueprint-edit-panel__element-utils__item"
+        transition="fade"
+      >
+      </div>
+    </div>
   </div>
   <input
     id="blueprint-edit-panel__background-input"
@@ -198,6 +227,11 @@ export default {
       this.elementUtilsType = null
     },
 
+    onSelectBackgroundImg() {
+      const image = this.svg.select('image')
+      this.clickControls.click(image)
+    },
+
     loadBackgroundImg() {
       const input = document.getElementById('blueprint-edit-panel__background-input')
       input.click()
@@ -244,6 +278,11 @@ export default {
       desc.after(background.elem)
 
       this.changeMode('select')
+    },
+
+    onSelectAllWalls() {
+      const walls = this.svg.selectAll('.wall')
+      this.clickControls.click(walls)
     },
 
     onToggleWallVisibility() {

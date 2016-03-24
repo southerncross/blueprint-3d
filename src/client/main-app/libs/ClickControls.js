@@ -5,9 +5,10 @@ class ClickControls {
     this.svg = svg
     this.elements = []
     this.resizers = []
+    this.multiMode = false
 
-    this.__multiClick = this.__multiClick.bind(this)
-    this.__singleClick = this.__singleClick.bind(this)
+    this.__appendClick = this.__appendClick.bind(this)
+    this.__replaceClick = this.__replaceClick.bind(this)
     this.__addElement = this.__addElement.bind(this)
     this.__clearElements = this.__clearElements.bind(this)
     this.__clearResizers = this.__clearResizers.bind(this)
@@ -18,38 +19,59 @@ class ClickControls {
     this.__onElementMoveCreator = this.__onElementMoveCreator.bind(this)
     this.__onElementDragStartCreator = this.__onElementDragStartCreator.bind(this)
     this.__onElementDragEndCreator = this.__onElementDragEndCreator.bind(this)
+
+    this.__onMultiElementsMoveCreator = this.__onMultiElementsMoveCreator.bind(this)
+    this.__onMultiElementsStartCreator = this.__onMultiElementsStartCreator.bind(this)
+    this.__onMultiElementsEndCreator = this.__onMultiElementsEndCreator.bind(this)
+
     this.__onResizerDragMoveCreator = this.__onResizerDragMoveCreator.bind(this)
     this.__onResizerDragStartCreator = this.__onResizerDragStartCreator.bind(this)
     this.__onResizerDragEndCreator = this.__onResizerDragEndCreator.bind(this)
+
     this.__onPositionResizerDragMoveCreator = this.__onPositionResizerDragMoveCreator.bind(this)
     this.__onPositionResizerDragStartCreator = this.__onPositionResizerDragStartCreator.bind(this)
     this.__onPositionResizerDragEndCreator = this.__onPositionResizerDragEndCreator.bind(this)
   }
 
   reset() {
-    this.__clearElements()
-    this.__clearResizers()
+    if (this.elements.length > 0) {
+      this.__clearElements()
+      this.__clearResizers()
+    }
   }
 
   click(elem) {
+    if (!elem) {
+      return
+    }
+
     if (this.multiMode && this.elements.length > 0) {
-      this.__multiClick(elem)
+      this.__appendClick(elem)
     } else {
-      this.__singleClick(elem)
+      this.__replaceClick(elem)
     }
   }
 
-  __multiClick(elem) {
+  __appendClick(elems) {
   }
 
-  __singleClick(elem) {
-    if (this.elements.length > 0) {
-      this.reset()
-    }
+  __replaceClick(elem) {
+    this.reset()
 
-    elem.drag(this.__onElementMoveCreator(), this.__onElementDragStartCreator(), this.__onElementDragEndCreator())
-    this.__addResizers(elem)
-    this.__addElement(elem)
+    if (elem.type === 'set') {
+      elem.forEach((e) => {
+        e.drag(
+          this.__onMultiElementsMoveCreator(),
+          this.__onMultiElementsStartCreator(),
+          this.__onMultiElementsEndCreator()
+        )
+        this.__addElement(e)
+      })
+    } else {
+      elem.drag(this.__onElementMoveCreator(), this.__onElementDragStartCreator(), this.__onElementDragEndCreator())
+      this.__addResizers(elem)
+      this.__addElement(elem)
+    }
   }
 
   __onElementMoveCreator() {
@@ -119,6 +141,24 @@ class ClickControls {
           }
         }
       }
+    }
+  }
+
+  __onMultiElementsMoveCreator() {
+    return function(dx, dy) {
+      // TODO
+    }
+  }
+
+  __onMultiElementsStartCreator() {
+    return function() {
+      // TODO
+    }
+  }
+
+  __onMultiElementsEndCreator() {
+    return function() {
+      // TODO
     }
   }
 
