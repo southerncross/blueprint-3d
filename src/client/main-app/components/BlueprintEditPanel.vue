@@ -120,6 +120,7 @@
 </template>
 
 <script>
+import $ from 'jquery'
 import ClickControls from '../libs/ClickControls'
 
 export default {
@@ -169,7 +170,6 @@ export default {
         return
       }
       this.mode = nextMode
-      console.error('boring')
       this.clickControls.reset()
     },
 
@@ -305,11 +305,10 @@ export default {
       }
 
       this.drawingLine = svg.line(x1, y1, x2, y2)
-      .attr({
-        ...configs.wall,
-        'class': 'wall',
+      .attr(Object.assign({}, JSON.parse(JSON.stringify(configs.wall)), {
+        class: 'wall',
         id: `wall-${this.wallCount}`
-      })
+      }))
       this.wallCount++
     }
   },

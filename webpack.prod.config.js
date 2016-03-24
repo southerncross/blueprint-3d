@@ -84,6 +84,7 @@ module.exports = {
   ],
   externals: {
     THREE: 'THREE',
-    Snap: 'Snap'
+    Snap: 'Snap',
+    jquery: 'jQuery'
   }
 }
