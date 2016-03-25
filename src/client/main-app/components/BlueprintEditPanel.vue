@@ -200,11 +200,9 @@ export default {
           locked: false
         }
       },
+      selectorBox: null,
       elementUtilsType: null,
-      mousePos: { x: -1, y: -1 },
-      drawingLine: null,
-      wallCount: 0,
-      clickedElement: null
+      mouseDown: false,
     }
   },
 
@@ -301,11 +299,22 @@ export default {
       })
     },
 
-    onCanvasClick(event) {
+    onMousedown(event) {
       switch (this.mode) {
         case 'select': {
           this.clickControls.reset()
           this.hideElementUtils()
+          this.selectorBox
+          .attr({
+            x: event.offsetX,
+            y: event.offsetY,
+            width: 0,
+            height: 0,
+            display: 'block'
+          })
+          .data('x', event.offsetX)
+          .data('y', event.offsetY)
+          this.mouseDown = true
           break
         }
         case 'wall': {
@@ -320,6 +329,31 @@ export default {
         default:
           break
       }
+    },
+
+    onMousemove(event) {
+      if (!this.mouseDown) {
+        return
+      }
+      const oldX = parseInt(this.selectorBox.data('x'))
+      const oldY = parseInt(this.selectorBox.data('y'))
+      const newX = event.offsetX
+      const newY = event.offsetY
+      const width = Math.abs(oldX - newX)
+      const height = Math.abs(oldY - newY)
+      this.selectorBox.attr({
+        x: Math.min(oldX, newX),
+        y: Math.min(oldY, newY),
+        width,
+        height
+      })
+    },
+
+    onMouseup(event) {
+      this.mouseDown = false
+      this.selectorBox.attr({
+        display: 'none'
+      })
     },
 
     onElementClick(event) {
@@ -343,8 +377,24 @@ export default {
     $('.tooltipped').tooltip()
 
     // Init SVG canvas
-    this.svg.attr({ 'class': 'card blue-grey lighten-5' }).click(this.onCanvasClick)
+    this.svg
+    .attr({ 'class': 'card blue-grey lighten-5' })
+    .mousedown(this.onMousedown)
+    .mousemove(this.onMousemove)
+    .mouseup(this.onMouseup)
     document.getElementById('blueprint-edit-panel__svg__container').appendChild(this.svg.node)
+
+    // Add selector box
+    this.selectorBox = this.svg
+    .rect(0, 0, 0, 0)
+    .attr({
+      class: 'selector-box',
+      id: 'selector-box',
+      stroke: 'red',
+      fill: 'transparent',
+      strokeDasharray: "5, 5",
+      display: 'none'
+    })
 
     // Init ClickControls
     this.clickControls = new ClickControls({ svg: this.svg })
@@ -357,7 +407,11 @@ export default {
 
   beforeDestroy() {
     // Uninit SVG canvas
-    this.svg.unclick(this.onDrawLine)
+    this.svg
+    .unclick(this.onDrawLine)
+    .unmousedown(this.onMousedown)
+    .unmousemove(this.onMousemove)
+    .unmouseup(this.onMouseup)
 
     // Uninit WallPainter
     this.wallPainter.uninit()
