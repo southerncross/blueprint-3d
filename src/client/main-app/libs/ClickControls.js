@@ -5,10 +5,7 @@ class ClickControls {
     this.svg = svg
     this.elements = []
     this.resizers = []
-    this.multiMode = false
 
-    this.__appendClick = this.__appendClick.bind(this)
-    this.__replaceClick = this.__replaceClick.bind(this)
     this.__addElement = this.__addElement.bind(this)
     this.__clearElements = this.__clearElements.bind(this)
     this.__clearResizers = this.__clearResizers.bind(this)
@@ -16,13 +13,9 @@ class ClickControls {
     this.__addLineResizers = this.__addLineResizers.bind(this)
     this.__addImageResizers = this.__addImageResizers.bind(this)
 
-    this.__onElementMoveCreator = this.__onElementMoveCreator.bind(this)
+    this.__onElementDragMoveCreator = this.__onElementDragMoveCreator.bind(this)
     this.__onElementDragStartCreator = this.__onElementDragStartCreator.bind(this)
     this.__onElementDragEndCreator = this.__onElementDragEndCreator.bind(this)
-
-    this.__onMultiElementsMoveCreator = this.__onMultiElementsMoveCreator.bind(this)
-    this.__onMultiElementsStartCreator = this.__onMultiElementsStartCreator.bind(this)
-    this.__onMultiElementsEndCreator = this.__onMultiElementsEndCreator.bind(this)
 
     this.__onResizerDragMoveCreator = this.__onResizerDragMoveCreator.bind(this)
     this.__onResizerDragStartCreator = this.__onResizerDragStartCreator.bind(this)
@@ -40,50 +33,57 @@ class ClickControls {
     }
   }
 
-  click(elem) {
+  click(elem, append = false) {
     if (!elem) {
       return
     }
 
-    if (this.multiMode && this.elements.length > 0) {
-      this.__appendClick(elem)
-    } else {
-      this.__replaceClick(elem)
-    }
-  }
-
-  __appendClick(elems) {
-  }
-
-  __replaceClick(elem) {
-    this.reset()
-
-    if (elem.type === 'set') {
+    const idSet = new Set()
+    this.elements.forEach((e) => idSet.add(e.attr('id')))
+    let elems = []
+    if (elem.type === 'set' || Array.isArray(elem)) {
       elem.forEach((e) => {
-        e.drag(
-          this.__onMultiElementsMoveCreator(),
-          this.__onMultiElementsStartCreator(),
-          this.__onMultiElementsEndCreator()
-        )
-        this.__addElement(e)
+        if (!idSet.has(e.attr('id'))) {
+          elems.push(e)
+        }
       })
     } else {
-      elem.drag(this.__onElementMoveCreator(), this.__onElementDragStartCreator(), this.__onElementDragEndCreator())
-      this.__addResizers(elem)
-      this.__addElement(elem)
+      if (!idSet.has(elem.attr('id'))) {
+        elems.push(elem)
+      }
+    }
+    if (elems.length === 0) {
+      return
+    }
+
+    if (!append) {
+      this.reset()
+    }
+
+    elems.forEach((e) => {
+      e.drag(
+        this.__onElementDragMoveCreator(),
+        this.__onElementDragStartCreator(),
+        this.__onElementDragEndCreator()
+      )
+      this.__addElement(e)
+    })
+
+    if (this.elements.length === 1) {
+      this.__addResizers(this.elements[0])
+    } else {
+      this.__clearResizers()
     }
   }
 
-  __onElementMoveCreator() {
+  __onElementDragMoveCreator() {
     const that = this
     return function(dx, dy) {
-      if (that.multiMode && that.elements.length > 0) {
-        // TODO
-      } else {
-        switch (this.type) {
+      that.elements.forEach((elem) => {
+        switch (elem.type) {
           case 'line': {
-            const { x1, y1, x2, y2 } = this.data('originPosition')
-            this.attr({
+            const { x1, y1, x2, y2 } = elem.data('originPosition')
+            elem.attr({
               x1: x1 + dx,
               y1: y1 + dy,
               x2: x2 + dx,
@@ -92,73 +92,55 @@ class ClickControls {
             break
           }
           default:
-            this.transform(new Snap.Matrix().translate(dx, dy))
+            elem.transform(new Snap.Matrix().translate(dx, dy))
             break
         }
-      }
+      })
     }
   }
 
   __onElementDragStartCreator() {
     const that = this
     return function() {
-      if (that.multiMode && that.elements.length > 0) {
-        // TODO
-      } else {
-        that.__clearResizers()
-        switch (this.type) {
+      that.__clearResizers()
+      that.elements.forEach((elem) => {
+        switch (elem.type) {
           case 'line': {
-            const x1 = parseFloat(this.attr('x1'))
-            const y1 = parseFloat(this.attr('y1'))
-            const x2 = parseFloat(this.attr('x2'))
-            const y2 = parseFloat(this.attr('y2'))
-            this.data('originPosition', { x1, y1, x2, y2 })
+            const x1 = parseFloat(elem.attr('x1'))
+            const y1 = parseFloat(elem.attr('y1'))
+            const x2 = parseFloat(elem.attr('x2'))
+            const y2 = parseFloat(elem.attr('y2'))
+            elem.data('originPosition', { x1, y1, x2, y2 })
             break
           }
           default:
             break
         }
-      }
+      })
     }
   }
 
   __onElementDragEndCreator() {
     const that = this
     return function() {
-      if (!that.multiMode) {
-        that.__addResizers(this)
-        switch (this.type) {
+      that.elements.forEach((elem) => {
+        if (that.elements.length === 1) {
+          that.__addResizers(elem)
+        }
+        switch (elem.type) {
           case 'line':
             break
           default: {
-            const bbox = this.getBBox()
-            this.attr({
+            const bbox = elem.getBBox()
+            elem.attr({
               x: bbox.x,
               y: bbox.y
             })
-            this.transform('')
+            elem.transform('')
             break
           }
         }
-      }
-    }
-  }
-
-  __onMultiElementsMoveCreator() {
-    return function(dx, dy) {
-      // TODO
-    }
-  }
-
-  __onMultiElementsStartCreator() {
-    return function() {
-      // TODO
-    }
-  }
-
-  __onMultiElementsEndCreator() {
-    return function() {
-      // TODO
+      })
     }
   }
 
@@ -242,18 +224,16 @@ class ClickControls {
   __onResizerDragEndCreator() {
     const that = this
     return function() {
-      if (!that.multiMode) {
-        const elem = this.data('elem')
-        const bbox = elem.getBBox()
-        elem.attr({
-          x: bbox.x,
-          y: bbox.y,
-          width: bbox.width,
-          height: bbox.height
-        })
-        elem.transform('')
-        that.__addResizers(elem)
-      }
+      const elem = this.data('elem')
+      const bbox = elem.getBBox()
+      elem.attr({
+        x: bbox.x,
+        y: bbox.y,
+        width: bbox.width,
+        height: bbox.height
+      })
+      elem.transform('')
+      that.__addResizers(elem)
     }
   }
 
