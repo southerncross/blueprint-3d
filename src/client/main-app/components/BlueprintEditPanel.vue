@@ -348,6 +348,7 @@ export default {
 
     // Init ClickControls
     this.clickControls = new ClickControls({ svg: this.svg })
+    this.clickControls.init()
 
     // Init WallPainter
     this.wallPainter = new WallPainter({ svg: this.svg })
@@ -360,6 +361,9 @@ export default {
 
     // Uninit WallPainter
     this.wallPainter.uninit()
+
+    // Uninit ClickControls
+    this.clickControls.uninit()
   }
 }
 </script>

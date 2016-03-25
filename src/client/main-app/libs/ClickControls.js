@@ -5,7 +5,10 @@ class ClickControls {
     this.svg = svg
     this.elements = []
     this.resizers = []
+    this.multiMode = false
 
+    this.__onKeydown = this.__onKeydown.bind(this)
+    this.__onKeyup = this.__onKeyup.bind(this)
     this.__addElement = this.__addElement.bind(this)
     this.__clearElements = this.__clearElements.bind(this)
     this.__clearResizers = this.__clearResizers.bind(this)
@@ -24,6 +27,16 @@ class ClickControls {
     this.__onPositionResizerDragMoveCreator = this.__onPositionResizerDragMoveCreator.bind(this)
     this.__onPositionResizerDragStartCreator = this.__onPositionResizerDragStartCreator.bind(this)
     this.__onPositionResizerDragEndCreator = this.__onPositionResizerDragEndCreator.bind(this)
+  }
+
+  init() {
+    document.addEventListener('keydown', this.__onKeydown)
+    document.addEventListener('keyup', this.__onKeyup)
+  }
+
+  uninit() {
+    document.removeEventListener('keydown', this.__onKeydown)
+    document.removeEventListener('keyup', this.__onKeyup)
   }
 
   reset() {
@@ -56,7 +69,7 @@ class ClickControls {
       return
     }
 
-    if (!append) {
+    if (!(append || this.multiMode)) {
       this.reset()
     }
 
@@ -371,6 +384,20 @@ class ClickControls {
       )
     })
     this.resizers.push(...edgeResizers)
+  }
+
+  __onKeydown(event) {
+    // Shift
+    if (event.shiftKey || event.keyIdentifier === 'Shift' || event.keyCode === 16) {
+      this.multiMode = true
+    }
+  }
+
+  __onKeyup(event) {
+    // Shift
+    if (event.shiftKey || event.keyIdentifier === 'Shift' || event.keyCode === 16) {
+      this.multiMode = false
+    }
   }
 }
 
