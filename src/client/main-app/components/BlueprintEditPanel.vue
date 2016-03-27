@@ -202,7 +202,7 @@ export default {
       },
       selectorBox: null,
       elementUtilsType: null,
-      mouseDown: false,
+      mouseDown: false
     }
   },
 
@@ -392,7 +392,7 @@ export default {
       id: 'selector-box',
       stroke: 'red',
       fill: 'transparent',
-      strokeDasharray: "5, 5",
+      strokeDasharray: '5, 5',
       display: 'none'
     })
 
