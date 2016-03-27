@@ -1,4 +1,4 @@
-import { makeId } from './utils'
+import { makeId } from '../utils'
 
 class WallPainter {
   constructor({ svg }) {

@@ -1,6 +1,6 @@
 import THREE from 'THREE'
 
-import '../../vendors/OrbitControls'
+import '../../../vendors/OrbitControls'
 
 class OrbitControl {
   constructor({ camera }) {

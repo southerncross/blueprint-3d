@@ -164,8 +164,8 @@
 <script>
 import $ from 'jquery'
 
-import SelectControl from '../libs/SelectControl'
-import WallPainter from '../libs/WallPainter'
+import SelectControl from '../libs/svg/SelectControl'
+import WallPainter from '../libs/svg/WallPainter'
 
 export default {
   name: 'BlueprintEditPanel',
