@@ -1,6 +1,6 @@
 import Snap from 'Snap'
 
-class ClickControls {
+class SelectControl {
   constructor({ svg }) {
     this.svg = svg
     this.elements = []
@@ -46,9 +46,13 @@ class ClickControls {
     }
   }
 
-  click(elem, append = false) {
+  select(elem, append = false) {
     if (!elem) {
       return
+    }
+
+    if (!(append || this.multiMode)) {
+      this.reset()
     }
 
     const idSet = new Set()
@@ -69,10 +73,6 @@ class ClickControls {
       return
     }
 
-    if (!(append || this.multiMode)) {
-      this.reset()
-    }
-
     elems.forEach((e) => {
       e.drag(
         this.__onElementDragMoveCreator(),
@@ -87,6 +87,10 @@ class ClickControls {
     } else {
       this.__clearResizers()
     }
+  }
+
+  get isMultiMode() {
+    return this.multiMode
   }
 
   __onElementDragMoveCreator() {
@@ -401,4 +405,4 @@ class ClickControls {
   }
 }
 
-export default ClickControls
+export default SelectControl

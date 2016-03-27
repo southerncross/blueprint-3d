@@ -164,7 +164,7 @@
 <script>
 import $ from 'jquery'
 
-import ClickControls from '../libs/ClickControls'
+import SelectControl from '../libs/SelectControl'
 import WallPainter from '../libs/WallPainter'
 
 export default {
@@ -213,7 +213,7 @@ export default {
       }
       this.mode = nextMode
       this.elementUtilsType = null
-      this.clickControls.reset()
+      this.selectControl.reset()
       this.wallPainter.cancel()
     },
 
@@ -227,7 +227,7 @@ export default {
 
     onSelectBackgroundImg() {
       const image = this.svg.select('image')
-      this.clickControls.click(image)
+      this.selectControl.select(image)
     },
 
     loadBackgroundImg() {
@@ -271,7 +271,7 @@ export default {
         opacity: parseFloat(background.opacity) / 100
       })
       .data({ elementType: 'background' })
-      .click(this.onElementClick)
+      .mousedonw(this.onElementMousedown)
 
       desc.after(background.elem)
 
@@ -280,7 +280,7 @@ export default {
 
     onSelectAllWalls() {
       const walls = this.svg.selectAll('.wall')
-      this.clickControls.click(walls)
+      this.selectControl.select(walls)
     },
 
     onToggleWallVisibility() {
@@ -302,7 +302,7 @@ export default {
     onMousedown(event) {
       switch (this.mode) {
         case 'select': {
-          this.clickControls.reset()
+          this.selectControl.reset()
           this.hideElementUtils()
           this.selectorBox
           .attr({
@@ -318,7 +318,7 @@ export default {
           break
         }
         case 'wall': {
-          const wall = this.wallPainter.draw().click(this.onElementClick)
+          const wall = this.wallPainter.draw().mousedown(this.onElementMousedown)
           this.configs.wall.elems.push(wall)
           break
         }
@@ -356,7 +356,7 @@ export default {
       })
     },
 
-    onElementClick(event) {
+    onElementMousedown(event) {
       if (this.mode !== 'select') {
         return
       }
@@ -367,7 +367,7 @@ export default {
       }
 
       event.stopPropagation()
-      this.clickControls.click(elem)
+      this.selectControl.select(elem)
       this.showElementUtils(elem)
     }
   },
@@ -396,9 +396,9 @@ export default {
       display: 'none'
     })
 
-    // Init ClickControls
-    this.clickControls = new ClickControls({ svg: this.svg })
-    this.clickControls.init()
+    // Init selectControl
+    this.selectControl = new SelectControl({ svg: this.svg })
+    this.selectControl.init()
 
     // Init WallPainter
     this.wallPainter = new WallPainter({ svg: this.svg })
@@ -416,8 +416,8 @@ export default {
     // Uninit WallPainter
     this.wallPainter.uninit()
 
-    // Uninit ClickControls
-    this.clickControls.uninit()
+    // Uninit selectControl
+    this.selectControl.uninit()
   }
 }
 </script>
