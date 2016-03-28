@@ -86,6 +86,28 @@
         >
           <i class="icon-wb_sunny" :class="mode === 'window' ? 'white-text' : 'black-text'"></i>
         </button>
+        <div
+          v-show="mode === 'window'"
+          class="blueprint-edit-panel__utils__item__sub-utils"
+          transition="slide-right-to-left"
+        >
+          <button
+            v-show="configs.window.elems.length > 0"
+            class="waves-effect waves-teal btn-flat tooltipped"
+            data-position="right" data-delay="0" data-tooltip="锁定"
+            @click="onToggleWindowLockStatus"
+          >
+            <i class="{{ configs.window.locked ? 'icon-lock' : 'icon-lock_open' }}"></i>
+          </button>
+          <button
+            v-show="configs.window.elems.length > 0"
+            class="waves-effect waves-teal btn-flat tooltipped"
+            data-position="right" data-delay="0" data-tooltip="可见性"
+            @click="onToggleWindowVisibility"
+          >
+            <i class="{{ configs.window.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off' }}"></i>
+          </button>
+        </div>
       </div>
       <div class="blueprint-edit-panel__utils__item">
         <button
@@ -307,6 +329,28 @@ export default {
       })
     },
 
+    onToggleWindowVisibility() {
+      const _window = this.configs.window
+      _window.visibility = (_window.visibility === 'visible') ? 'hidden' : 'visible'
+      _window.elems.forEach((elem) => {
+        elem.attr({ visibility: _window.visibility })
+      })
+    },
+
+    onToggleWindowLockStatus() {
+      const _window = this.configs.window
+      _window.locked = !_window.locked
+      _window.elem.data({ 'locked': _window.locked })
+    },
+
+    onSelectAllWindows() {
+      const _window = this.configs.window
+      _window.locked = !_window.locked
+      _window.elems.forEach((elem) => {
+        elem.data({ 'locked': _window.locked })
+      })
+    },
+
     onMousedown(event) {
       if (event.bypass) {
         return
@@ -522,7 +566,7 @@ export default {
         stroke: 'red'
       },
       drawingStyle: {
-        stroke: 'yellow',
+        stroke: 'yellow'
       },
       length: 50,
       className: 'window'

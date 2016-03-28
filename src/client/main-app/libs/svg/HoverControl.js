@@ -26,6 +26,7 @@ class HoverControl {
 
     this.cancel()
 
+    // TODO fix the bug that bbox may not reflect true line
     const strokeWidth = elem.attr('strokeWidth')
     const bbox = elem.getBBox()
     const x1 = Number(bbox.x)
