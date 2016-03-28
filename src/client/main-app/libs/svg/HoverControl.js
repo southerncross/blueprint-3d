@@ -19,7 +19,7 @@ class HoverControl {
     this.__onHoverElemMouseoutCreator = this.__onHoverElemMouseoutCreator.bind(this)
   }
 
-  hover(elem, event) {
+  hover(x, y, elem) {
     if (elem.attr('class') !== 'wall') {
       return
     }
@@ -27,8 +27,6 @@ class HoverControl {
     this.cancel()
 
     const strokeWidth = elem.attr('strokeWidth')
-    const x = event.offsetX
-    const y = event.offsetY
     const bbox = elem.getBBox()
     const x1 = Number(bbox.x)
     const y1 = Number(bbox.y)
@@ -75,6 +73,10 @@ class HoverControl {
   }
 
   sync(x, y, ownerElem) {
+    if (!this.hoverElem) {
+      return
+    }
+
     const bbox = ownerElem.getBBox()
     const x1 = Number(bbox.x)
     const y1 = Number(bbox.y)
@@ -126,16 +128,25 @@ class HoverControl {
 
   draw() {
     const elem = this.hoverElem
+    this.hoverElem = null
+    // Copy a new element, because we have to clean up mouse event handler
+    let copiedElem = null
     if (elem) {
-      elem
-      .attr(this.style)
+      copiedElem = this.svg.line(
+        elem.attr('x1'),
+        elem.attr('y1'),
+        elem.attr('x2'),
+        elem.attr('y2')
+      )
+      .attr(Object.assign({}, this.drawingStyle, this.style))
       .attr({
+        strokeWidth: elem.attr('strokeWidth'),
         class: this.className,
         id: `${this.className}-${makeId()}`
       })
+      elem.remove()
     }
-    this.hoverElem = null
-    return elem
+    return copiedElem
   }
 
   cancel() {

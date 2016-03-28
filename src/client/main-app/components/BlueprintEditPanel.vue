@@ -430,8 +430,11 @@ export default {
       if (elem.data('locked')) {
         return
       }
+      if (elem.attr('class') !== 'wall') {
+        return
+      }
 
-      this.hoverControl.hover(elem, event)
+      this.hoverControl.hover(event.offsetX, event.offsetY, elem)
     },
 
     onElementMousemove(event) {
@@ -441,6 +444,9 @@ export default {
 
       const elem = this.svg.select(`#${event.target.id}`)
       if (elem.data('locked')) {
+        return
+      }
+      if (elem.attr('class') !== 'wall') {
         return
       }
 
@@ -454,6 +460,9 @@ export default {
 
       const elem = this.svg.select(`#${event.target.id}`)
       if (elem.data('locked')) {
+        return
+      }
+      if (elem.attr('class') !== 'wall') {
         return
       }
 
@@ -496,7 +505,7 @@ export default {
       svg: this.svg,
       style: {
         stroke: '#00bcd4',
-        strokeWidth: 100,
+        strokeWidth: 10,
         strokeLinecap: 'round'
       },
       drawingStyle: {
@@ -514,7 +523,6 @@ export default {
       },
       drawingStyle: {
         stroke: 'yellow',
-        strokeWidth: 15
       },
       length: 50,
       className: 'window'

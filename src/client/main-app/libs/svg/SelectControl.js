@@ -334,6 +334,8 @@ class SelectControl {
         this.__onPositionResizerDragStartCreator(),
         this.__onPositionResizerDragEndCreator()
       )
+      .mousedown((event) => { event.bypass = true })
+      .mouseup((event) => { event.bypass = true })
     })
 
     this.resizers.push(...positionResizers)
@@ -370,6 +372,8 @@ class SelectControl {
         this.__onResizerDragStartCreator(),
         this.__onResizerDragEndCreator()
       )
+      .mousedown((event) => { event.bypass = true })
+      .mouseup((event) => { event.bypass = true })
     })
     this.resizers.push(...cornerResizers)
 
@@ -389,6 +393,8 @@ class SelectControl {
         this.__onResizerDragStartCreator(),
         this.__onResizerDragEndCreator()
       )
+      .mousedown((event) => { event.bypass = true })
+      .mouseup((event) => { event.bypass = true })
     })
     this.resizers.push(...edgeResizers)
   }
