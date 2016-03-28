@@ -1,18 +1,13 @@
 import { makeId } from '../utils'
 
-class WallPainter {
-  constructor({ svg }) {
+class ConnectedLinePainter {
+  constructor({ svg, style, drawingStyle, className }) {
     this.mousePos = { x: 0, y: 0 }
     this.drawingLine = null
     this.svg = svg
-    this.drawingLineStyle = {
-      stroke: '#006064'
-    }
-    this.lineStyle = {
-      stroke: '#00bcd4',
-      strokeWidth: 5,
-      strokeLinecap: 'round'
-    }
+    this.drawingLineStyle = drawingStyle
+    this.lineStyle = style
+    this.className = className
 
     this.init = this.init.bind(this)
     this.uninit = this.uninit.bind(this)
@@ -50,8 +45,8 @@ class WallPainter {
     this.drawingLine = svg.line(x1, y1, x2, y2)
     .attr(lineStyle)
     .attr({
-      class: 'wall',
-      id: `wall-${makeId()}`
+      class: this.className,
+      id: `${this.className}-${makeId()}`
     })
 
     return this.drawingLine
@@ -95,4 +90,4 @@ class WallPainter {
   }
 }
 
-export default WallPainter
+export default ConnectedLinePainter

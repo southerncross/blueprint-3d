@@ -165,7 +165,8 @@
 import $ from 'jquery'
 
 import SelectControl from '../libs/svg/SelectControl'
-import WallPainter from '../libs/svg/WallPainter'
+import ConnectedLinePainter from '../libs/svg/ConnectedLinePainter'
+import HoverControl from '../libs/svg/HoverControl'
 import { isLineSelected } from '../libs/utils'
 
 export default {
@@ -196,6 +197,11 @@ export default {
           opacity: 30
         },
         wall: {
+          elems: [],
+          visibility: 'visible',
+          locked: false
+        },
+        window: {
           elems: [],
           visibility: 'visible',
           locked: false
@@ -331,6 +337,9 @@ export default {
         case 'door':
           break
         case 'window':
+          const _window = this.hoverControl.draw()
+          this.wrapElementWithEventHandler(_window)
+          this.configs.window.elems.push(_window)
           break
         default:
           break
@@ -338,21 +347,21 @@ export default {
     },
 
     onMousemove(event) {
-      if (!this.mouseDown) {
-        return
+      // Select box
+      if (this.mouseDown) {
+        const oldX = parseInt(this.selectorBox.data('x'))
+        const oldY = parseInt(this.selectorBox.data('y'))
+        const newX = event.offsetX
+        const newY = event.offsetY
+        const width = Math.abs(oldX - newX)
+        const height = Math.abs(oldY - newY)
+        this.selectorBox.attr({
+          x: Math.min(oldX, newX),
+          y: Math.min(oldY, newY),
+          width,
+          height
+        })
       }
-      const oldX = parseInt(this.selectorBox.data('x'))
-      const oldY = parseInt(this.selectorBox.data('y'))
-      const newX = event.offsetX
-      const newY = event.offsetY
-      const width = Math.abs(oldX - newX)
-      const height = Math.abs(oldY - newY)
-      this.selectorBox.attr({
-        x: Math.min(oldX, newX),
-        y: Math.min(oldY, newY),
-        width,
-        height
-      })
     },
 
     onMouseup(event) {
@@ -377,6 +386,9 @@ export default {
       elem
       .mousedown(this.onElementMousedown)
       .mouseup(this.onElementMouseup)
+      .mouseover(this.onElementMouseover)
+      .mouseout(this.onElementMouseout)
+      .mousemove(this.onElementMousemove)
       .click(this.onElementClick)
     },
 
@@ -393,7 +405,24 @@ export default {
     },
 
     onElementClick(event) {
-      if (this.mode !== 'select') {
+      if (this.mode === 'select') {
+        const elem = this.svg.select(`#${event.target.id}`)
+        if (elem.data('locked')) {
+          return
+        }
+
+        event.bypass = true
+        if (elem.data('selecting')) {
+          return
+        } else {
+          this.selectControl.select(elem)
+          this.showElementUtils(elem)
+        }
+      }
+    },
+
+    onElementMouseover(event) {
+      if (this.mode !== 'window' && this.mode !== 'door') {
         return
       }
 
@@ -402,12 +431,34 @@ export default {
         return
       }
 
-      event.bypass = true
-      if (elem.data('selecting')) {
+      this.hoverControl.hover(elem, event)
+    },
+
+    onElementMousemove(event) {
+      if (this.mode !== 'window' && this.mode !== 'door') {
         return
-      } else {
-        this.selectControl.select(elem)
-        this.showElementUtils(elem)
+      }
+
+      const elem = this.svg.select(`#${event.target.id}`)
+      if (elem.data('locked')) {
+        return
+      }
+
+      this.hoverControl.sync(event.offsetX, event.offsetY, elem)
+    },
+
+    onElementMouseout(event) {
+      if (this.mode !== 'window' && this.mode !== 'door') {
+        return
+      }
+
+      const elem = this.svg.select(`#${event.target.id}`)
+      if (elem.data('locked')) {
+        return
+      }
+
+      if (!this.hoverControl.isHovering(elem)) {
+        this.hoverControl.cancel()
       }
     }
   },
@@ -441,8 +492,33 @@ export default {
     this.selectControl.init()
 
     // Init WallPainter
-    this.wallPainter = new WallPainter({ svg: this.svg })
+    this.wallPainter = new ConnectedLinePainter({
+      svg: this.svg,
+      style: {
+        stroke: '#00bcd4',
+        strokeWidth: 100,
+        strokeLinecap: 'round'
+      },
+      drawingStyle: {
+        stroke: '#006064'
+      },
+      className: 'wall'
+    })
     this.wallPainter.init()
+
+    // Init hoverControl
+    this.hoverControl = new HoverControl({
+      svg: this.svg,
+      style: {
+        stroke: 'red'
+      },
+      drawingStyle: {
+        stroke: 'yellow',
+        strokeWidth: 15
+      },
+      length: 50,
+      className: 'window'
+    })
   },
 
   beforeDestroy() {
