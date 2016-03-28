@@ -166,6 +166,7 @@ import $ from 'jquery'
 
 import SelectControl from '../libs/svg/SelectControl'
 import WallPainter from '../libs/svg/WallPainter'
+import { isLineSelected } from '../libs/utils'
 
 export default {
   name: 'BlueprintEditPanel',
@@ -354,6 +355,14 @@ export default {
       this.selectorBox.attr({
         display: 'none'
       })
+      const bbox = this.selectorBox.getBBox()
+      const selectedElements = []
+      this.svg.selectAll('line').forEach((line) => {
+        if (isLineSelected(line, bbox)) {
+          selectedElements.push(line)
+        }
+      })
+      this.selectControl.select(selectedElements)
     },
 
     onElementMousedown(event) {
