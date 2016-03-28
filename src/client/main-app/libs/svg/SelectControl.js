@@ -74,7 +74,8 @@ class SelectControl {
     }
 
     elems.forEach((e) => {
-      e.drag(
+      e.data('selecting', true)
+      .drag(
         this.__onElementDragMoveCreator(),
         this.__onElementDragStartCreator(),
         this.__onElementDragEndCreator()
@@ -96,6 +97,7 @@ class SelectControl {
   __onElementDragMoveCreator() {
     const that = this
     return function(dx, dy) {
+      this.data('mousedown', false)
       that.elements.forEach((elem) => {
         switch (elem.type) {
           case 'line': {
@@ -118,7 +120,7 @@ class SelectControl {
 
   __onElementDragStartCreator() {
     const that = this
-    return function() {
+    return function(x, y, event) {
       that.__clearResizers()
       that.elements.forEach((elem) => {
         switch (elem.type) {
@@ -139,7 +141,7 @@ class SelectControl {
 
   __onElementDragEndCreator() {
     const that = this
-    return function() {
+    return function(event) {
       that.elements.forEach((elem) => {
         if (that.elements.length === 1) {
           that.__addResizers(elem)
@@ -182,9 +184,10 @@ class SelectControl {
 
   __clearElements() {
     this.elements.forEach((elem) => {
-      elem.undrag()
-      elem.attr(elem.data('backupStyles'))
-      elem.removeData('backupStyles')
+      elem
+      .undrag()
+      .attr(elem.data('backupStyles'))
+      .removeData('backupStyles')
     })
     this.elements = []
   }

@@ -272,7 +272,8 @@ export default {
         opacity: parseFloat(background.opacity) / 100
       })
       .data({ elementType: 'background' })
-      .mousedonw(this.onElementMousedown)
+
+      this.wrapElementWithEventHandler(background.elem)
 
       desc.after(background.elem)
 
@@ -301,6 +302,9 @@ export default {
     },
 
     onMousedown(event) {
+      if (event.bypass) {
+        return
+      }
       switch (this.mode) {
         case 'select': {
           this.selectControl.reset()
@@ -319,7 +323,8 @@ export default {
           break
         }
         case 'wall': {
-          const wall = this.wallPainter.draw().mousedown(this.onElementMousedown)
+          const wall = this.wallPainter.draw()
+          this.wrapElementWithEventHandler(wall)
           this.configs.wall.elems.push(wall)
           break
         }
@@ -352,6 +357,9 @@ export default {
 
     onMouseup(event) {
       this.mouseDown = false
+      if (event.bypass) {
+        return
+      }
       this.selectorBox.attr({
         display: 'none'
       })
@@ -365,7 +373,26 @@ export default {
       this.selectControl.select(selectedElements)
     },
 
+    wrapElementWithEventHandler(elem) {
+      elem
+      .mousedown(this.onElementMousedown)
+      .mouseup(this.onElementMouseup)
+      .click(this.onElementClick)
+    },
+
     onElementMousedown(event) {
+      if (this.mode === 'select') {
+        event.bypass = true
+      }
+    },
+
+    onElementMouseup(event) {
+      if (this.mode === 'select') {
+        event.bypass = true
+      }
+    },
+
+    onElementClick(event) {
       if (this.mode !== 'select') {
         return
       }
@@ -375,9 +402,13 @@ export default {
         return
       }
 
-      event.stopPropagation()
-      this.selectControl.select(elem)
-      this.showElementUtils(elem)
+      event.bypass = true
+      if (elem.data('selecting')) {
+        return
+      } else {
+        this.selectControl.select(elem)
+        this.showElementUtils(elem)
+      }
     }
   },
 
