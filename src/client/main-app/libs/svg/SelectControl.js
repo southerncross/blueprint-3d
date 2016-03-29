@@ -188,6 +188,7 @@ class SelectControl {
       .undrag()
       .attr(elem.data('backupStyles'))
       .removeData('backupStyles')
+      .removeData('selecting')
     })
     this.elements = []
   }
