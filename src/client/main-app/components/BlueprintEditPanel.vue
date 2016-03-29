@@ -26,6 +26,14 @@
             <i class="icon-apps white-text yellow darken-2"></i>
           </button>
           <button
+            v-show="configs.window.elems.length > 0"
+            class="waves-effect waves-teal btn-flat tooltipped"
+            data-position="right" data-delay="0" data-tooltip="选中所有窗户"
+            @click="onSelectAllWindows"
+          >
+            <i class="icon-apps white-text blue"></i>
+          </button>
+          <button
             v-show="configs.background.elem"
             class="waves-effect waves-teal btn-flat tooltipped"
             data-position="right" data-delay="0" data-tooltip="选中背景图"
@@ -344,11 +352,8 @@ export default {
     },
 
     onSelectAllWindows() {
-      const _window = this.configs.window
-      _window.locked = !_window.locked
-      _window.elems.forEach((elem) => {
-        elem.data({ 'locked': _window.locked })
-      })
+      const windows = this.svg.selectAll('.window')
+      this.selectControl.select(windows)
     },
 
     onMousedown(event) {
@@ -381,9 +386,11 @@ export default {
         case 'door':
           break
         case 'window':
-          const _window = this.hoverControl.draw()
-          this.wrapElementWithEventHandler(_window)
-          this.configs.window.elems.push(_window)
+          const _window = this.windowPainter.draw()
+          if (_window) {
+            this.wrapElementWithEventHandler(_window)
+            this.configs.window.elems.push(_window)
+          }
           break
         default:
           break
@@ -478,7 +485,13 @@ export default {
         return
       }
 
-      this.hoverControl.hover(event.offsetX, event.offsetY, elem)
+      if (this.mode === 'window') {
+        this.windowPainter.hover(event.offsetX, event.offsetY, elem)
+      }
+
+      if (this.mode === 'door') {
+
+      }
     },
 
     onElementMousemove(event) {
@@ -494,7 +507,11 @@ export default {
         return
       }
 
-      this.hoverControl.sync(event.offsetX, event.offsetY, elem)
+      if (this.mode === 'window') {
+        this.windowPainter.sync(event.offsetX, event.offsetY, elem)
+      }
+      if (this.mode === 'door') {
+      }
     },
 
     onElementMouseout(event) {
@@ -510,8 +527,12 @@ export default {
         return
       }
 
-      if (!this.hoverControl.isHovering(elem)) {
-        this.hoverControl.cancel()
+      if (this.mode === 'window') {
+        if (!this.windowPainter.isHovering(elem)) {
+          this.windowPainter.cancel()
+        }
+      }
+      if (this.mode === 'door') {
       }
     }
   },
@@ -544,7 +565,7 @@ export default {
     this.selectControl = new SelectControl({ svg: this.svg })
     this.selectControl.init()
 
-    // Init WallPainter
+    // Init wall painter
     this.wallPainter = new ConnectedLinePainter({
       svg: this.svg,
       style: {
@@ -561,17 +582,30 @@ export default {
     })
     this.wallPainter.init()
 
-    // Init hoverControl
-    this.hoverControl = new HoverControl({
+    // Init window painter
+    this.windowPainter = new HoverControl({
       svg: this.svg,
       style: {
-        stroke: 'red'
+        stroke: '#B3E5FC'
       },
       drawingStyle: {
-        stroke: 'yellow'
+        stroke: '#81D4FA'
       },
       length: 50,
       className: 'window'
+    })
+
+    // Init door painter
+    this.doorPainter = new HoverControl({
+      svg: this.svg,
+      style: {
+
+      },
+      drawingStyle: {
+
+      },
+      length: 50,
+      className: 'door'
     })
   },
 

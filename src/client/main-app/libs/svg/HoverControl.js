@@ -129,6 +129,10 @@ class HoverControl {
 
   draw() {
     const elem = this.hoverElem
+    if (!elem) {
+      return null
+    }
+
     this.hoverElem = null
     // Copy a new element, because we have to clean up mouse event handler
     let copiedElem = null
