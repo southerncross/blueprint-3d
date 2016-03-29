@@ -37,13 +37,13 @@ class ConnectedLinePainter {
 
     if (drawingLine) {
       drawingLine
-      .attr(drawingLineStyle)
+      .attr(lineStyle)
       x1 = Number(drawingLine.attr('x2'))
       y1 = Number(drawingLine.attr('y2'))
     }
 
     this.drawingLine = svg.line(x1, y1, x2, y2)
-    .attr(lineStyle)
+    .attr(drawingLineStyle)
     .attr({
       class: this.className,
       id: `${this.className}-${makeId()}`

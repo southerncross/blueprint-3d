@@ -548,12 +548,14 @@ export default {
     this.wallPainter = new ConnectedLinePainter({
       svg: this.svg,
       style: {
-        stroke: '#00bcd4',
+        stroke: '#212121',
         strokeWidth: 10,
         strokeLinecap: 'round'
       },
       drawingStyle: {
-        stroke: '#006064'
+        stroke: '#616161',
+        strokeWidth: 10,
+        strokeLinecap: 'round'
       },
       className: 'wall'
     })
