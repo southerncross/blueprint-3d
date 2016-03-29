@@ -6,7 +6,7 @@
       <div class="blueprint-edit-panel__utils__item">
         <button
           class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="left" data-delay="0" data-tooltip="选择模式"
+          data-position="left" data-delay="500" data-tooltip="选择模式"
           :class="mode === 'select' ? 'purple' : 'white'"
           @click="mode = 'select'"
         >
@@ -54,7 +54,7 @@
       <div class="blueprint-edit-panel__utils__item">
         <button
           class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="left" data-delay="0" data-tooltip="画墙模式"
+          data-position="left" data-delay="500" data-tooltip="画墙模式"
           :class="mode === 'wall' ? 'yellow darken-2' : 'white'"
           @click="changeMode('wall')"
         >
@@ -86,17 +86,39 @@
       <div class="blueprint-edit-panel__utils__item">
         <button
           class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="left" data-delay="0" data-tooltip="画门模式"
+          data-position="left" data-delay="500" data-tooltip="画门模式"
           :class="mode === 'door' ? 'green' : 'white'"
           @click="changeMode('door')"
         >
           <i class="icon-directions_run" :class="mode === 'door' ? 'white-text' : 'black-text'"></i>
         </button>
+        <div
+          v-show="mode === 'door'"
+          class="blueprint-edit-panel__utils__item__sub-utils"
+          transition="slide-right-to-left"
+        >
+          <button
+            v-show="this.configs.door.count > 0"
+            class="waves-effect waves-teal btn-flat tooltipped"
+            data-position="right" data-delay="0" data-tooltip="锁定"
+            @click="onToggleDoorLockStatus"
+          >
+            <i class="{{ configs.door.locked ? 'icon-lock' : 'icon-lock_open' }}"></i>
+          </button>
+          <button
+            v-show="this.configs.door.count > 0"
+            class="waves-effect waves-teal btn-flat tooltipped"
+            data-position="right" data-delay="0" data-tooltip="可见性"
+            @click="onToggleDoorVisibility"
+          >
+            <i class="{{ configs.door.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off' }}"></i>
+          </button>
+        </div>
       </div>
       <div class="blueprint-edit-panel__utils__item">
         <button
           class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="left" data-delay="0" data-tooltip="画窗模式"
+          data-position="left" data-delay="500" data-tooltip="画窗模式"
           :class="mode === 'window' ? 'blue' : 'white'"
           @click="changeMode('window')"
         >
@@ -128,7 +150,7 @@
       <div class="blueprint-edit-panel__utils__item">
         <button
           class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="left" data-delay="0" data-tooltip="背景"
+          data-position="left" data-delay="500" data-tooltip="背景"
           :class="mode === 'background' ? 'red' : 'white'"
           @click="changeMode('background')"
         >
@@ -240,7 +262,9 @@ export default {
           locked: false
         },
         door: {
-          count: 0
+          count: 0,
+          visibility: 'visible',
+          locked: false
         },
         window: {
           count: 0,
@@ -380,6 +404,22 @@ export default {
       this.selectControl.select(windows)
     },
 
+    onToggleDoorVisibility() {
+      const door = this.configs.door
+      door.visibility = (door.visibility === 'visible') ? 'hidden' : 'visible'
+      this.svg.selectAll('.door').forEach((elem) => {
+        elem.attr({ visibility: door.visibility })
+      })
+    },
+
+    onToggleDoorLockStatus() {
+      const door = this.configs.door
+      door.locked = !door.locked
+      this.svg.selectAll('.door').forEach((elem) => {
+        elem.data({ 'locked': door.locked })
+      })
+    },
+
     onSelectAllDoors() {
       const doors = this.svg.selectAll('.door')
       this.selectControl.select(doors)
@@ -414,15 +454,22 @@ export default {
           this.wrapElementWithEventHandler(wall)
           break
         }
-        case 'door':
+        case 'door': {
+          const door = this.doorPainter.draw()
+          if (door) {
+            this.wrapElementWithEventHandler(door)
+            this.configs.door.count++
+          }
           break
-        case 'window':
+        }
+        case 'window': {
           const _window = this.windowPainter.draw()
           if (_window) {
             this.wrapElementWithEventHandler(_window)
             this.configs.window.count++
           }
           break
+        }
         default:
           break
       }
@@ -521,7 +568,7 @@ export default {
       }
 
       if (this.mode === 'door') {
-
+        this.doorPainter.hover(event.offsetX, event.offsetY, elem)
       }
     },
 
@@ -542,6 +589,7 @@ export default {
         this.windowPainter.sync(event.offsetX, event.offsetY, elem)
       }
       if (this.mode === 'door') {
+        this.doorPainter.sync(event.offsetX, event.offsetY, elem)
       }
     },
 
@@ -564,6 +612,9 @@ export default {
         }
       }
       if (this.mode === 'door') {
+        if (!this.doorPainter.isHovering(elem)) {
+          this.doorPainter.cancel()
+        }
       }
     },
 
@@ -669,10 +720,10 @@ export default {
     this.doorPainter = new HoverControl({
       svg: this.svg,
       style: {
-
+        stroke: '#C8E6C9'
       },
       drawingStyle: {
-
+        stroke: '#A5D6A7'
       },
       length: 50,
       className: 'door'
