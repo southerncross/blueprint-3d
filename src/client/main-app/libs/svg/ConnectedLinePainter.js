@@ -59,6 +59,10 @@ class ConnectedLinePainter {
     }
   }
 
+  get isDrawing() {
+    return !!this.drawingLine
+  }
+
   __onMousemove(event) {
     const { mousePos, drawingLine } = this
     mousePos.x = event.offsetX

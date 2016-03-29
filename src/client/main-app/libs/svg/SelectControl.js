@@ -90,6 +90,10 @@ class SelectControl {
     }
   }
 
+  get selectedElems() {
+    return this.elements
+  }
+
   get isMultiMode() {
     return this.multiMode
   }

@@ -18,7 +18,7 @@
           transition="slide-right-to-left"
         >
           <button
-            v-show="configs.wall.elems.length > 0"
+            v-show="this.configs.wall.count > 0"
             class="waves-effect waves-teal btn-flat tooltipped"
             data-position="right" data-delay="0" data-tooltip="选中所有墙面"
             @click="onSelectAllWalls"
@@ -26,7 +26,7 @@
             <i class="icon-apps white-text yellow darken-2"></i>
           </button>
           <button
-            v-show="configs.window.elems.length > 0"
+            v-show="this.configs.window.count > 0"
             class="waves-effect waves-teal btn-flat tooltipped"
             data-position="right" data-delay="0" data-tooltip="选中所有窗户"
             @click="onSelectAllWindows"
@@ -34,7 +34,15 @@
             <i class="icon-apps white-text blue"></i>
           </button>
           <button
-            v-show="configs.background.elem"
+            v-show="this.configs.door.count > 0"
+            class="waves-effect waves-teal btn-flat tooltipped"
+            data-position="right" data-delay="0" data-tooltip="选中门"
+            @click="onSelectAllDoors"
+          >
+            <i class="icon-apps white-text green"></i>
+          </button>
+          <button
+            v-show="this.configs.background.count > 0"
             class="waves-effect waves-teal btn-flat tooltipped"
             data-position="right" data-delay="0" data-tooltip="选中背景图"
             @click="onSelectBackgroundImg"
@@ -58,7 +66,7 @@
           transition="slide-right-to-left"
         >
           <button
-            v-show="configs.wall.elems.length > 0"
+            v-show="this.configs.wall.count > 0"
             class="waves-effect waves-teal btn-flat tooltipped"
             data-position="right" data-delay="0" data-tooltip="锁定"
             @click="onToggleWallLockStatus"
@@ -66,7 +74,7 @@
             <i class="{{ configs.wall.locked ? 'icon-lock' : 'icon-lock_open' }}"></i>
           </button>
           <button
-            v-show="configs.wall.elems.length > 0"
+            v-show="this.configs.wall.count > 0"
             class="waves-effect waves-teal btn-flat tooltipped"
             data-position="right" data-delay="0" data-tooltip="可见性"
             @click="onToggleWallVisibility"
@@ -100,7 +108,7 @@
           transition="slide-right-to-left"
         >
           <button
-            v-show="configs.window.elems.length > 0"
+            v-show="this.configs.window.count > 0"
             class="waves-effect waves-teal btn-flat tooltipped"
             data-position="right" data-delay="0" data-tooltip="锁定"
             @click="onToggleWindowLockStatus"
@@ -108,7 +116,7 @@
             <i class="{{ configs.window.locked ? 'icon-lock' : 'icon-lock_open' }}"></i>
           </button>
           <button
-            v-show="configs.window.elems.length > 0"
+            v-show="this.configs.window.count > 0"
             class="waves-effect waves-teal btn-flat tooltipped"
             data-position="right" data-delay="0" data-tooltip="可见性"
             @click="onToggleWindowVisibility"
@@ -139,7 +147,7 @@
             <i class="icon-image"></i>
           </button>
           <button
-            v-show="configs.background.elem"
+            v-show="this.configs.background.count > 0"
             class="waves-effect waves-teal btn-flat tooltipped"
             data-position="right" data-delay="0" data-tooltip="锁定"
             @click="onToggleBackgroundImgLockStatus"
@@ -147,7 +155,7 @@
             <i class="{{ configs.background.locked ? 'icon-lock' : 'icon-lock_open' }}"></i>
           </button>
           <button
-            v-show="configs.background.elem"
+            v-show="this.configs.background.count > 0"
             class="waves-effect waves-teal btn-flat tooltipped"
             data-position="right" data-delay="0" data-tooltip="可见性"
             @click="onToggleBackgroundImgVisibility"
@@ -221,18 +229,21 @@ export default {
       mode: 'select',
       configs: {
         background: {
-          elem: null,
+          count: 0,
           visibility: 'visible',
           locked: false,
           opacity: 30
         },
         wall: {
-          elems: [],
+          count: 0,
           visibility: 'visible',
           locked: false
         },
+        door: {
+          count: 0
+        },
         window: {
-          elems: [],
+          count: 0,
           visibility: 'visible',
           locked: false
         }
@@ -275,18 +286,26 @@ export default {
     onToggleBackgroundImgVisibility() {
       const { background } = this.configs
       background.visibility = (background.visibility === 'visible') ? 'hidden' : 'visible'
-      background.elem.attr({ visibility: background.visibility })
+      const elem = this.svg.select('.background')
+      if (elem) {
+        elem.attr({ visibility: background.visibility })
+      }
     },
 
     onToggleBackgroundImgLockStatus() {
       const { background } = this.configs
       background.locked = !background.locked
-      background.elem.data({ 'locked': background.locked })
+      const elem = this.svg.select('.background')
+      if (elem) {
+        elem.data({ 'locked': background.locked })
+      }
     },
 
     onBackgroundImgOpacityChange(event) {
-      const { background } = this.configs
-      background.elem.attr({ opacity: parseFloat(event.target.value) / 100 })
+      const elem = this.svg.select('.background')
+      if (elem) {
+        elem.attr({ opacity: parseFloat(event.target.value) / 100 })
+      }
     },
 
     onBackgroundImgChange(event) {
@@ -296,22 +315,25 @@ export default {
       }
 
       const { background } = this.configs
-      if (background.elem) {
-        background.elem.remove()
+      const elem = this.svg.select('.background')
+      if (elem) {
+        elem.remove()
       }
 
       const url = window.URL.createObjectURL(file)
       const desc = this.svg.select('desc')
-      background.elem = this.svg.image(url)
+      const newElem = this.svg.image(url)
       .attr({
+        class: 'background',
         id: 'blueprint-background',
         opacity: parseFloat(background.opacity) / 100
       })
       .data({ elementType: 'background' })
 
-      this.wrapElementWithEventHandler(background.elem)
+      this.wrapElementWithEventHandler(newElem)
+      this.configs.background.count = 1
 
-      desc.after(background.elem)
+      desc.after(newElem)
 
       this.changeMode('select')
     },
@@ -324,7 +346,7 @@ export default {
     onToggleWallVisibility() {
       const { wall } = this.configs
       wall.visibility = (wall.visibility === 'visible') ? 'hidden' : 'visible'
-      wall.elems.forEach((elem) => {
+      this.svg.selectAll('.wall').forEach((elem) => {
         elem.attr({ visibility: wall.visibility })
       })
     },
@@ -332,7 +354,7 @@ export default {
     onToggleWallLockStatus() {
       const { wall } = this.configs
       wall.locked = !wall.locked
-      wall.elems.forEach((elem) => {
+      this.svg.selectAll('.wall').forEach((elem) => {
         elem.data({ 'locked': wall.locked })
       })
     },
@@ -340,7 +362,7 @@ export default {
     onToggleWindowVisibility() {
       const _window = this.configs.window
       _window.visibility = (_window.visibility === 'visible') ? 'hidden' : 'visible'
-      _window.elems.forEach((elem) => {
+      this.svg.selectAll('.window').forEach((elem) => {
         elem.attr({ visibility: _window.visibility })
       })
     },
@@ -348,12 +370,19 @@ export default {
     onToggleWindowLockStatus() {
       const _window = this.configs.window
       _window.locked = !_window.locked
-      _window.elem.data({ 'locked': _window.locked })
+      this.svg.selectAll('.window').forEach((elem) => {
+        elem.data({ 'locked': _window.locked })
+      })
     },
 
     onSelectAllWindows() {
       const windows = this.svg.selectAll('.window')
       this.selectControl.select(windows)
+    },
+
+    onSelectAllDoors() {
+      const doors = this.svg.selectAll('.door')
+      this.selectControl.select(doors)
     },
 
     onMousedown(event) {
@@ -378,9 +407,11 @@ export default {
           break
         }
         case 'wall': {
+          if (this.wallPainter.isDrawing) {
+            this.configs.wall.count++
+          }
           const wall = this.wallPainter.draw()
           this.wrapElementWithEventHandler(wall)
-          this.configs.wall.elems.push(wall)
           break
         }
         case 'door':
@@ -389,7 +420,7 @@ export default {
           const _window = this.windowPainter.draw()
           if (_window) {
             this.wrapElementWithEventHandler(_window)
-            this.configs.window.elems.push(_window)
+            this.configs.window.count++
           }
           break
         default:
@@ -534,6 +565,45 @@ export default {
       }
       if (this.mode === 'door') {
       }
+    },
+
+    onKeydown(event) {
+      if (this.mode !== 'select') {
+        return
+      }
+
+      if (event.code === 'Escape' ||
+          event.keyCode === 27) {
+        this.selectControl.reset()
+        return
+      }
+
+      if (event.code === 'Backspace' ||
+          event.keyCode === 8 ||
+          event.code === 'Delete' ||
+          event.keyCode === 46) {
+        event.preventDefault()
+        this.selectControl.selectedElems.forEach((elem) => {
+          switch (elem.attr('class')) {
+            case 'background':
+              this.configs.background.count = 0
+              break
+            case 'wall':
+              this.configs.wall.count--
+              break
+            case 'window':
+              this.configs.window.count--
+              break
+            case 'door':
+              this.configs.door.count--
+              break
+            default:
+              break
+          }
+          elem.remove()
+        })
+        this.selectControl.reset()
+      }
     }
   },
 
@@ -607,6 +677,9 @@ export default {
       length: 50,
       className: 'door'
     })
+
+    // Init delete event listener
+    document.addEventListener('keydown', this.onKeydown)
   },
 
   beforeDestroy() {
@@ -622,6 +695,8 @@ export default {
 
     // Uninit selectControl
     this.selectControl.uninit()
+
+    document.removeEventListener('keydown', this.onKeydown)
   }
 }
 </script>
