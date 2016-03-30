@@ -1,5 +1,6 @@
 <template>
 <div class="blueprint-edit-panel__container">
+  <svg-canvas></svg-canvas>
   <div class="blueprint-edit-panel__main">
     <div id="blueprint-edit-panel__svg__container"></div>
     <div class="blueprint-edit-panel__utils__container">
@@ -224,6 +225,7 @@
 <script>
 import $ from 'jquery'
 
+import SvgCanvas from './SvgCanvas'
 import SelectControl from '../libs/svg/SelectControl'
 import ConnectedLinePainter from '../libs/svg/ConnectedLinePainter'
 import HoverControl from '../libs/svg/HoverControl'
@@ -231,6 +233,10 @@ import { isLineSelected } from '../libs/utils'
 
 export default {
   name: 'BlueprintEditPanel',
+
+  components: {
+    SvgCanvas
+  },
 
   props: {
     svg: {
