@@ -31,9 +31,6 @@ import Snap from 'Snap'
 import BlueprintEditPanel from './BlueprintEditPanel'
 import BlueprintViewPanel from './BlueprintViewPanel'
 
-const DEFAULT_CANVAS_HEIGHT = 600
-const DEFAULT_CANVAS_WIDTH = 800
-
 export default {
   name: 'CreateBlueprint',
 
@@ -55,7 +52,8 @@ export default {
         svg = _svg
       })
     } else {
-      svg = Snap(DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT)
+      // svg = Snap('100%', '100%')
+      svg = Snap()
     }
 
     return {

@@ -1,8 +1,10 @@
 <template>
 <div class="blueprint-edit-panel__container">
-  <svg-canvas></svg-canvas>
+  <svg-canvas
+    :svg="svg"
+  >
+  </svg-canvas>
   <div class="blueprint-edit-panel__main">
-    <div id="blueprint-edit-panel__svg__container"></div>
     <div class="blueprint-edit-panel__utils__container">
       <div class="blueprint-edit-panel__utils__item">
         <button
@@ -668,14 +670,6 @@ export default {
     // Init materializeCss tooltip
     $('.tooltipped').tooltip()
 
-    // Init SVG canvas
-    this.svg
-    .attr({ 'class': 'card blue-grey lighten-5' })
-    .mousedown(this.onMousedown)
-    .mousemove(this.onMousemove)
-    .mouseup(this.onMouseup)
-    document.getElementById('blueprint-edit-panel__svg__container').appendChild(this.svg.node)
-
     // Add selector box
     this.selectorBox = this.svg
     .rect(0, 0, 0, 0)
@@ -792,9 +786,6 @@ export default {
     vertical-align top
 
 .blueprint-edit-panel
-  &__container
-    width 900px
-    margin auto
   &__main
     position relative
   &__utils
