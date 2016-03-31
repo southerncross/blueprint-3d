@@ -19,7 +19,11 @@
     :set-mode.once="setMode"
   >
   </window-menu>
-  <!-- <door-menu></door-menu> -->
+  <door-menu
+    :mode="mode"
+    :set-mode.once="setMode"
+  >
+  </door-menu>
   <background-menu
     :mode="mode"
     :svg.once="svg"
@@ -35,7 +39,7 @@ import SelectMenu from './SelectMenu'
 import WallMenu from './WallMenu'
 import BackgroundMenu from './BackgroundMenu'
 import WindowMenu from './WindowMenu'
-// import DoorMenu from './DoorMenu'
+import DoorMenu from './DoorMenu'
 
 export default {
   name: 'MenuContainer',
@@ -44,8 +48,8 @@ export default {
     SelectMenu,
     WallMenu,
     WindowMenu,
+    DoorMenu,
     BackgroundMenu
-    // DoorMenu,
   },
 
   props: {
