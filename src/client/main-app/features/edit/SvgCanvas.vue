@@ -62,9 +62,9 @@ $svg-canvas
 
 #svg-canvas
   @extends $svg-canvas
-  z-index 50
+  z-index -10
   background-color transparent
   &__background
     @extends $svg-canvas
-    z-index -10
+    z-index -20
 </style>

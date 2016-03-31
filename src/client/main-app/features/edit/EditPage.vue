@@ -11,7 +11,10 @@
     :svg.once="svg"
     :set-mode.once="setMode"
     :wrap-element-with-event-handler.once="wrapElementWithEventHandler"
-    class-name="background"
+    :select-background.once="selectBackground"
+    :select-all-walls.once="selectAllWalls"
+    :select-all-windows.once="selectAllWindows"
+    :select-all-doors.once="selectAllDoors"
   >
   </menu-container>
 <!--   <modifier-container
@@ -88,7 +91,7 @@ export default {
   },
 
   methods: {
-    changeMode(nextMode) {
+    setMode(nextMode) {
       if (nextMode === this.mode) {
         return
       }
@@ -106,7 +109,7 @@ export default {
       this.elementUtilsType = null
     },
 
-    onSelectBackgroundImg() {
+    selectBackground() {
       const image = this.svg.select('image')
       this.selectControl.select(image)
     },
@@ -168,10 +171,10 @@ export default {
 
       desc.after(newElem)
 
-      this.changeMode('select')
+      this.setMode('select')
     },
 
-    onSelectAllWalls() {
+    selectAllWalls() {
       const walls = this.svg.selectAll('.wall')
       this.selectControl.select(walls)
     },
@@ -208,7 +211,7 @@ export default {
       })
     },
 
-    onSelectAllWindows() {
+    selectAllWindows() {
       const windows = this.svg.selectAll('.window')
       this.selectControl.select(windows)
     },
@@ -229,7 +232,7 @@ export default {
       })
     },
 
-    onSelectAllDoors() {
+    selectAllDoors() {
       const doors = this.svg.selectAll('.door')
       this.selectControl.select(doors)
     },
