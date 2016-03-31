@@ -80,14 +80,24 @@ export default {
   },
 
   computed: {
-    show: () => this.mode === 'background',
-    menuBtnClassName: () => this.show ? 'red' : 'white',
-    menuIconClassName: () => this.show ? 'white-text' : 'black-text',
-    lockIconClassName: () => this.locked ? 'icon-lock' : 'icon-lock_open',
-    visibilityIconClassName: () => this.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off'
+    show: function() {
+      return this.mode === 'background'
+    },
+    menuBtnClassName: function() {
+      return this.mode === 'background' ? 'red' : 'white'
+    },
+    menuIconClassName: function() {
+      return this.mode === 'background' ? 'white-text' : 'black-text'
+    },
+    lockIconClassName: function() {
+      return this.locked ? 'icon-lock' : 'icon-lock_open'
+    },
+    visibilityIconClassName: function() {
+      return this.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off'
+    }
   },
 
-  method: {
+  methods: {
     loadBackground() {
       const input = document.getElementById('background-menu__background-input')
       input.click()

@@ -1,6 +1,8 @@
 <template>
-<div id="svg-canvas"></div>
-<canvas id="svg-canvas__background"></canvas>
+<div>
+  <div id="svg-canvas"></div>
+  <canvas id="svg-canvas__background"></canvas>
+</div>
 </template>
 
 <script>
