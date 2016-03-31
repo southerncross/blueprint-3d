@@ -7,18 +7,20 @@
     :select-all-walls.once="selectAllWalls"
     :select-all-windows.once="selectAllWindows"
     :select-all-doors.once="selectAllDoors"
-    class-name="select"
   >
   </select-menu>
-  <!-- <wall-menu></wall-menu>
-  <window-menu></window-menu>
+  <wall-menu
+    :mode="mode"
+    :set-mode.once="setMode"
+  >
+  </wall-menu>
+  <!-- <window-menu></window-menu>
   <door-menu></door-menu> -->
   <background-menu
     :mode="mode"
     :svg.once="svg"
     :set-mode.once="setMode"
     :wrap-element-wight-event-handler.once="wrapElementWithEventHandler"
-    class-name="background"
   >
   </background-menu>
 </div>
@@ -26,9 +28,9 @@
 
 <script>
 import SelectMenu from './SelectMenu'
+import WallMenu from './WallMenu'
 import BackgroundMenu from './BackgroundMenu'
 // import DoorMenu from './DoorMenu'
-// import WallMenu from './WallMenu'
 // import WindowMenu from './WindowMenu'
 
 export default {
@@ -36,9 +38,9 @@ export default {
 
   components: {
     SelectMenu,
+    WallMenu,
     BackgroundMenu
     // DoorMenu,
-    // WallMenu,
     // WindowMenu
   },
 

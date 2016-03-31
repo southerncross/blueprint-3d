@@ -1,41 +1,81 @@
 <template>
-<div class="blueprint-edit-panel__utils__item">
-  <!-- <button
+<div>
+  <button
     class="btn-floating btn-large waves-effect waves-light tooltipped"
     data-position="left" data-delay="500" data-tooltip="画墙模式"
-    :class="mode === 'wall' ? 'yellow darken-2' : 'white'"
-    @click="changeMode('wall')"
+    :class="menuBtnClassName"
+    @click="setMode('wall')"
   >
-    <i class="icon-border_style" :class="mode === 'wall' ? 'white-text' : 'black-text'"></i>
+    <i class="icon-border_style" :class="menuIconClassName"></i>
   </button>
   <div
-    v-show="mode === 'wall'"
-    class="blueprint-edit-panel__utils__item__sub-utils"
+    v-show="show"
+    class="wall-menu__utils__item__sub-utils"
     transition="slide-right-to-left"
   >
     <button
-      v-show="this.configs.wall.count > 0"
+      v-show="existed"
       class="waves-effect waves-teal btn-flat tooltipped"
       data-position="right" data-delay="0" data-tooltip="锁定"
-      @click="onToggleWallLockStatus"
+      @click="toggleWallLock"
     >
-      <i class="{{ configs.wall.locked ? 'icon-lock' : 'icon-lock_open' }}"></i>
+      <i :class="lockIconClassName"></i>
     </button>
     <button
-      v-show="this.configs.wall.count > 0"
+      v-show="existed"
       class="waves-effect waves-teal btn-flat tooltipped"
       data-position="right" data-delay="0" data-tooltip="可见性"
-      @click="onToggleWallVisibility"
+      @click="toggleWallVisibility"
     >
-      <i class="{{ configs.wall.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off' }}"></i>
+      <i :class="visibilityIconClassName"></i>
     </button>
-  </div> -->
+  </div>
 </div>
 </template>
 
 <script>
+import {
+  toggleWallVisibility,
+  toggleWallLock
+} from '../../../vuex/actions'
+
 export default {
-  name: 'WallMenu'
+  name: 'WallMenu',
+
+  vuex: {
+    getters: {
+      existed: state => state.wall.count > 0,
+      visibility: state => state.wall.visible ? 'visible' : 'hidden',
+      locked: state => state.wall.lock
+    },
+    actions: {
+      toggleWallVisibility,
+      toggleWallLock
+    }
+  },
+
+  props: {
+    mode: String,
+    setMode: Function
+  },
+
+  computed: {
+    show: function() {
+      return this.mode === 'wall'
+    },
+    menuBtnClassName: function() {
+      return this.mode === 'wall' ? 'yellow darken-2' : 'white'
+    },
+    menuIconClassName: function() {
+      return this.mode === 'wall' ? 'white-text' : 'black-text'
+    },
+    lockIconClassName: function() {
+      return this.locked ? 'icon-lock' : 'icon-lock_open'
+    },
+    visibilityIconClassName: function() {
+      return this.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off'
+    }
+  }
 }
 </script>
 
