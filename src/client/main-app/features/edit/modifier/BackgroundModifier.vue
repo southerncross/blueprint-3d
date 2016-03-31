@@ -1,7 +1,7 @@
 <template>
-<div v-show="elementUtilsType === 'background'" transition="slide-bottom-to-top">
+<div v-show="show" transition="slide-bottom-to-top">
   <div
-    class="blueprint-edit-panel__element-utils__item"
+    class="background-modifier__element-utils__item"
     transition="fade"
   >
     <span class="range-field">
@@ -9,8 +9,8 @@
         id="blueprint-edit-panel__background__opacity"
         type="range"
         min="0" max="100"
-        v-model="configs.background.opacity"
-        @input="onBackgroundImgOpacityChange"
+        :value="opacity"
+        @input="onBackgroundOpacityChange"
       />
     </span>
   </div>
@@ -18,8 +18,31 @@
 </template>
 
 <script>
+import {
+  updateBackgroundOpacity
+} from '../../../vuex/actions'
+
 export default {
-  name: 'BackgroundModifier'
+  name: 'BackgroundModifier',
+
+  vuex: {
+    getters: {
+      opacity: state => state.background.opacity
+    },
+    actions: {
+      updateBackgroundOpacity
+    }
+  },
+
+  props: {
+    show: Boolean
+  },
+
+  methods: {
+    onBackgroundOpacityChange(event) {
+      this.updateBackgroundOpacity(parseFloat(event.target.value) / 100)
+    }
+  }
 }
 </script>
 

@@ -1,7 +1,7 @@
 <template>
-<div v-show="elementUtilsType === 'line'" transition="slide-bottom-to-top">
+<div v-show="show" transition="slide-bottom-to-top">
   <div
-    class="blueprint-edit-panel__element-utils__item"
+    class="wall-modifier__element-utils__item"
     transition="fade"
   >
   </div>
@@ -10,7 +10,11 @@
 
 <script>
 export default {
-  name: 'WallModifier'
+  name: 'WallModifier',
+
+  props: {
+    show: Boolean
+  }
 }
 </script>
 

@@ -17,10 +17,10 @@
     :select-all-doors.once="selectAllDoors"
   >
   </menu-container>
-<!--   <modifier-container
+  <modifier-container
     class="edit-page__modifier-container"
   >
-  </modifier-container> -->
+  </modifier-container>
 </div>
 </template>
 
