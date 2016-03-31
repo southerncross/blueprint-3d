@@ -28,14 +28,14 @@
 <script>
 import Snap from 'Snap'
 
-import BlueprintEditPanel from './BlueprintEditPanel'
+import EditPage from './EditPage'
 import BlueprintViewPanel from './BlueprintViewPanel'
 
 export default {
   name: 'CreateBlueprint',
 
   components: {
-    EditPanel: BlueprintEditPanel,
+    EditPanel: EditPage,
     ViewPanel: BlueprintViewPanel
   },
 
@@ -66,7 +66,7 @@ export default {
 </script>
 
 <style lang="stylus">
-@import '../../palette'
+@import '../../../palette'
 
 canvas-width = 720px
 canvas-height = 680px

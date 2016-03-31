@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import App from './App'
-import CreateBlueprint from './components/CreateBlueprint'
+import CreateBlueprint from './features/edit/CreateBlueprint'
 
 Vue.config.debug = true
 Vue.use(Router)

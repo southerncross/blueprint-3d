@@ -9,9 +9,12 @@
 
 <script>
 import NavColumn from './layout/NavColumn'
+import store from './vuex/store'
 
 export default {
   name: 'App',
+
+  store,
 
   components: {
     NavColumn

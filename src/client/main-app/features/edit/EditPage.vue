@@ -1,226 +1,23 @@
 <template>
 <div class="blueprint-edit-panel__container">
   <svg-canvas
+    class="edit-page__svg-canvas"
     :svg="svg"
   >
   </svg-canvas>
-  <div class="blueprint-edit-panel__main">
-    <div class="blueprint-edit-panel__utils__container">
-      <div class="blueprint-edit-panel__utils__item">
-        <button
-          class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="left" data-delay="500" data-tooltip="选择模式"
-          :class="mode === 'select' ? 'purple' : 'white'"
-          @click="mode = 'select'"
-        >
-          <i class="icon-call_made" :class="mode === 'select' ? 'white-text' : 'black-text'"></i>
-        </button>
-        <div
-          v-show="mode === 'select'"
-          class="blueprint-edit-panel__utils__item__sub-utils"
-          transition="slide-right-to-left"
-        >
-          <button
-            v-show="this.configs.wall.count > 0"
-            class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="right" data-delay="0" data-tooltip="选中所有墙面"
-            @click="onSelectAllWalls"
-          >
-            <i class="icon-apps white-text yellow darken-2"></i>
-          </button>
-          <button
-            v-show="this.configs.window.count > 0"
-            class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="right" data-delay="0" data-tooltip="选中所有窗户"
-            @click="onSelectAllWindows"
-          >
-            <i class="icon-apps white-text blue"></i>
-          </button>
-          <button
-            v-show="this.configs.door.count > 0"
-            class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="right" data-delay="0" data-tooltip="选中门"
-            @click="onSelectAllDoors"
-          >
-            <i class="icon-apps white-text green"></i>
-          </button>
-          <button
-            v-show="this.configs.background.count > 0"
-            class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="right" data-delay="0" data-tooltip="选中背景图"
-            @click="onSelectBackgroundImg"
-          >
-            <i class="icon-apps white-text red"></i>
-          </button>
-        </div>
-      </div>
-      <div class="blueprint-edit-panel__utils__item">
-        <button
-          class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="left" data-delay="500" data-tooltip="画墙模式"
-          :class="mode === 'wall' ? 'yellow darken-2' : 'white'"
-          @click="changeMode('wall')"
-        >
-          <i class="icon-border_style" :class="mode === 'wall' ? 'white-text' : 'black-text'"></i>
-        </button>
-        <div
-          v-show="mode === 'wall'"
-          class="blueprint-edit-panel__utils__item__sub-utils"
-          transition="slide-right-to-left"
-        >
-          <button
-            v-show="this.configs.wall.count > 0"
-            class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="right" data-delay="0" data-tooltip="锁定"
-            @click="onToggleWallLockStatus"
-          >
-            <i class="{{ configs.wall.locked ? 'icon-lock' : 'icon-lock_open' }}"></i>
-          </button>
-          <button
-            v-show="this.configs.wall.count > 0"
-            class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="right" data-delay="0" data-tooltip="可见性"
-            @click="onToggleWallVisibility"
-          >
-            <i class="{{ configs.wall.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off' }}"></i>
-          </button>
-        </div>
-      </div>
-      <div class="blueprint-edit-panel__utils__item">
-        <button
-          class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="left" data-delay="500" data-tooltip="画门模式"
-          :class="mode === 'door' ? 'green' : 'white'"
-          @click="changeMode('door')"
-        >
-          <i class="icon-directions_run" :class="mode === 'door' ? 'white-text' : 'black-text'"></i>
-        </button>
-        <div
-          v-show="mode === 'door'"
-          class="blueprint-edit-panel__utils__item__sub-utils"
-          transition="slide-right-to-left"
-        >
-          <button
-            v-show="this.configs.door.count > 0"
-            class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="right" data-delay="0" data-tooltip="锁定"
-            @click="onToggleDoorLockStatus"
-          >
-            <i class="{{ configs.door.locked ? 'icon-lock' : 'icon-lock_open' }}"></i>
-          </button>
-          <button
-            v-show="this.configs.door.count > 0"
-            class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="right" data-delay="0" data-tooltip="可见性"
-            @click="onToggleDoorVisibility"
-          >
-            <i class="{{ configs.door.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off' }}"></i>
-          </button>
-        </div>
-      </div>
-      <div class="blueprint-edit-panel__utils__item">
-        <button
-          class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="left" data-delay="500" data-tooltip="画窗模式"
-          :class="mode === 'window' ? 'blue' : 'white'"
-          @click="changeMode('window')"
-        >
-          <i class="icon-wb_sunny" :class="mode === 'window' ? 'white-text' : 'black-text'"></i>
-        </button>
-        <div
-          v-show="mode === 'window'"
-          class="blueprint-edit-panel__utils__item__sub-utils"
-          transition="slide-right-to-left"
-        >
-          <button
-            v-show="this.configs.window.count > 0"
-            class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="right" data-delay="0" data-tooltip="锁定"
-            @click="onToggleWindowLockStatus"
-          >
-            <i class="{{ configs.window.locked ? 'icon-lock' : 'icon-lock_open' }}"></i>
-          </button>
-          <button
-            v-show="this.configs.window.count > 0"
-            class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="right" data-delay="0" data-tooltip="可见性"
-            @click="onToggleWindowVisibility"
-          >
-            <i class="{{ configs.window.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off' }}"></i>
-          </button>
-        </div>
-      </div>
-      <div class="blueprint-edit-panel__utils__item">
-        <button
-          class="btn-floating btn-large waves-effect waves-light tooltipped"
-          data-position="left" data-delay="500" data-tooltip="背景"
-          :class="mode === 'background' ? 'red' : 'white'"
-          @click="changeMode('background')"
-        >
-          <i class="icon-now_wallpaper" :class="mode === 'background' ? 'white-text' : 'black-text'"></i>
-        </button>
-        <div
-          v-show="mode === 'background'"
-          class="blueprint-edit-panel__utils__item__sub-utils"
-          transition="slide-right-to-left"
-        >
-          <button
-            class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="right" data-delay="0" data-tooltip="添加背景"
-            @click="loadBackgroundImg"
-          >
-            <i class="icon-image"></i>
-          </button>
-          <button
-            v-show="this.configs.background.count > 0"
-            class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="right" data-delay="0" data-tooltip="锁定"
-            @click="onToggleBackgroundImgLockStatus"
-          >
-            <i class="{{ configs.background.locked ? 'icon-lock' : 'icon-lock_open' }}"></i>
-          </button>
-          <button
-            v-show="this.configs.background.count > 0"
-            class="waves-effect waves-teal btn-flat tooltipped"
-            data-position="right" data-delay="0" data-tooltip="可见性"
-            @click="onToggleBackgroundImgVisibility"
-          >
-            <i class="{{ configs.background.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off' }}"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="blueprint-edit-panel__element-utils__container">
-    <div v-show="elementUtilsType === 'background'" transition="slide-bottom-to-top">
-      <div
-        class="blueprint-edit-panel__element-utils__item"
-        transition="fade"
-      >
-        <span class="range-field">
-          <input
-            id="blueprint-edit-panel__background__opacity"
-            type="range"
-            min="0" max="100"
-            v-model="configs.background.opacity"
-            @input="onBackgroundImgOpacityChange"
-          />
-        </span>
-      </div>
-    </div>
-    <div v-show="elementUtilsType === 'line'" transition="slide-bottom-to-top">
-      <div
-        class="blueprint-edit-panel__element-utils__item"
-        transition="fade"
-      >
-      </div>
-    </div>
-  </div>
-  <input
-    id="blueprint-edit-panel__background-input"
-    type="file"
-    @change="onBackgroundImgChange"
-  />
+  <menu-container
+    class="edit-page__menu-container"
+    :mode="mode"
+    :svg.once="svg"
+    :set-mode.once="setMode"
+    :wrap-element-with-event-handler.once="wrapElementWithEventHandler"
+    class-name="background"
+  >
+  </menu-container>
+<!--   <modifier-container
+    class="edit-page__modifier-container"
+  >
+  </modifier-container> -->
 </div>
 </template>
 
@@ -228,16 +25,20 @@
 import $ from 'jquery'
 
 import SvgCanvas from './SvgCanvas'
-import SelectControl from '../libs/svg/SelectControl'
-import ConnectedLinePainter from '../libs/svg/ConnectedLinePainter'
-import HoverControl from '../libs/svg/HoverControl'
-import { isLineSelected } from '../libs/utils'
+import MenuContainer from './menu/MenuContainer'
+import ModifierContainer from './modifier/ModifierContainer'
+import SelectControl from '../../libs/svg/SelectControl'
+import ConnectedLinePainter from '../../libs/svg/ConnectedLinePainter'
+import HoverControl from '../../libs/svg/HoverControl'
+import { isLineSelected } from '../../libs/utils'
 
 export default {
-  name: 'BlueprintEditPanel',
+  name: 'EditPage',
 
   components: {
-    SvgCanvas
+    SvgCanvas,
+    MenuContainer,
+    ModifierContainer
   },
 
   props: {

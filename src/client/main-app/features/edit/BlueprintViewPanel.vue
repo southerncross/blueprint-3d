@@ -25,10 +25,10 @@
 <script>
 import THREE from 'THREE'
 
-import MoveControl from '../libs/three/MoveControl'
-import OrbitControl from '../libs/three/OrbitControl'
-import Fullscreen from '../libs/three/Fullscreen'
-import PointerLock from '../libs/three/PointerLock'
+import MoveControl from '../../libs/three/MoveControl'
+import OrbitControl from '../../libs/three/OrbitControl'
+import Fullscreen from '../../libs/three/Fullscreen'
+import PointerLock from '../../libs/three/PointerLock'
 
 const CANVAS_WIDTH = 800
 const CANVAS_HEIGHT = 600
