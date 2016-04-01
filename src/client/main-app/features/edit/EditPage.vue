@@ -557,79 +557,11 @@ export default {
 </script>
 
 <style lang="stylus">
-.fade
-  &-transition
-    transition all .6s ease
-    opacity 1
-  &-enter, &-leave
-    opacity 0
+.edit-page
+  &__menu-container
+    position fixed
+    right 40px
+    top 50%
+    transform translateY(-50%)
 
-.slide-bottom-to-top
-  &-transition
-    transition all .3s ease
-    margin-top 0
-    opacity 1
-  &-enter, &-leave
-    margin-top 50px
-    opacity 0
-
-.slide-right-to-left
-  &-transition
-    transition all .3s ease
-    margin-left 0
-    opacity 1
-  &-enter, &-leave
-    margin-left 50px
-    opacity 0
-
-#blueprint-edit-panel
-  &__background-input
-    display none
-  &__svg__container
-    display inline-block
-    vertical-align top
-
-.blueprint-edit-panel
-  &__main
-    position relative
-  &__utils
-    &__container
-      position absolute
-      top 0
-      left 820px
-      text-align center
-      vertical-align top
-    &__item
-      position relative
-      margin-top 30px
-      &__sub-utils
-        position absolute
-        top 50%
-        left 60px
-        transform translateY(-50%)
-  &__element-utils
-    &__container
-      width 800px
-    &__item
-      display inline-block
-
-.corner-resizer
-  &--nw
-    cursor nw-resize
-  &--ne
-    cursor ne-resize
-  &--se
-    cursor se-resize
-  &--sw
-    cursor sw-resize
-
-.edge-resizer
-  &--n
-    cursor n-resize
-  &--e
-    cursor e-resize
-  &--s
-    cursor s-resize
-  &--w
-    cursor w-resize
 </style>

@@ -67,4 +67,24 @@ $svg-canvas
   &__background
     @extends $svg-canvas
     z-index -20
+
+.corner-resizer
+  &--nw
+    cursor nw-resize
+  &--ne
+    cursor ne-resize
+  &--se
+    cursor se-resize
+  &--sw
+    cursor sw-resize
+
+.edge-resizer
+  &--n
+    cursor n-resize
+  &--e
+    cursor e-resize
+  &--s
+    cursor s-resize
+  &--w
+    cursor w-resize
 </style>

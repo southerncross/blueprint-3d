@@ -132,5 +132,6 @@ export default {
 </script>
 
 <style lang="stylus">
-
+#background-menu__background-input
+  display none
 </style>
