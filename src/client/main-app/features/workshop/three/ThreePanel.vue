@@ -1,12 +1,12 @@
 <template>
 <div>
-  content
+  three panel
 </div>
 </template>
 
 <script>
 export default {
-  name: 'Content'
+  name: 'ThreePanel'
 }
 </script>
 

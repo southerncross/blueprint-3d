@@ -3,7 +3,7 @@
   <div class="collapsible-header edit-menu__header">
     <button
       class="btn-floating btn-large waves-effect waves-light tooltipped"
-      data-position="left" data-delay="500" data-tooltip="画窗模式"
+      data-position="right" data-delay="500" data-tooltip="画窗模式"
       :class="menuBtnClassName"
       @click="setMode('window')"
     >
@@ -38,8 +38,9 @@
 <script>
 import {
   toggleWindowVisibility,
-  toggleWindowLock
-} from '../../../vuex/actions'
+  toggleWindowLock,
+  addWindow
+} from '../../../../vuex/actions'
 
 export default {
   name: 'WindowMenu',
@@ -52,17 +53,21 @@ export default {
     },
     actions: {
       toggleWindowVisibility,
-      toggleWindowLock
+      toggleWindowLock,
+      addWindow
     }
   },
 
   props: {
     mode: String,
+    elemEventControl: Object,
+    svgEventControl: Object,
+    windowPainter: Object,
     setMode: Function
   },
 
   computed: {
-    show: function() {
+    isWindowMode: function() {
       return this.mode === 'window'
     },
     menuBtnClassName: function() {
@@ -77,6 +82,51 @@ export default {
     visibilityIconClassName: function() {
       return this.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off'
     }
+  },
+
+  created() {
+    this.elemEventControl
+    .register('mouseover', (event) => {
+      if (!this.isWindowMode) {
+        return
+      }
+      const elem = this.svg.select(`#${event.target.id}`)
+      if (elem.data('locked')) {
+        return
+      }
+      if (elem.attr('class') !== 'wall') {
+        return
+      }
+      this.windowPainter.hover(event.offsetX, event.offsetY, elem)
+    })
+    .register('mousemove', (event) => {
+      if (!this.isWindowMode) {
+        return
+      }
+      const elem = this.svg.select(`#${event.target.id}`)
+      if (elem.data('locked')) {
+        return
+      }
+      if (elem.attr('class') !== 'wall') {
+        return
+      }
+      this.windowPainter.sync(event.offsetX, event.offsetY, elem)
+    })
+
+    this.svgEventControl
+    .register('mousedown', (event) => {
+      if (event.bypass) {
+        return
+      }
+      if (!this.isWindowMode) {
+        return
+      }
+      const _window = this.windowPainter.draw()
+      if (_window) {
+        this.elemEventControl.wrap(_window)
+        this.addWindow()
+      }
+    })
   }
 }
 </script>

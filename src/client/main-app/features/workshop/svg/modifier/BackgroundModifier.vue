@@ -20,7 +20,7 @@
 <script>
 import {
   updateBackgroundOpacity
-} from '../../../vuex/actions'
+} from '../../../../vuex/actions'
 
 export default {
   name: 'BackgroundModifier',

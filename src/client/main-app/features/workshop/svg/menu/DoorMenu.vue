@@ -3,7 +3,7 @@
   <div class="collapsible-header edit-menu__header">
     <button
       class="btn-floating btn-large waves-effect waves-light tooltipped"
-      data-position="left" data-delay="500" data-tooltip="画门模式"
+      data-position="right" data-delay="500" data-tooltip="画门模式"
       :class="menuBtnClassName"
       @click="setMode('door')"
     >
@@ -38,8 +38,9 @@
 <script>
 import {
   toggleDoorVisibility,
-  toggleDoorLock
-} from '../../../vuex/actions'
+  toggleDoorLock,
+  addDoor
+} from '../../../../vuex/actions'
 
 export default {
   name: 'DoorMenu',
@@ -52,17 +53,21 @@ export default {
     },
     actions: {
       toggleDoorVisibility,
-      toggleDoorLock
+      toggleDoorLock,
+      addDoor
     }
   },
 
   props: {
     mode: String,
+    elemEventControl: Object,
+    svgEventControl: Object,
+    doorPainter: Object,
     setMode: Function
   },
 
   computed: {
-    show: function() {
+    isDoorMode: function() {
       return this.mode === 'door'
     },
     menuBtnClassName: function() {
@@ -77,6 +82,51 @@ export default {
     visibilityIconClassName: function() {
       return this.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off'
     }
+  },
+
+  created() {
+    this.elemEventControl
+    .register('mouseover', (event) => {
+      if (!this.isDoorMode) {
+        return
+      }
+      const elem = this.svg.select(`#${event.target.id}`)
+      if (elem.data('locked')) {
+        return
+      }
+      if (elem.attr('class') !== 'wall') {
+        return
+      }
+      this.doorPainter.hover(event.offsetX, event.offsetY, elem)
+    })
+    .register('mousemove', (event) => {
+      if (!this.isDoorMode) {
+        return
+      }
+      const elem = this.svg.select(`#${event.target.id}`)
+      if (elem.data('locked')) {
+        return
+      }
+      if (elem.attr('class') !== 'wall') {
+        return
+      }
+      this.doorPainter.sync(event.offsetX, event.offsetY, elem)
+    })
+
+    this.svgEventControl
+    .register('mousedown', (event) => {
+      if (event.bypass) {
+        return
+      }
+      if (!this.isDoorMode) {
+        return
+      }
+      const door = this.doorPainter.draw()
+      if (door) {
+        this.elemEventControl.wrap(door)
+        this.addDoor()
+      }
+    })
   }
 }
 </script>

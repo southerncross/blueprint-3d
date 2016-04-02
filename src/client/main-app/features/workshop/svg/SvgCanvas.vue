@@ -58,7 +58,7 @@ $svg-canvas
   top 0
   right 0
   bottom 0
-  left 80px
+  left 0
 
 #svg-canvas
   @extends $svg-canvas

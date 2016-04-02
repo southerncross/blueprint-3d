@@ -4,28 +4,34 @@
     class="menu-item"
     :mode="mode"
     :set-mode.once="setMode"
-    :select-background.once="selectBackground"
-    :select-all-walls.once="selectAllWalls"
-    :select-all-windows.once="selectAllWindows"
-    :select-all-doors.once="selectAllDoors"></select-menu>
+    :select-control.once="selectControl"
+    :svg-event-control.once="svgEventControl"
+    :elem-event-control.once="elemEventControl"></select-menu>
   <wall-menu
     class="menu-item"
     :mode="mode"
-    :set-mode.once="setMode"></wall-menu>
+    :set-mode.once="setMode"
+    :svg-event-control.once="svgEventControl"
+    :elem-event-control.once="elemEventControl"></wall-menu>
   <window-menu
     class="menu-item"
     :mode="mode"
-    :set-mode.once="setMode"></window-menu>
+    :set-mode.once="setMode"
+    :svg-event-control.once="svgEventControl"
+    :elem-event-control.once="elemEventControl"></window-menu>
   <door-menu
     class="menu-item"
     :mode="mode"
-    :set-mode.once="setMode"></door-menu>
+    :set-mode.once="setMode"
+    :svg-event-control.once="svgEventControl"
+    :elem-event-control.once="elemEventControl"></door-menu>
   <background-menu
     class="menu-item"
     :mode="mode"
     :svg.once="svg"
     :set-mode.once="setMode"
-    :wrap-element-wight-event-handler.once="wrapElementWithEventHandler"></background-menu>
+    :svg-event-control.once="svgEventControl"
+    :elem-event-control.once="elemEventControl"></background-menu>
 </ul>
 </template>
 
@@ -50,12 +56,11 @@ export default {
   props: {
     mode: String,
     svg: Object,
+    selectControl: Object,
+    elemEventControl: Object,
+    svgEventControl: Object,
     setMode: Function,
-    wrapElementWithEventHandler: Function,
-    selectBackground: Function,
-    selectAllWalls: Function,
-    selectAllWindows: Function,
-    selectAllDoors: Function
+    wrapElementWithEventHandler: Function
   }
 }
 </script>

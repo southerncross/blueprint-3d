@@ -38,8 +38,9 @@
 <script>
 import {
   toggleWallVisibility,
-  toggleWallLock
-} from '../../../vuex/actions'
+  toggleWallLock,
+  addWall
+} from '../../../../vuex/actions'
 
 export default {
   name: 'WallMenu',
@@ -52,17 +53,21 @@ export default {
     },
     actions: {
       toggleWallVisibility,
-      toggleWallLock
+      toggleWallLock,
+      addWall
     }
   },
 
   props: {
     mode: String,
+    elemEventControl: Object,
+    svgEventControl: Object,
+    wallPainter: Object,
     setMode: Function
   },
 
   computed: {
-    show: function() {
+    isWallMode: function() {
       return this.mode === 'wall'
     },
     menuBtnClassName: function() {
@@ -77,6 +82,23 @@ export default {
     visibilityIconClassName: function() {
       return this.visibility === 'visible' ? 'icon-visibility' : 'icon-visibility_off'
     }
+  },
+
+  created() {
+    this.svgEventControl
+    .register('mousedown', (event) => {
+      if (event.bypass) {
+        return
+      }
+      if (!this.isWallMode) {
+        return
+      }
+      if (this.wallPainter.isDrawing) {
+        this.addWall()
+      }
+      const wall = this.wallPainter.draw()
+      this.elemEventControl.wrap(wall)
+    })
   }
 }
 </script>
