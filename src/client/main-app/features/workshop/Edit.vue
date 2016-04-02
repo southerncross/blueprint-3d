@@ -1,12 +1,11 @@
 <template>
-<div class="blueprint-edit-panel__container">
+<div>
   <svg-canvas
-    class="edit-page__svg-canvas"
-    :svg="svg"
-  >
+    class="edit__svg-canvas"
+    :svg="svg">
   </svg-canvas>
   <menu-container
-    class="edit-page__menu-container"
+    class="edit__menu-container"
     :mode="mode"
     :svg.once="svg"
     :set-mode.once="setMode"
@@ -14,12 +13,10 @@
     :select-background.once="selectBackground"
     :select-all-walls.once="selectAllWalls"
     :select-all-windows.once="selectAllWindows"
-    :select-all-doors.once="selectAllDoors"
-  >
+    :select-all-doors.once="selectAllDoors">
   </menu-container>
   <modifier-container
-    class="edit-page__modifier-container"
-  >
+    class="edit__modifier-container">
   </modifier-container>
 </div>
 </template>
@@ -36,7 +33,7 @@ import HoverControl from '../../libs/svg/HoverControl'
 import { isLineSelected } from '../../libs/utils'
 
 export default {
-  name: 'EditPage',
+  name: 'Edit',
 
   components: {
     SvgCanvas,
@@ -557,10 +554,10 @@ export default {
 </script>
 
 <style lang="stylus">
-.edit-page
+.edit
   &__menu-container
     position fixed
-    right 40px
+    left 40px
     top 50%
     transform translateY(-50%)
 

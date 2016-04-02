@@ -1,48 +1,49 @@
 <template>
-<div>
-  <button
-    class="btn-floating btn-large waves-effect waves-light tooltipped"
-    :class="menuBtnClassName"
-    data-position="left" data-delay="500" data-tooltip="背景"
-    @click="setMode('background')"
-  >
-    <i class="icon-now_wallpaper" :class="menuIconClassName"></i>
-  </button>
-  <div
-    v-show="show"
-    class="background-menu__utils__item__sub-utils"
-    transition="slide-right-to-left"
-  >
+<li>
+  <div class="collapsible-header edit-menu__header">
     <button
-      class="waves-effect waves-teal btn-flat tooltipped"
-      data-position="right" data-delay="0" data-tooltip="添加背景"
-      @click="loadBackground"
-    >
-      <i class="icon-image"></i>
+      class="btn-floating btn-large waves-effect waves-light tooltipped"
+      :class="menuBtnClassName"
+      data-position="right" data-delay="500" data-tooltip="背景"
+      @click="setMode('background')">
+      <i class="icon-now_wallpaper" :class="menuIconClassName"></i>
     </button>
-    <button
-      v-show="existed"
-      class="waves-effect waves-teal btn-flat tooltipped"
-      data-position="right" data-delay="0" data-tooltip="锁定"
-      @click="toggleBackgroundLock"
-    >
-      <i :class="lockIconClassName"></i>
-    </button>
-    <button
-      v-show="existed"
-      class="waves-effect waves-teal btn-flat tooltipped"
-      data-position="right" data-delay="0" data-tooltip="可见性"
-      @click="toggleBackgroundVisibility"
-    >
-      <i :class="visibilityIconClassName"></i>
-    </button>
+  </div>
+  <div class="collapsible-body edit-menu__body">
+    <ul>
+      <li>
+        <button
+          class="btn-floating btn-small waves-effect waves-light tooltipped"
+          data-position="right" data-delay="0" data-tooltip="添加背景"
+          @click="loadBackground"
+        >
+          <i class="icon-image"></i>
+        </button>
+      </li>
+        <button
+          class="btn-floating btn-small waves-effect waves-light tooltipped"
+          data-position="right" data-delay="0" data-tooltip="锁定"
+          @click="toggleBackgroundLock"
+        >
+          <i :class="lockIconClassName"></i>
+        </button>
+      <li>
+      <button
+        class="btn-floating btn-small waves-effect waves-light tooltipped"
+        data-position="right" data-delay="0" data-tooltip="可见性"
+        @click="toggleBackgroundVisibility"
+      >
+        <i :class="visibilityIconClassName"></i>
+      </button>
+      </li>
+    </ul>
   </div>
   <input
     id="background-menu__background-input"
     type="file"
     @change="onBackgroundChange"
   />
-</div>
+</li>
 </template>
 
 <script>

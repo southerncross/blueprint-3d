@@ -1,36 +1,38 @@
 <template>
-<div>
-  <button
-    class="btn-floating btn-large waves-effect waves-light tooltipped"
-    data-position="left" data-delay="500" data-tooltip="画墙模式"
-    :class="menuBtnClassName"
-    @click="setMode('wall')"
-  >
-    <i class="icon-border_style" :class="menuIconClassName"></i>
-  </button>
-  <div
-    v-show="show"
-    class="wall-menu__utils__item__sub-utils"
-    transition="slide-right-to-left"
-  >
+<li>
+  <div class="collapsible-header edit-menu__header">
     <button
-      v-show="existed"
-      class="waves-effect waves-teal btn-flat tooltipped"
-      data-position="right" data-delay="0" data-tooltip="锁定"
-      @click="toggleWallLock"
+      class="btn-floating btn-large waves-effect waves-light tooltipped"
+      data-position="right" data-delay="500" data-tooltip="画墙模式"
+      :class="menuBtnClassName"
+      @click="setMode('wall')"
     >
-      <i :class="lockIconClassName"></i>
-    </button>
-    <button
-      v-show="existed"
-      class="waves-effect waves-teal btn-flat tooltipped"
-      data-position="right" data-delay="0" data-tooltip="可见性"
-      @click="toggleWallVisibility"
-    >
-      <i :class="visibilityIconClassName"></i>
+      <i class="icon-border_style" :class="menuIconClassName"></i>
     </button>
   </div>
-</div>
+  <div class="collapsible-body edit-menu__body">
+    <ul>
+      <li>
+        <button
+          class="btn-floating btn-small waves-effect waves-light tooltipped"
+          data-position="right" data-delay="0" data-tooltip="锁定"
+          @click="toggleWallLock"
+        >
+          <i :class="lockIconClassName"></i>
+        </button>
+      </li>
+      <li>
+        <button
+          class="btn-floating btn-small waves-effect waves-light tooltipped"
+          data-position="right" data-delay="0" data-tooltip="可见性"
+          @click="toggleWallVisibility"
+        >
+          <i :class="visibilityIconClassName"></i>
+        </button>
+      </li>
+    </ul>
+  </div>
+</li>
 </template>
 
 <script>

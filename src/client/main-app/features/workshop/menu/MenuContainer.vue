@@ -1,37 +1,32 @@
 <template>
-<div>
+<ul class="collapsible menu-container" data-collapsible="accordion">
   <select-menu
+    class="menu-item"
     :mode="mode"
     :set-mode.once="setMode"
     :select-background.once="selectBackground"
     :select-all-walls.once="selectAllWalls"
     :select-all-windows.once="selectAllWindows"
-    :select-all-doors.once="selectAllDoors"
-  >
-  </select-menu>
+    :select-all-doors.once="selectAllDoors"></select-menu>
   <wall-menu
+    class="menu-item"
     :mode="mode"
-    :set-mode.once="setMode"
-  >
-  </wall-menu>
+    :set-mode.once="setMode"></wall-menu>
   <window-menu
+    class="menu-item"
     :mode="mode"
-    :set-mode.once="setMode"
-  >
-  </window-menu>
+    :set-mode.once="setMode"></window-menu>
   <door-menu
+    class="menu-item"
     :mode="mode"
-    :set-mode.once="setMode"
-  >
-  </door-menu>
+    :set-mode.once="setMode"></door-menu>
   <background-menu
+    class="menu-item"
     :mode="mode"
     :svg.once="svg"
     :set-mode.once="setMode"
-    :wrap-element-wight-event-handler.once="wrapElementWithEventHandler"
-  >
-  </background-menu>
-</div>
+    :wrap-element-wight-event-handler.once="wrapElementWithEventHandler"></background-menu>
+</ul>
 </template>
 
 <script>
@@ -66,5 +61,12 @@ export default {
 </script>
 
 <style lang="stylus">
+@require './edit-menu.styl'
 
+.menu-container
+  border 0
+  box-shadow none
+
+.menu-item
+  margin 20px 0
 </style>
