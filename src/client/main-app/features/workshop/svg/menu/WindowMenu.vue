@@ -60,6 +60,7 @@ export default {
 
   props: {
     mode: String,
+    svg: Object,
     elemEventControl: Object,
     svgEventControl: Object,
     windowPainter: Object,

@@ -2,19 +2,20 @@
 <div>
   <svg-canvas
     class="edit__svg-canvas"
-    :svg="svg"
-    :select-control="selectControl">
+    :svg.once="svg"
+    :select-control.once="selectControl">
   </svg-canvas>
   <menu-container
     class="edit__menu-container"
     :mode="mode"
     :svg.once="svg"
-    :select-control="selectControl"
-    :elem-event-control="elemEventControl"
-    :svg-event-control="svgEventControl"
-    :wall-painter="wallPainter"
+    :select-control.once="selectControl"
+    :elem-event-control.once="elemEventControl"
+    :svg-event-control.once="svgEventControl"
+    :wall-painter.once="wallPainter"
+    :window-painter.once="windowPainter"
+    :door-painter.once="doorPainter"
     :set-mode.once="setMode"
-    :wrap-element-with-event-handler.once="wrapElementWithEventHandler">
   </menu-container>
   <modifier-container
     class="edit__modifier-container">
@@ -28,6 +29,7 @@ import MenuContainer from './menu/MenuContainer'
 import ModifierContainer from './modifier/ModifierContainer'
 import SelectControl from '../../../libs/svg/SelectControl'
 import EventControl from '../../../libs/svg/EventControl'
+import HoverControl from '../../../libs/svg/HoverControl'
 import ConnectedLinePainter from '../../../libs/svg/ConnectedLinePainter'
 
 export default {
@@ -64,6 +66,28 @@ export default {
           strokeLinecap: 'round'
         },
         className: 'wall'
+      }),
+      windowPainter: new HoverControl({
+        svg: this.svg,
+        style: {
+          stroke: '#B3E5FC'
+        },
+        drawingStyle: {
+          stroke: '#81D4FA'
+        },
+        length: 50,
+        className: 'window'
+      }),
+      doorPainter: new HoverControl({
+        svg: this.svg,
+        style: {
+          stroke: '#C8E6C9'
+        },
+        drawingStyle: {
+          stroke: '#A5D6A7'
+        },
+        length: 50,
+        className: 'door'
       })
     }
   },
