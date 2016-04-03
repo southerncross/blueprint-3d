@@ -1,12 +1,20 @@
 <template>
 <div>
-  <div>
-    switch
+  <div class="switch text-cyan edit__switch">
+    <label>
+      3D
+      <input type="checkbox" :checked="mode === 'svg'" @click="toggleMode">
+      <span class="lever"></span>
+      2D
+    </label>
   </div>
   <svg-panel
-    v-show="showSvgPanel"
+    v-show="showSvgPanel()"
+    transition="fade"
     :svg.once="svg"></svg-panel>
-  <three-panel></three-panel>
+  <three-panel
+    v-show="showThreePanel()"
+    transition="fade"></three-panel>
 </div>
 </template>
 
@@ -53,11 +61,17 @@ export default {
 </script>
 
 <style lang="stylus">
+@import '../../transition'
+
 .edit
   &__menu-container
     position fixed
     left 40px
     top 50%
     transform translateY(-50%)
+  &__switch
+    position absolute
+    top 100px
+    left 10px
 
 </style>
