@@ -10,7 +10,7 @@ class EventControl {
     }
 
     this.register = this.register.bind(this)
-    this.wrapElement = this.wrapElement.bind(this)
+    this.wrap = this.wrap.bind(this)
   }
 
   register(name, handler) {
@@ -18,7 +18,7 @@ class EventControl {
     return this
   }
 
-  wrapElement(elem) {
+  wrap(elem) {
     Object.keys(this.handlers).forEach((handlerName) => {
       this.handlers[handlerName].forEach((handler) => {
         elem[handlerName](handler)

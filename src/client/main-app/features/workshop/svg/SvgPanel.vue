@@ -12,6 +12,7 @@
     :select-control="selectControl"
     :elem-event-control="elemEventControl"
     :svg-event-control="svgEventControl"
+    :wall-painter="wallPainter"
     :set-mode.once="setMode"
     :wrap-element-with-event-handler.once="wrapElementWithEventHandler">
   </menu-container>
@@ -77,6 +78,17 @@ export default {
       this.selectControl.reset()
       this.wallPainter.cancel()
     }
+  },
+
+  ready() {
+    this.selectControl.init()
+    this.wallPainter.init()
+    this.svgEventControl.wrap(this.svg)
+  },
+
+  beforeDestroy() {
+    this.wallPainter.uninit()
+    this.selectControl.uninit()
   }
 }
 </script>

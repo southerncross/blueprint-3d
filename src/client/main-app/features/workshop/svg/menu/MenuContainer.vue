@@ -3,6 +3,7 @@
   <select-menu
     class="menu-item"
     :mode="mode"
+    :svg="svg"
     :set-mode.once="setMode"
     :select-control.once="selectControl"
     :svg-event-control.once="svgEventControl"
@@ -10,6 +11,7 @@
   <wall-menu
     class="menu-item"
     :mode="mode"
+    :wall-painter="wallPainter"
     :set-mode.once="setMode"
     :svg-event-control.once="svgEventControl"
     :elem-event-control.once="elemEventControl"></wall-menu>
@@ -59,6 +61,7 @@ export default {
     selectControl: Object,
     elemEventControl: Object,
     svgEventControl: Object,
+    wallPainter: Object,
     setMode: Function,
     wrapElementWithEventHandler: Function
   }

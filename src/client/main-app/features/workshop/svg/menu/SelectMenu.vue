@@ -70,6 +70,7 @@ export default {
 
   props: {
     mode: String,
+    svg: Object,
     selectControl: Object,
     elemEventControl: Object,
     svgEventControl: Object,
@@ -131,7 +132,7 @@ export default {
         return
       }
       event.bypass = true
-      if (event.data('selecting')) {
+      if (elem.data('selecting')) {
         return
       }
       this.selectControl.select(elem)
@@ -159,11 +160,15 @@ export default {
         0
       )
       .attr({
-        display: 'block'
+        class: 'selector-box',
+        display: 'block',
+        stroke: 'red',
+        fill: 'transparent',
+        strokeDasharray: '5, 5'
       })
       .data('x', event.offsetX)
       .data('y', event.offsetY)
-      this.mouseDown = true
+      this.mousedown = true
     })
     .register('mousemove', (event) => {
       if (!this.mousedown) {
@@ -195,6 +200,9 @@ export default {
         return
       }
       const selectorBox = this.svg.select('.selector-box')
+      if (!selectorBox) {
+        return
+      }
       const bbox = selectorBox.getBBox()
       const selectedElements = []
       this.svg.selectAll('line').forEach((line) => {
