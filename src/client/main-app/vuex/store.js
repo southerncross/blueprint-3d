@@ -32,6 +32,9 @@ const mutations = {
   UPDATE_BACKGROUND (state) {
     state.bakcground.count = 1
   },
+  REMOVE_BACKGROUND (state) {
+    state.background.count = 0
+  },
   TOGGLE_BACKGROUND_LOCK (state) {
     state.background.lock = !state.background.lock
   },

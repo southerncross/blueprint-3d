@@ -1,5 +1,6 @@
 // Background
 export const updateBackground = makeAction('UPDATE_BACKGROUND')
+export const removeBackground = makeAction('REMOVE_BACKGROUND')
 export const toggleBackgroundLock = makeAction('TOGGLE_BACKGROUND_LOCK')
 export const toggleBackgroundVisibility = makeAction('TOGGLE_BACKGROUND_VISIBILITY')
 export const updateBackgroundOpacity = makeAction('UPDATE_BACKGROUND_OPACITY')

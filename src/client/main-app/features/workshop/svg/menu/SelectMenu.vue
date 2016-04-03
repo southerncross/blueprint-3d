@@ -54,6 +54,12 @@
 </template>
 
 <script>
+import {
+  removeBackground,
+  removeWall,
+  removeWindow,
+  removeDoor
+} from '../../../../vuex/actions'
 import { isLineSelected } from '../../../../libs/utils'
 
 export default {
@@ -65,6 +71,12 @@ export default {
       hasWall: state => state.wall.count > 0,
       hasWindow: state => state.window.count > 0,
       hasDoor: state => state.window.count > 0
+    },
+    actions: {
+      removeBackground,
+      removeWall,
+      removeWindow,
+      removeDoor
     }
   },
 
@@ -112,6 +124,44 @@ export default {
     selectAllDoors() {
       const doors = this.svg.selectAll('.door')
       this.selectControl.select(doors)
+    },
+    onKeydown(event) {
+      if (!this.isSelectMode) {
+        return
+      }
+
+      if (event.code === 'Escape' ||
+          event.keyCode === 27) {
+        this.selectControl.reset()
+        return
+      }
+
+      if (event.code === 'Backspace' ||
+          event.keyCode === 8 ||
+          event.code === 'Delete' ||
+          event.keyCode === 46) {
+        event.preventDefault()
+        this.selectControl.selectedElems.forEach((elem) => {
+          switch (elem.attr('class')) {
+            case 'background':
+              this.removeBackground()
+              break
+            case 'wall':
+              this.removeWall()
+              break
+            case 'window':
+              this.removeWindow()
+              break
+            case 'door':
+              this.removeDoor()
+              break
+            default:
+              break
+          }
+          elem.remove()
+        })
+        this.selectControl.reset()
+      }
     }
   },
 
@@ -213,6 +263,12 @@ export default {
       this.selectControl.select(selectedElements)
       selectorBox.remove()
     })
+
+    document.addEventListener('keydown', this.onKeydown)
+  },
+
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.onKeydown)
   }
 }
 </script>
