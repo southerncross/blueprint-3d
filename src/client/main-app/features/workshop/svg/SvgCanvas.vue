@@ -40,11 +40,6 @@ export default {
   },
 
   ready() {
-    // Init SVG canvas
-    // this.svg
-    // .mousedown(this.onMousedown)
-    // .mousemove(this.onMousemove)
-    // .mouseup(this.onMouseup)
     drawGrids(document.getElementById('svg-canvas__background'))
 
     document.getElementById('svg-canvas').appendChild(this.svg.node)

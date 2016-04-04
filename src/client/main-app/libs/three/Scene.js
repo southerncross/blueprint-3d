@@ -12,24 +12,37 @@ class Scene {
     this.clock = new THREE.Clock()
     this.orbitControl = null
     this.moveControl = null
+    this.mode = 'orbit'
+    this.keepRendering = false
 
-    this.init = this.init.bind(this)
+    this.__init()
+
     this.add = this.add.bind(this)
+    this.mount = this.mount.bind(this)
+    this.startRendering = this.startRendering.bind(this)
+    this.stopRendering = this.stopRendering.bind(this)
     this.setOrbitView = this.setOrbitView.bind(this)
     this.setRoamView = this.setRoamView.bind(this)
-  }
 
-  init({ canvas, width, height }) {
-    this.__initRenderer(canvas, width, height)
-    this.__initCamera()
-    this.__initControls()
-    this.__initLight()
-    this.__initAxes()
-    this.__initPlane()
+    this.__render = this.__render.bind(this)
   }
 
   add(mesh) {
     this.scene.add(mesh)
+  }
+
+  mount({ mountDom, width, height }) {
+    this.renderer.setSize(width, height)
+    mountDom.appendChild(this.renderer.domElement)
+  }
+
+  startRendering() {
+    this.keepRendering = true
+    this.__render()
+  }
+
+  stopRendering() {
+    this.keepRendering = false
   }
 
   setOrbitView(callback) {
@@ -37,6 +50,7 @@ class Scene {
     this.camera.lookAt(new THREE.Vector3(0, 0, 0))
     this.moveControl.disable()
     this.orbitControl.enable()
+    this.mode = 'orbit'
     // this.renderer.setSize(CANVAS_WIDTH, CANVAS_HEIGHT)
     // this.isFullscreen = false
     callback()
@@ -47,6 +61,7 @@ class Scene {
     this.camera.lookAt(new THREE.Vector3(0, 0, 0))
     this.orbitControl.disable()
     this.moveControl.enable()
+    this.mode = 'roam'
     // this.renderer.setSize(window.innerWidth, window.innerHeight)
     // this.isFullscreen = true
 
@@ -64,13 +79,19 @@ class Scene {
     }
   }
 
-  __initRenderer(canvas, width, height) {
+  __init() {
+    this.__initRenderer()
+    this.__initCamera()
+    this.__initControls()
+    this.__initLight()
+    this.__initAxes()
+    this.__initPlane()
+  }
+
+  __initRenderer() {
     const renderer = new THREE.WebGLRenderer()
-    renderer.setClearColor(new THREE.Color(0x000000, 1.0))
-    renderer.setSize(width, height)
+    renderer.setClearColor(new THREE.Color(0xffffff, 1.0))
     renderer.shadowMap.enabled = true
-    renderer.domElement.className = 'card'
-    canvas.appendChild(renderer.domElement)
     this.renderer = renderer
   }
 
@@ -118,6 +139,39 @@ class Scene {
     planeMesh.receiveShadow = true
     planeMesh.rotation.x = -0.5 * Math.PI
     this.scene.add(planeMesh)
+  }
+
+  __render() {
+    const {
+      renderer,
+      scene,
+      camera,
+      orbitControl,
+      moveControl,
+      mode,
+      keepRendering
+    } = this
+
+    switch (mode) {
+      case 'orbit': {
+        orbitControl.update()
+        if (keepRendering) {
+          requestAnimationFrame(this.__render)
+          renderer.render(scene, camera)
+        }
+        break
+      }
+      case 'roam': {
+        moveControl.move()
+        if (keepRendering) {
+          requestAnimationFrame(this.__render)
+          renderer.render(scene, camera)
+        }
+        break
+      }
+      default:
+        break
+    }
   }
 }
 

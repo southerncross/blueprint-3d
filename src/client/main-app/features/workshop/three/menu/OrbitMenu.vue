@@ -1,10 +1,10 @@
 <template>
-<div>roam view</div>
+<div>orbit menu</div>
 </template>
 
 <script>
 export default {
-  name: 'RoamView'
+  name: 'OrbitMenu'
 }
 </script>
 

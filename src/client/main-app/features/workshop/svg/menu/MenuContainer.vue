@@ -68,8 +68,7 @@ export default {
     wallPainter: Object,
     windowPainter: Object,
     doorPainter: Object,
-    setMode: Function,
-    wrapElementWithEventHandler: Function
+    setMode: Function
   }
 }
 </script>

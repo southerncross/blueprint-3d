@@ -13,8 +13,9 @@
     transition="fade"
     :svg.once="svg"></svg-panel>
   <three-panel
-    v-show="showThreePanel()"
-    transition="fade"></three-panel>
+    v-if="showThreePanel()"
+    transition="fade"
+    :svg.once="svg"></three-panel>
 </div>
 </template>
 
