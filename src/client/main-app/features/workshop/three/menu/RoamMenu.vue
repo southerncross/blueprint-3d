@@ -7,7 +7,7 @@
       :class="menuBtnClassName"
       @click="setMode('roam')"
     >
-      <i class="icon-call_made" :class="menuIconClassName"></i>
+      <i class="icon-accessibility" :class="menuIconClassName"></i>
     </button>
   </div>
 </li>
@@ -27,7 +27,7 @@ export default {
       return this.mode === 'roam'
     },
     menuBtnClassName: function() {
-      return this.mode === 'roam' ? 'purple' : 'white'
+      return this.mode === 'roam' ? 'red' : 'white'
     },
     menuIconClassName: function() {
       return this.mode === 'roam' ? 'white-text' : 'black-text'

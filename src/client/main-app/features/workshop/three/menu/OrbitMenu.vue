@@ -7,7 +7,7 @@
       :class="menuBtnClassName"
       @click="setMode('orbit')"
     >
-      <i class="icon-call_made" :class="menuIconClassName"></i>
+      <i class="icon-public" :class="menuIconClassName"></i>
     </button>
   </div>
 </li>
@@ -27,7 +27,7 @@ export default {
       return this.mode === 'orbit'
     },
     menuBtnClassName: function() {
-      return this.mode === 'orbit' ? 'purple' : 'white'
+      return this.mode === 'orbit' ? 'blue' : 'white'
     },
     menuIconClassName: function() {
       return this.mode === 'orbit' ? 'white-text' : 'black-text'

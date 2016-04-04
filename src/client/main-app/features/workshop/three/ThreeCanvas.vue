@@ -18,7 +18,7 @@ export default {
       height: window.innerHeight
     })
     this.scene.startRendering()
-    this.scene.stopRendering()
+    // this.scene.stopRendering()
   },
 
   beforeDestroy() {
@@ -28,4 +28,6 @@ export default {
 </script>
 
 <style lang="stylus">
+#three-canvas
+  overflow hidden
 </style>

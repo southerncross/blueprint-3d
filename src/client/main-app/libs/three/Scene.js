@@ -85,7 +85,7 @@ class Scene {
     this.__initControls()
     this.__initLight()
     this.__initAxes()
-    this.__initPlane()
+    this.__initGrid()
   }
 
   __initRenderer() {
@@ -96,7 +96,7 @@ class Scene {
   }
 
   __initCamera() {
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 5000)
     camera.position.set(100, 100, 100)
     camera.lookAt(new THREE.Vector3(0, 0, 0))
     this.camera = camera
@@ -131,14 +131,13 @@ class Scene {
     this.scene.add(axes)
   }
 
-  __initPlane() {
-    const planeMesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(500, 500),
-      new THREE.MeshBasicMaterial({ color: 0xcccccc })
-    )
-    planeMesh.receiveShadow = true
-    planeMesh.rotation.x = -0.5 * Math.PI
-    this.scene.add(planeMesh)
+  __initGrid() {
+    const size = 200
+    const step = 10
+
+    const gridHelper = new THREE.GridHelper(size, step)
+    gridHelper.setColors(0x000000, 0xb0bec5)
+    this.scene.add(gridHelper)
   }
 
   __render() {

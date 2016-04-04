@@ -42,6 +42,16 @@ export default {
         return
       }
       this.mode = nextMode
+      switch (nextMode) {
+        case 'orbit':
+          this.scene.setOrbitView()
+          break
+        case 'roam':
+          this.scene.setRoamView()
+          break
+        default:
+          break
+      }
     },
 
     drawWalls() {

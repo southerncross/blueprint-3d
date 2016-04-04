@@ -1,5 +1,5 @@
 <template>
-<div class="navbar-fixed">
+<div class="navbar-fixed workshop__top-bar">
   <nav>
     <div class="nav-wrapper cyan">
       <a v-link="{ name: 'home' }"><span class="icon-cube logo"></span></a>
@@ -22,6 +22,11 @@ export default {
 .logo
   font-size x-large
   vertical-align middle
+
+.workshop__top-bar
+  position fixed
+  left 0
+  top 0
 
 .nav-wrapper
   padding 0 2%
