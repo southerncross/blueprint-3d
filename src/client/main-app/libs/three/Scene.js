@@ -53,6 +53,11 @@ class Scene {
     this.mode = 'orbit'
     // this.renderer.setSize(CANVAS_WIDTH, CANVAS_HEIGHT)
     // this.isFullscreen = false
+
+    if (typeof callback !== 'function') {
+      return
+    }
+
     callback()
   }
 
@@ -64,6 +69,10 @@ class Scene {
     this.mode = 'roam'
     // this.renderer.setSize(window.innerWidth, window.innerHeight)
     // this.isFullscreen = true
+
+    if (typeof callback !== 'function') {
+      return
+    }
 
     const listener = () => {
       PointerLock.removePointerLockListener(listener)
