@@ -1,10 +1,38 @@
 <template>
-<div>orbit menu</div>
+<li>
+  <div class="edit-menu__header">
+    <button
+      class="btn-floating btn-large waves-effect waves-light tooltipped"
+      data-position="right" data-delay="500" data-tooltip="上帝视角"
+      :class="menuBtnClassName"
+      @click="setMode('orbit')"
+    >
+      <i class="icon-call_made" :class="menuIconClassName"></i>
+    </button>
+  </div>
+</li>
 </template>
 
 <script>
 export default {
-  name: 'OrbitMenu'
+  name: 'OrbitMenu',
+
+  props: {
+    mode: String,
+    setMode: Function
+  },
+
+  computed: {
+    isOrbitMode: function() {
+      return this.mode === 'orbit'
+    },
+    menuBtnClassName: function() {
+      return this.mode === 'orbit' ? 'purple' : 'white'
+    },
+    menuIconClassName: function() {
+      return this.mode === 'orbit' ? 'white-text' : 'black-text'
+    }
+  }
 }
 </script>
 
