@@ -76,8 +76,8 @@ export default {
     mode: String,
     svg: Object,
     className: String,
-    setMode: Function,
-    wrapElementWithEventHandler: Function
+    elemEventControl: Object,
+    setMode: Function
   },
 
   computed: {
@@ -120,11 +120,11 @@ export default {
       .attr({
         class: this.className,
         id: this.className,
-        opacity: parseFloat(this.opacity) / 100
+        opacity: parseFloat(this.opacity)
       })
 
-      this.wrapElementWithEventHandler(newElem)
-      this.existed = true
+      this.elemEventControl.wrap(newElem)
+      this.updateBackground()
 
       desc.after(newElem)
     }

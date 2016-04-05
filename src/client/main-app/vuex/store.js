@@ -30,7 +30,7 @@ const state = {
 const mutations = {
   // Background
   UPDATE_BACKGROUND (state) {
-    state.bakcground.count = 1
+    state.background.count = 1
   },
   REMOVE_BACKGROUND (state) {
     state.background.count = 0
