@@ -18,7 +18,6 @@ export default {
       height: window.innerHeight
     })
     this.scene.startRendering()
-    // this.scene.stopRendering()
   },
 
   beforeDestroy() {
