@@ -27,4 +27,15 @@ export default {
 <style lang="stylus">
 body
   overflow hidden
+
+// Debug boring
+.dg.ac
+  top 100px
+  & .cr.string input[type=text]
+    height auto
+  & .cr.number input[type=text]
+    height auto
+
+.hue-field, .dg .c
+  box-sizing content-box
 </style>

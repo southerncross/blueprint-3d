@@ -1,4 +1,5 @@
 import THREE from 'THREE'
+import dat from 'dat'
 
 import MoveControl from './MoveControl'
 import OrbitControl from './OrbitControl'
@@ -14,6 +15,17 @@ class Scene {
     this.moveControl = null
     this.mode = 'orbit'
     this.keepRendering = false
+    // Debug boring
+    this.controls = {
+      message: 'hello',
+      speed: 3,
+      color: '#ffae23'
+    }
+    const gui = new dat.GUI()
+    gui.add(this.controls, 'message')
+    gui.add(this.controls, 'speed', -5, 5)
+    gui.addColor(this.controls, 'color')
+    this.gui = gui
 
     this.__init()
 
