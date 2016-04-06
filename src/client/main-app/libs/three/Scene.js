@@ -45,7 +45,7 @@ class Scene {
     this.keepRendering = false
   }
 
-  setOrbitView(callback) {
+  setOrbitView(callback = () => {}) {
     this.camera.position.set(100, 100, 100)
     this.camera.lookAt(new THREE.Vector3(0, 0, 0))
     this.moveControl.disable()
@@ -61,7 +61,7 @@ class Scene {
     callback()
   }
 
-  setRoamView(callback) {
+  setRoamView(callback = () => {}) {
     this.camera.position.set(0, 0, 10)
     this.camera.lookAt(new THREE.Vector3(0, 0, 0))
     this.orbitControl.disable()
@@ -80,8 +80,8 @@ class Scene {
     }
 
     try {
-      PointerLock.requestPointerLock()
       PointerLock.addPointerLockListener(listener)
+      PointerLock.requestPointerLock()
     } catch (err) {
       console.error(err)
       PointerLock.removePointerLockListener(listener)

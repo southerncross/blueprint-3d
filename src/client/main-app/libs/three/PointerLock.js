@@ -71,8 +71,17 @@ function requestPointerLock() {
   }
 }
 
+function exitPointerLock() {
+  if (isPointerLockAvailable) {
+    element.exitPointerLock()
+  } else {
+    throw new Error('Failed to request pointer lock: Pointer Lock API is not supported in your browser.')
+  }
+}
+
 export default {
   addPointerLockListener,
   removePointerLockListener,
-  requestPointerLock
+  requestPointerLock,
+  exitPointerLock
 }
