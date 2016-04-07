@@ -144,17 +144,17 @@ class Scene {
       ambientLight.color = new THREE.Color(e)
     })
 
-    this.scene.add(new THREE.ArrowHelper(new THREE.Vector3(-1, -1, -1).normalize(), new THREE.Vector3(0, 100, 0), 30, 0xff0000))
     const dirColor = '#ffffff'
     const dirIntensity = 0.5
     const directionalLight = new THREE.DirectionalLight(dirColor, dirIntensity)
     directionalLight.position.set(1, 1, 1)
     this.scene.add(directionalLight)
+    this.scene.add(new THREE.DirectionalLightHelper(directionalLight, 100))
 
-    this.scene.add(new THREE.ArrowHelper(new THREE.Vector3(-1, -1, 1).normalize(), new THREE.Vector3(0, 100, 0), 30, 0xff0000))
     const anotherDirectionalLight = new THREE.DirectionalLight(dirColor, dirIntensity)
     anotherDirectionalLight.position.set(1, 1, -1)
     this.scene.add(anotherDirectionalLight)
+    this.scene.add(new THREE.DirectionalLightHelper(anotherDirectionalLight, 100))
 
     // Control
     const directionalControl = {}
@@ -170,11 +170,34 @@ class Scene {
       anotherDirectionalLight.color = new THREE.Color(e)
     })
 
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6)
-    hemiLight.color.setHSL(0.6, 1, 0.6)
-    hemiLight.groundColor.setHSL(0.095, 1, 0.75)
+    const hemiLight = new THREE.HemisphereLight(0x898989, 0x595959, 0.6)
     hemiLight.position.set(0, 500, 0)
     this.scene.add(hemiLight)
+    this.scene.add(new THREE.HemisphereLightHelper(hemiLight, 50))
+
+    // control
+    const hemiControl = {}
+    hemiControl.color = '#ffffff'
+    hemiControl.groundColor = '#ffffff'
+    hemiControl.x = 0
+    hemiControl.y = 500
+    hemiControl.z = 0
+    const hemiFolder = this.gui.addFolder('hemiLight')
+    hemiFolder.addColor(hemiControl, 'color').onChange((e) => {
+      hemiLight.color = new THREE.Color(e)
+    })
+    hemiFolder.addColor(hemiControl, 'groundColor').onChange((e) => {
+      hemiLight.groundColor = new THREE.Color(e)
+    })
+    hemiFolder.add(hemiControl, 'x', -500, 500).onChange((e) => {
+      hemiLight.position.x = e
+    })
+    hemiFolder.add(hemiControl, 'y', -500, 500).onChange((e) => {
+      hemiLight.position.y = e
+    })
+    hemiFolder.add(hemiControl, 'z', -500, 500).onChange((e) => {
+      hemiLight.position.z = e
+    })
   }
 
   __initAxes() {
