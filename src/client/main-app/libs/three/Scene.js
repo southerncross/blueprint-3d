@@ -102,6 +102,7 @@ class Scene {
     this.__initLight()
     this.__initAxes()
     this.__initGrid()
+    this.__initCubeMap()
   }
 
   __initRenderer() {
@@ -129,8 +130,8 @@ class Scene {
   }
 
   __initLight() {
-    const cube = new THREE.Mesh(new THREE.BoxGeometry(30, 30, 30), new THREE.MeshLambertMaterial({ color: '#ffffff' }))
-    this.scene.add(cube)
+    // const cube = new THREE.Mesh(new THREE.BoxGeometry(30, 30, 30), new THREE.MeshLambertMaterial({ color: '#ffffff' }))
+    // this.scene.add(cube)
 
     const ambiColor = '#0c0c0c'
     const ambientLight = new THREE.AmbientLight(ambiColor)
@@ -212,6 +213,35 @@ class Scene {
     const gridHelper = new THREE.GridHelper(size, step)
     gridHelper.setColors(0x000000, 0xb0bec5)
     this.scene.add(gridHelper)
+  }
+
+  __initCubeMap() {
+    const loader = new THREE.CubeTextureLoader()
+    loader.setPath('/images/')
+    var textureCube = loader.load([
+      'posx.jpg',
+      'negx.jpg',
+      'posy.jpg',
+      'negy.jpg',
+      'posz.jpg',
+      'negz.jpg'
+    ])
+
+    var shader = THREE.ShaderLib['cube']
+    shader.uniforms['tCube'].value = textureCube
+    var material = new THREE.ShaderMaterial({
+      fragmentShader: shader.fragmentShader,
+      vertexShader: shader.vertexShader,
+      uniforms: shader.uniforms,
+      depthWrite: false,
+      side: THREE.BackSide
+    })
+    const cubeMesh = new THREE.Mesh(new THREE.CubeGeometry(5000, 5000, 5000), material)
+    this.scene.add(cubeMesh)
+
+    const sphere = new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshBasicMaterial({ color: 0xffffff }))
+    sphere.material.envMap = textureCube
+    this.scene.add(sphere)
   }
 
   __render() {
