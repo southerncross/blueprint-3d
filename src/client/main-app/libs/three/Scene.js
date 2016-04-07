@@ -129,9 +129,14 @@ class Scene {
   }
 
   __initLight() {
+    const cube = new THREE.Mesh(new THREE.BoxGeometry(30, 30, 30), new THREE.MeshLambertMaterial({ color: '#ffffff' }))
+    this.scene.add(cube)
+
     const ambiColor = '#0c0c0c'
     const ambientLight = new THREE.AmbientLight(ambiColor)
     this.scene.add(ambientLight)
+
+    // Control
     const ambientControl = {}
     ambientControl.color = ambiColor
     const ambientFolder = this.gui.addFolder('ambientLight')
@@ -139,21 +144,30 @@ class Scene {
       ambientLight.color = new THREE.Color(e)
     })
 
+    this.scene.add(new THREE.ArrowHelper(new THREE.Vector3(-1, -1, -1).normalize(), new THREE.Vector3(0, 100, 0), 30, 0xff0000))
     const dirColor = '#ffffff'
     const dirIntensity = 0.5
     const directionalLight = new THREE.DirectionalLight(dirColor, dirIntensity)
-    directionalLight.position.set(-1, 1.75, 1)
-    directionalLight.position.multiplyScalar(50)
+    directionalLight.position.set(1, 1, 1)
     this.scene.add(directionalLight)
+
+    this.scene.add(new THREE.ArrowHelper(new THREE.Vector3(-1, -1, 1).normalize(), new THREE.Vector3(0, 100, 0), 30, 0xff0000))
+    const anotherDirectionalLight = new THREE.DirectionalLight(dirColor, dirIntensity)
+    anotherDirectionalLight.position.set(1, 1, -1)
+    this.scene.add(anotherDirectionalLight)
+
+    // Control
     const directionalControl = {}
     directionalControl.color = dirColor
     directionalControl.intensity = dirIntensity
     const directionalFolder = this.gui.addFolder('directionalLight')
     directionalFolder.add(directionalControl, 'intensity', 0, 1.0).onChange((e) => {
       directionalLight.intensity = e
+      anotherDirectionalLight.intensity = e
     })
     directionalFolder.addColor(directionalControl, 'color').onChange((e) => {
       directionalLight.color = new THREE.Color(e)
+      anotherDirectionalLight.color = new THREE.Color(e)
     })
 
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6)
