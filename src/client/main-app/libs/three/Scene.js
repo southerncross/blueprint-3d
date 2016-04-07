@@ -16,16 +16,11 @@ class Scene {
     this.mode = 'orbit'
     this.keepRendering = false
     // Debug boring
-    this.controls = {
-      message: 'hello',
-      speed: 3,
-      color: '#ffae23'
-    }
-    const gui = new dat.GUI()
-    gui.add(this.controls, 'message')
-    gui.add(this.controls, 'speed', -5, 5)
-    gui.addColor(this.controls, 'color')
-    this.gui = gui
+    this.controls = {}
+    this.gui = new dat.GUI()
+    // gui.add(this.controls, 'message')
+    // gui.add(this.controls, 'speed', -5, 5)
+    // gui.addColor(this.controls, 'color')
 
     this.__init()
 
@@ -134,11 +129,32 @@ class Scene {
   }
 
   __initLight() {
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1)
-    dirLight.color.setHSL(0.1, 1, 0.95)
-    dirLight.position.set(-1, 1.75, 1)
-    dirLight.position.multiplyScalar(50)
-    this.scene.add(dirLight)
+    const ambiColor = '#0c0c0c'
+    const ambientLight = new THREE.AmbientLight(ambiColor)
+    this.scene.add(ambientLight)
+    const ambientControl = {}
+    ambientControl.color = ambiColor
+    const ambientFolder = this.gui.addFolder('ambientLight')
+    ambientFolder.addColor(ambientControl, 'color').onChange((e) => {
+      ambientLight.color = new THREE.Color(e)
+    })
+
+    const dirColor = '#ffffff'
+    const dirIntensity = 0.5
+    const directionalLight = new THREE.DirectionalLight(dirColor, dirIntensity)
+    directionalLight.position.set(-1, 1.75, 1)
+    directionalLight.position.multiplyScalar(50)
+    this.scene.add(directionalLight)
+    const directionalControl = {}
+    directionalControl.color = dirColor
+    directionalControl.intensity = dirIntensity
+    const directionalFolder = this.gui.addFolder('directionalLight')
+    directionalFolder.add(directionalControl, 'intensity', 0, 1.0).onChange((e) => {
+      directionalLight.intensity = e
+    })
+    directionalFolder.addColor(directionalControl, 'color').onChange((e) => {
+      directionalLight.color = new THREE.Color(e)
+    })
 
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6)
     hemiLight.color.setHSL(0.6, 1, 0.6)
