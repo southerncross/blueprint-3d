@@ -15,6 +15,7 @@
 
 <script>
 import THREE from 'THREE'
+import ThreeBSP from 'ThreeBSP'
 
 import Scene from '../../../libs/three/Scene'
 import ThreeCanvas from './ThreeCanvas'
@@ -94,40 +95,42 @@ export default {
         wallGeo.merge(wallMesh.geometry, wallMesh.matrix)
       })
 
-      // const windowGeo = new THREE.Geometry()
-      // this.svg.selectAll('.window').forEach((wall, idx) => {
-      //   const height = 10
-      //   let depth = 1
-      //   let width = 1
-      //   const x1 = Number(wall.attr('x1'))
-      //   const y1 = Number(wall.attr('y1'))
-      //   const x2 = Number(wall.attr('x2'))
-      //   const y2 = Number(wall.attr('y2'))
-      //   const x = (x1 + x2) / 2 / scale
-      //   const y = (y1 + y2) / 2 / scale
-      //   if (x1 === x2) {
-      //     depth = Math.abs(y1 - y2) / scale + width
-      //   } else {
-      //     width = Math.abs(x1 - x2) / scale + depth
-      //   }
+      const windowGeo = new THREE.Geometry()
+      this.svg.selectAll('.window').forEach((wall, idx) => {
+        console.error('boring')
+        const height = 10
+        let depth = 1
+        let width = 1
+        const x1 = Number(wall.attr('x1'))
+        const y1 = Number(wall.attr('y1'))
+        const x2 = Number(wall.attr('x2'))
+        const y2 = Number(wall.attr('y2'))
+        const x = (x1 + x2) / 2 / scale
+        const y = (y1 + y2) / 2 / scale
+        if (x1 === x2) {
+          depth = Math.abs(y1 - y2) / scale + width
+        } else {
+          width = Math.abs(x1 - x2) / scale + depth
+        }
 
-      //   const boxGeo = new THREE.BoxGeometry(width, height, depth)
-      //   boxGeo.translate(x - planeSize / 2 / scale, height / 2 + height, y - planeSize / 2 / scale)
-      //   const windowMesh = new THREE.Mesh(boxGeo)
-      //   windowMesh.updateMatrix()
-      //   windowGeo.merge(windowMesh.geometry, windowMesh.matrix)
-      // })
+        const boxGeo = new THREE.BoxGeometry(width, height, depth)
+        boxGeo.translate(x - planeSize / 2 / scale, height / 2 + height, y - planeSize / 2 / scale)
+        const windowMesh = new THREE.Mesh(boxGeo)
+        windowMesh.updateMatrix()
+        windowGeo.merge(windowMesh.geometry, windowMesh.matrix)
+      })
 
-      // const wallCsgGeo = THREE.CSG.toCSG(wallGeo)
-      // const windowCsgGeo = THREE.CSG.toCSG(windowGeo)
-      // wallCsgGeo.subtract(windowCsgGeo)
-      // const finalWallGeo = THREE.CSG.fromCSG(wallCsgGeo)
+      const wallBSP = new ThreeBSP(wallGeo)
+      const windowBSP = new ThreeBSP(windowGeo)
+      const newBSP = wallBSP.subtract(windowBSP)
+      const newMesh = newBSP.toMesh(new THREE.MeshLambertMaterial({ color: 0xffffff }))
+      this.scene.add(newMesh)
 
-      const wallMat = new THREE.MeshLambertMaterial({ color: 0xffffff })
+      // const wallMat = new THREE.MeshLambertMaterial({ color: 0xffffff })
       // const wallMesh = new THREE.Mesh(finalWallGeo, wallMat)
-      const wallMesh = new THREE.Mesh(wallGeo, wallMat)
+      // const wallMesh = new THREE.Mesh(wallGeo, wallMat)
 
-      this.scene.add(wallMesh)
+      // this.scene.add(wallMesh)
     }
   },
 

@@ -52,7 +52,7 @@ export default {
     toggleMode() {
       this.mode = this.mode === 'svg' ? 'three' : 'svg'
 
-      // debug
+      // debug boring
       if (this.mode === 'svg') {
         $('.dg.main.a').remove()
       }
