@@ -13,6 +13,7 @@ class Scene {
     this.clock = new THREE.Clock()
     this.orbitControl = null
     this.moveControl = null
+    this.anaglyphEffect = false
     this.mode = 'orbit'
     this.keepRendering = false
     // Debug boring
@@ -30,6 +31,7 @@ class Scene {
     this.stopRendering = this.stopRendering.bind(this)
     this.setOrbitView = this.setOrbitView.bind(this)
     this.setRoamView = this.setRoamView.bind(this)
+    this.toggleAnaglyphEffect = this.toggleAnaglyphEffect.bind(this)
 
     this.__render = this.__render.bind(this)
   }
@@ -40,6 +42,7 @@ class Scene {
 
   mount({ mountDom, width, height }) {
     this.renderer.setSize(width, height)
+    this.anaglyphRenderer.setSize(width, height)
     mountDom.appendChild(this.renderer.domElement)
   }
 
@@ -95,6 +98,10 @@ class Scene {
     }
   }
 
+  toggleAnaglyphEffect() {
+    this.anaglyphEffect = !this.anaglyphEffect
+  }
+
   __init() {
     this.__initRenderer()
     this.__initCamera()
@@ -110,6 +117,7 @@ class Scene {
     renderer.setClearColor(new THREE.Color(0xffffff, 1.0))
     renderer.shadowMap.enabled = true
     this.renderer = renderer
+    this.anaglyphRenderer = new THREE.AnaglyphEffect(renderer)
   }
 
   __initCamera() {
@@ -246,14 +254,19 @@ class Scene {
 
   __render() {
     const {
-      renderer,
       scene,
       camera,
       orbitControl,
       moveControl,
       mode,
-      keepRendering
+      keepRendering,
+      anaglyphEffect
     } = this
+
+    let renderer = this.renderer
+    if (anaglyphEffect) {
+      renderer = this.anaglyphRenderer
+    }
 
     switch (mode) {
       case 'orbit': {
