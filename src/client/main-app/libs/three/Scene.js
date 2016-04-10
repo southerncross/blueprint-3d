@@ -15,6 +15,7 @@ class Scene {
     this.moveControl = null
     this.anaglyphEffect = false
     this.mode = 'orbit'
+    this.skybox = null
     this.keepRendering = false
     // Debug boring
     this.controls = {}
@@ -58,6 +59,7 @@ class Scene {
   setOrbitView(callback = () => {}) {
     this.camera.position.set(100, 100, 100)
     this.camera.lookAt(new THREE.Vector3(0, 0, 0))
+    this.scene.remove(this.skybox)
     this.moveControl.disable()
     this.orbitControl.enable()
     this.mode = 'orbit'
@@ -74,6 +76,7 @@ class Scene {
   setRoamView(callback = () => {}) {
     this.camera.position.set(0, 0, 10)
     this.camera.lookAt(new THREE.Vector3(0, 0, 0))
+    this.scene.add(this.skybox)
     this.orbitControl.disable()
     this.moveControl.enable()
     this.mode = 'roam'
@@ -244,12 +247,7 @@ class Scene {
       depthWrite: false,
       side: THREE.BackSide
     })
-    const cubeMesh = new THREE.Mesh(new THREE.CubeGeometry(5000, 5000, 5000), material)
-    this.scene.add(cubeMesh)
-
-    const sphere = new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshBasicMaterial({ color: 0xffffff }))
-    sphere.material.envMap = textureCube
-    this.scene.add(sphere)
+    this.skybox = new THREE.Mesh(new THREE.CubeGeometry(2000, 2000, 2000), material)
   }
 
   __render() {

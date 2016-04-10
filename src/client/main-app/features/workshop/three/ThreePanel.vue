@@ -67,8 +67,8 @@ export default {
     },
 
     drawWalls() {
-      const scale = 5
-      const planeSize = 200
+      const scale = 20
+      const planeSize = 100
 
       const wallGeo = new THREE.Geometry()
       this.svg.selectAll('.wall').forEach((wall, idx) => {
