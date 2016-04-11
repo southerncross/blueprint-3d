@@ -113,9 +113,10 @@ class MoveControl {
     control.getObject().translateY(velocity.y * delta)
     control.getObject().translateZ(velocity.z * delta)
 
-    if (control.getObject().position.y < 10) {
+    const height = 17
+    if (control.getObject().position.y < height) {
       velocity.y = 0
-      control.getObject().position.y = 10
+      control.getObject().position.y = height
       this.canJump = true
     }
   }

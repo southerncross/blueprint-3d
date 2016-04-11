@@ -28,7 +28,7 @@ export default {
 
   vuex: {
     getters: {
-      windowCount: state => state.door.count,
+      windowCount: state => state.window.count,
       doorCount: state => state.door.count
     }
   },
