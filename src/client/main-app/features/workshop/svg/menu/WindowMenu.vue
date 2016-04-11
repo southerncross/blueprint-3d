@@ -87,7 +87,7 @@ export default {
 
   created() {
     this.elemEventControl
-    .register('mouseover', (event) => {
+    .register('mousedown', (event) => {
       if (!this.isWindowMode) {
         return
       }
@@ -98,22 +98,12 @@ export default {
       if (elem.attr('class') !== 'wall') {
         return
       }
-      this.windowPainter.hover(event.offsetX, event.offsetY, elem)
-    })
-    .register('mousemove', (event) => {
-      if (!this.isWindowMode) {
-        return
-      }
-      const elem = this.svg.select(`#${event.target.id}`)
-      if (elem.data('locked')) {
-        return
-      }
-      if (elem.attr('class') !== 'wall') {
-        return
-      }
-      this.windowPainter.sync(event.offsetX, event.offsetY, elem)
+      this.windowPainter.draw(event.target.id, event.offsetX, event.offsetY)
+      event.bypass = true
     })
 
+    // We have to handle half-click event inside of svg canvas otherwise the finishing-click
+    // event will not be triggered.
     this.svgEventControl
     .register('mousedown', (event) => {
       if (event.bypass) {
@@ -122,10 +112,12 @@ export default {
       if (!this.isWindowMode) {
         return
       }
-      const _window = this.windowPainter.draw()
-      if (_window) {
-        this.elemEventControl.wrap(_window)
-        this.addWindow()
+      if (this.windowPainter.isDrawing) {
+        const _window = this.windowPainter.draw(event.target.id, event.offsetX, event.offsetY)
+        if (_window) {
+          this.elemEventControl.wrap(_window)
+          this.addWindow()
+        }
       }
     })
   }

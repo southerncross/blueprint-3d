@@ -29,7 +29,6 @@ import MenuContainer from './menu/MenuContainer'
 import ModifierContainer from './modifier/ModifierContainer'
 import SelectControl from '../../../libs/svg/SelectControl'
 import EventControl from '../../../libs/svg/EventControl'
-import HoverControl from '../../../libs/svg/HoverControl'
 import ConnectedLinePainter from '../../../libs/svg/ConnectedLinePainter'
 import HoveredLinePainter from '../../../libs/svg/HoveredLinePainter'
 
@@ -68,7 +67,7 @@ export default {
         },
         className: 'wall'
       }),
-      windowPainter: new HoverControl({
+      windowPainter: new HoveredLinePainter({
         svg: this.svg,
         style: {
           stroke: '#B3E5FC'
@@ -76,7 +75,6 @@ export default {
         drawingStyle: {
           stroke: '#81D4FA'
         },
-        length: 50,
         className: 'window'
       }),
       doorPainter: new HoveredLinePainter({
@@ -107,12 +105,14 @@ export default {
   ready() {
     this.selectControl.init()
     this.wallPainter.init()
+    this.windowPainter.init()
     this.doorPainter.init()
     this.svgEventControl.wrap(this.svg)
   },
 
   beforeDestroy() {
     this.doorPainter.uninit()
+    this.windowPainter.uninit()
     this.wallPainter.uninit()
     this.selectControl.uninit()
   }

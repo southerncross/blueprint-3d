@@ -114,8 +114,10 @@ export default {
       }
       if (this.doorPainter.isDrawing) {
         const door = this.doorPainter.draw(event.target.id, event.offsetX, event.offsetY)
-        this.elemEventControl.wrap(door)
-        this.addDoor()
+        if (door) {
+          this.elemEventControl.wrap(door)
+          this.addDoor()
+        }
       }
     })
   }

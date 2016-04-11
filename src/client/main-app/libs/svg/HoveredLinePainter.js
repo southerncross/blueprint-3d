@@ -45,6 +45,10 @@ class HoveredLinePainter {
    * @return {Snap object} Element if drawing is finished, otherwise null.
    */
   draw(hoverElemId, x, y) {
+    if (!hoverElemId) {
+      return
+    }
+
     const { svg, drawingLine, drawingLineStyle, lineStyle } = this
 
     const hoverElem = svg.select(`#${hoverElemId}`)

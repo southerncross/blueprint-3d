@@ -71,15 +71,17 @@ export default {
       const scale = 10
       const planeSize = 100
       const wallHeight = 30
+      const wallDepth = 1
       const windowHeight = 12
       const windowOffsetGround = 10
+      const doorHeight = 20
       const offsetX = -window.innerWidth / 2
       const offsetY = -window.innerHeight / 2
 
       const wallGeo = new THREE.Geometry()
       this.svg.selectAll('.wall').forEach((wall, idx) => {
-        let depth = 1
-        let width = 1
+        let depth = wallDepth
+        let width = wallDepth
         const x1 = Number(wall.attr('x1')) + offsetX
         const y1 = Number(wall.attr('y1')) + offsetY
         const x2 = Number(wall.attr('x2')) + offsetX
@@ -101,8 +103,8 @@ export default {
 
       const windowGeo = new THREE.Geometry()
       this.svg.selectAll('.window').forEach((wall, idx) => {
-        let depth = 1
-        let width = 1
+        let depth = wallDepth
+        let width = wallDepth
         const x1 = Number(wall.attr('x1')) + offsetX
         const y1 = Number(wall.attr('y1')) + offsetY
         const x2 = Number(wall.attr('x2')) + offsetX
@@ -122,9 +124,33 @@ export default {
         windowGeo.merge(windowMesh.geometry, windowMesh.matrix)
       })
 
+      const doorGeo = new THREE.Geometry()
+      this.svg.selectAll('.door').forEach((door, idx) => {
+        let depth = wallDepth
+        let width = wallDepth
+        const x1 = Number(door.attr('x1')) + offsetX
+        const y1 = Number(door.attr('y1')) + offsetY
+        const x2 = Number(door.attr('x2')) + offsetX
+        const y2 = Number(door.attr('y2')) + offsetY
+        const x = (x1 + x2) / 2 / scale
+        const y = (y1 + y2) / 2 / scale
+        if (x1 === x2) {
+          depth = Math.abs(y1 - y2) / scale + width
+        } else {
+          width = Math.abs(x1 - x2) / scale + depth
+        }
+
+        const boxGeo = new THREE.BoxGeometry(width, doorHeight, depth)
+        boxGeo.translate(x - planeSize / 2 / scale, doorHeight / 2, y - planeSize / 2 / scale)
+        const doorMesh = new THREE.Mesh(boxGeo)
+        doorMesh.updateMatrix()
+        doorGeo.merge(doorMesh.geometry, doorMesh.matrix)
+      })
+
       const wallBSP = new ThreeBSP(wallGeo)
       const windowBSP = new ThreeBSP(windowGeo)
-      const newBSP = wallBSP.subtract(windowBSP)
+      const doorBSP = new ThreeBSP(doorGeo)
+      const newBSP = wallBSP.subtract(windowBSP).subtract(doorBSP)
       const newMesh = newBSP.toMesh(new THREE.MeshLambertMaterial({ color: 0xffffff }))
       this.scene.add(newMesh)
 
