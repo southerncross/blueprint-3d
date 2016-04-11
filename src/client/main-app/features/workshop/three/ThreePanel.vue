@@ -68,18 +68,22 @@ export default {
     },
 
     drawWalls() {
-      const scale = 20
+      const scale = 10
       const planeSize = 100
+      const wallHeight = 30
+      const windowHeight = 12
+      const windowOffsetGround = 10
+      const offsetX = -window.innerWidth / 2
+      const offsetY = -window.innerHeight / 2
 
       const wallGeo = new THREE.Geometry()
       this.svg.selectAll('.wall').forEach((wall, idx) => {
-        const height = 30
         let depth = 1
         let width = 1
-        const x1 = Number(wall.attr('x1'))
-        const y1 = Number(wall.attr('y1'))
-        const x2 = Number(wall.attr('x2'))
-        const y2 = Number(wall.attr('y2'))
+        const x1 = Number(wall.attr('x1')) + offsetX
+        const y1 = Number(wall.attr('y1')) + offsetY
+        const x2 = Number(wall.attr('x2')) + offsetX
+        const y2 = Number(wall.attr('y2')) + offsetY
         const x = (x1 + x2) / 2 / scale
         const y = (y1 + y2) / 2 / scale
         if (x1 === x2) {
@@ -88,8 +92,8 @@ export default {
           width = Math.abs(x1 - x2) / scale + depth
         }
 
-        const boxGeo = new THREE.BoxGeometry(width, height, depth)
-        boxGeo.translate(x - planeSize / 2 / scale, height / 2, y - planeSize / 2 / scale)
+        const boxGeo = new THREE.BoxGeometry(width, wallHeight, depth)
+        boxGeo.translate(x - planeSize / 2 / scale, wallHeight / 2, y - planeSize / 2 / scale)
         const wallMesh = new THREE.Mesh(boxGeo)
         wallMesh.updateMatrix()
         wallGeo.merge(wallMesh.geometry, wallMesh.matrix)
@@ -97,14 +101,12 @@ export default {
 
       const windowGeo = new THREE.Geometry()
       this.svg.selectAll('.window').forEach((wall, idx) => {
-        console.error('boring')
-        const height = 10
         let depth = 1
         let width = 1
-        const x1 = Number(wall.attr('x1'))
-        const y1 = Number(wall.attr('y1'))
-        const x2 = Number(wall.attr('x2'))
-        const y2 = Number(wall.attr('y2'))
+        const x1 = Number(wall.attr('x1')) + offsetX
+        const y1 = Number(wall.attr('y1')) + offsetY
+        const x2 = Number(wall.attr('x2')) + offsetX
+        const y2 = Number(wall.attr('y2')) + offsetY
         const x = (x1 + x2) / 2 / scale
         const y = (y1 + y2) / 2 / scale
         if (x1 === x2) {
@@ -113,8 +115,8 @@ export default {
           width = Math.abs(x1 - x2) / scale + depth
         }
 
-        const boxGeo = new THREE.BoxGeometry(width, height, depth)
-        boxGeo.translate(x - planeSize / 2 / scale, height / 2 + height, y - planeSize / 2 / scale)
+        const boxGeo = new THREE.BoxGeometry(width, windowHeight, depth)
+        boxGeo.translate(x - planeSize / 2 / scale, windowHeight / 2 + windowOffsetGround, y - planeSize / 2 / scale)
         const windowMesh = new THREE.Mesh(boxGeo)
         windowMesh.updateMatrix()
         windowGeo.merge(windowMesh.geometry, windowMesh.matrix)

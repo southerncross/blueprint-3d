@@ -87,42 +87,18 @@ export default {
 
   created() {
     this.elemEventControl
-    .register('mouseover', (event) => {
-      if (!this.isDoorMode) {
-        return
-      }
-      const elem = this.svg.select(`#${event.target.id}`)
-      if (elem.data('locked')) {
-        return
-      }
-      if (elem.attr('class') !== 'wall') {
-        return
-      }
-      this.doorPainter.hover(event.offsetX, event.offsetY, elem)
-    })
-    .register('mousemove', (event) => {
-      if (!this.isDoorMode) {
-        return
-      }
-      const elem = this.svg.select(`#${event.target.id}`)
-      if (elem.data('locked')) {
-        return
-      }
-      if (elem.attr('class') !== 'wall') {
-        return
-      }
-      this.doorPainter.sync(event.offsetX, event.offsetY, elem)
-    })
-
-    this.svgEventControl
     .register('mousedown', (event) => {
-      if (event.bypass) {
-        return
-      }
       if (!this.isDoorMode) {
         return
       }
-      const door = this.doorPainter.draw()
+      const elem = this.svg.select(`#${event.target.id}`)
+      if (elem.data('locked')) {
+        return
+      }
+      if (elem.attr('class') !== 'wall') {
+        return
+      }
+      const door = this.doorPainter.draw(event.target.id, event.offsetX, event.offsetY)
       if (door) {
         this.elemEventControl.wrap(door)
         this.addDoor()
