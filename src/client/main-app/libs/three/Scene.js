@@ -6,7 +6,12 @@ import OrbitControl from './OrbitControl'
 import PointerLock from './PointerLock'
 
 class Scene {
-  constructor() {
+  constructor(config = {}) {
+    this.config = Object.assign({
+      showGrid: true,
+      showAxes: true,
+      showSkybox: false
+    }, config)
     this.scene = new THREE.Scene()
     this.camera = null
     this.renderer = null
@@ -16,6 +21,8 @@ class Scene {
     this.anaglyphEffect = false
     this.mode = 'orbit'
     this.skybox = null
+    this.grid = null
+    this.axes = null
     this.keepRendering = false
     // Debug boring
     this.controls = {}
@@ -59,7 +66,6 @@ class Scene {
   setOrbitView(callback = () => {}) {
     this.camera.position.set(100, 100, 100)
     this.camera.lookAt(new THREE.Vector3(0, 0, 0))
-    this.scene.remove(this.skybox)
     this.moveControl.disable()
     this.orbitControl.enable()
     this.mode = 'orbit'
@@ -76,7 +82,6 @@ class Scene {
   setRoamView(callback = () => {}) {
     this.camera.position.set(0, 0, 10)
     this.camera.lookAt(new THREE.Vector3(0, 0, 0))
-    this.scene.add(this.skybox)
     this.orbitControl.disable()
     this.moveControl.enable()
     this.mode = 'roam'
@@ -103,6 +108,37 @@ class Scene {
 
   toggleAnaglyphEffect() {
     this.anaglyphEffect = !this.anaglyphEffect
+    return this.anaglyphEffect
+  }
+
+  toggleAxes() {
+    this.config.showAxes = !this.config.showAxes
+    if (this.config.showAxes) {
+      this.scene.add(this.axes)
+    } else {
+      this.scene.remove(this.axes)
+    }
+    return this.config.showAxes
+  }
+
+  toggleSkybox() {
+    this.config.showSkybox = !this.config.showSkybox
+    if (this.config.showSkybox) {
+      this.scene.add(this.skybox)
+    } else {
+      this.scene.remove(this.skybox)
+    }
+    return this.config.showSkybox
+  }
+
+  toggleGrid() {
+    this.config.showGrid = !this.config.showGrid
+    if (this.config.showGrid) {
+      this.scene.add(this.grid)
+    } else {
+      this.scene.remove(this.grid)
+    }
+    return this.config.showGrid
   }
 
   __init() {
@@ -112,7 +148,7 @@ class Scene {
     this.__initLight()
     this.__initAxes()
     this.__initGrid()
-    this.__initCubeMap()
+    this.__initSkybox()
   }
 
   __initRenderer() {
@@ -161,12 +197,12 @@ class Scene {
     const directionalLight = new THREE.DirectionalLight(dirColor, dirIntensity)
     directionalLight.position.set(1, 1, 1)
     this.scene.add(directionalLight)
-    this.scene.add(new THREE.DirectionalLightHelper(directionalLight, 100))
+    // this.scene.add(new THREE.DirectionalLightHelper(directionalLight, 100))
 
     const anotherDirectionalLight = new THREE.DirectionalLight(dirColor, dirIntensity)
     anotherDirectionalLight.position.set(1, 1, -1)
     this.scene.add(anotherDirectionalLight)
-    this.scene.add(new THREE.DirectionalLightHelper(anotherDirectionalLight, 100))
+    // this.scene.add(new THREE.DirectionalLightHelper(anotherDirectionalLight, 100))
 
     // Control
     const directionalControl = {}
@@ -185,7 +221,7 @@ class Scene {
     const hemiLight = new THREE.HemisphereLight(0x898989, 0x595959, 0.6)
     hemiLight.position.set(0, 500, 0)
     this.scene.add(hemiLight)
-    this.scene.add(new THREE.HemisphereLightHelper(hemiLight, 50))
+    // this.scene.add(new THREE.HemisphereLightHelper(hemiLight, 50))
 
     // control
     const hemiControl = {}
@@ -213,20 +249,25 @@ class Scene {
   }
 
   __initAxes() {
-    const axes = new THREE.AxisHelper(1000)
-    this.scene.add(axes)
+    this.axes = new THREE.AxisHelper(1000)
+    if (this.config.showAxes) {
+      this.scene.add(this.axes)
+    }
   }
 
   __initGrid() {
     const size = 200
     const step = 10
 
-    const gridHelper = new THREE.GridHelper(size, step)
-    gridHelper.setColors(0x000000, 0xb0bec5)
-    this.scene.add(gridHelper)
+    this.grid = new THREE.GridHelper(size, step)
+    this.grid.setColors(0x000000, 0xb0bec5)
+    if (this.config.showGrid) {
+      this.scene.add(this.grid)
+    }
   }
 
-  __initCubeMap() {
+  __initSkybox() {
+    const size = 500
     const loader = new THREE.CubeTextureLoader()
     loader.setPath('/images/')
     var textureCube = loader.load([
@@ -247,7 +288,7 @@ class Scene {
       depthWrite: false,
       side: THREE.BackSide
     })
-    this.skybox = new THREE.Mesh(new THREE.CubeGeometry(2000, 2000, 2000), material)
+    this.skybox = new THREE.Mesh(new THREE.CubeGeometry(size, size, size), material)
   }
 
   __render() {

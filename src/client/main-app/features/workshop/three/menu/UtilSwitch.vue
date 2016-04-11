@@ -1,12 +1,13 @@
 <template>
 <li>
   <div class="edit-menu__header">
+    <span class="util-switch__title">{{display}}</span>
     <div class="switch text-cyan menu-switch">
       <label>
-        Off
-        <input type="checkbox" :checked="anaglyphEffect" @click="toggleAnaglyphEffect">
+        关
+        <input type="checkbox" :checked="status" @click="toggle">
         <span class="lever"></span>
-        On
+        开
       </label>
     </div>
   </div>
@@ -15,11 +16,12 @@
 
 <script>
 export default {
-  name: 'AnaglyphSwitch',
+  name: 'UtilSwitch',
 
   props: {
-    anaglyphEffect: Boolean,
-    toggleAnaglyphEffect: Function
+    display: String,
+    status: Boolean,
+    toggle: Function
   }
 }
 </script>
@@ -27,4 +29,7 @@ export default {
 <style lang="stylus">
 .menu-switch
   margin-left -28px
+
+.util-switch__title
+  text-shadow 0px 0px 5px white
 </style>

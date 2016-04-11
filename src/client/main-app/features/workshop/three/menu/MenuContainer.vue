@@ -7,21 +7,34 @@
   <roam-menu
     class="menu-item"
     :mode="mode"
-    :set-mode.once="setMode"
-    :toggle-anaglyph-effect.once="toggleAnaglyphEffect"
-    :toggle-vr-effect.once="toggleVrEffect"></roam-menu>
-  <anaglyph-switch
+    :set-mode.once="setMode"></roam-menu>
+  <util-switch
     class="menu-item"
-    :anaglyph-effect="anaglyphEffect"
-    :toggle-anaglyph-effect.once="toggleAnaglyphEffect"
-    ></anaglyph-switch>
+    display="红蓝3D"
+    :status="anaglyphEffect"
+    :toggle.once="toggleAnaglyphEffect"></util-switch>
+  <util-switch
+    class="menu-item"
+    display="坐标轴"
+    :status="showAxes"
+    :toggle.once="toggleShowAxes"></util-switch>
+  <util-switch
+    class="menu-item"
+    display="水平网格"
+    :status="showGrid"
+    :toggle.once="toggleShowGrid"></util-switch>
+  <util-switch
+    class="menu-item"
+    display="立方贴图"
+    :status="showSkybox"
+    :toggle.once="toggleShowSkybox"></util-switch>
 </ul>
 </template>
 
 <script>
 import OrbitMenu from './OrbitMenu'
 import RoamMenu from './RoamMenu'
-import AnaglyphSwitch from './AnaglyphSwitch'
+import UtilSwitch from './UtilSwitch'
 
 export default {
   name: 'MenuContainer',
@@ -29,15 +42,37 @@ export default {
   components: {
     OrbitMenu,
     RoamMenu,
-    AnaglyphSwitch
+    UtilSwitch
   },
 
   props: {
     mode: String,
-    setMode: Function,
-    anaglyphEffect: Boolean,
-    toggleAnaglyphEffect: Function,
-    toggleVrEffect: Function
+    scene: Object,
+    setMode: Function
+  },
+
+  data() {
+    return {
+      showAxes: true,
+      showGrid: true,
+      showSkybox: false,
+      anaglyphEffect: false
+    }
+  },
+
+  methods: {
+    toggleShowAxes() {
+      this.showAxes = this.scene.toggleAxes()
+    },
+    toggleShowGrid() {
+      this.showGrid = this.scene.toggleGrid()
+    },
+    toggleShowSkybox() {
+      this.showSkybox = this.scene.toggleSkybox()
+    },
+    toggleAnaglyphEffect() {
+      this.anaglyphEffect = this.scene.toggleAnaglyphEffect()
+    }
   }
 }
 </script>

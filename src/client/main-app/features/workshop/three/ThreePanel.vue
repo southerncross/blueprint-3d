@@ -6,10 +6,7 @@
     class="edit__menu-container"
     :mode="mode"
     :scene="scene"
-    :set-mode.once="setMode"
-    :anaglyph-effect="anaglyphEffect"
-    :toggle-anaglyph-effect.once="toggleAnaglyphEffect"
-    :toggle-vr-effect="toggleVrEffect"></menu-container>
+    :set-mode.once="setMode"></menu-container>
 </div>
 </template>
 
@@ -29,6 +26,13 @@ export default {
     MenuContainer
   },
 
+  vuex: {
+    getters: {
+      windowCount: state => state.door.count,
+      doorCount: state => state.door.count
+    }
+  },
+
   props: {
     svg: Object
   },
@@ -36,7 +40,6 @@ export default {
   data() {
     return {
       mode: 'orbit',
-      anaglyphEffect: false,
       scene: new Scene()
     }
   },
@@ -57,14 +60,6 @@ export default {
         default:
           break
       }
-    },
-
-    toggleAnaglyphEffect() {
-      this.scene.toggleAnaglyphEffect()
-    },
-
-    toggleVrEffect() {
-
     },
 
     drawWalls() {
@@ -148,9 +143,15 @@ export default {
       })
 
       const wallBSP = new ThreeBSP(wallGeo)
-      const windowBSP = new ThreeBSP(windowGeo)
-      const doorBSP = new ThreeBSP(doorGeo)
-      const newBSP = wallBSP.subtract(windowBSP).subtract(doorBSP)
+      let newBSP = wallBSP
+      if (this.windowCount > 0) {
+        const windowBSP = new ThreeBSP(windowGeo)
+        newBSP = wallBSP.subtract(windowBSP)
+      }
+      if (this.doorCount > 0) {
+        const doorBSP = new ThreeBSP(doorGeo)
+        newBSP = wallBSP.subtract(doorBSP)
+      }
       const newMesh = newBSP.toMesh(new THREE.MeshLambertMaterial({ color: 0xffffff }))
       this.scene.add(newMesh)
 
