@@ -98,8 +98,22 @@ export default {
       if (elem.attr('class') !== 'wall') {
         return
       }
-      const door = this.doorPainter.draw(event.target.id, event.offsetX, event.offsetY)
-      if (door) {
+      this.doorPainter.draw(event.target.id, event.offsetX, event.offsetY)
+      event.bypass = true
+    })
+
+    // We have to handle half-click event inside of svg canvas otherwise the finishing-click
+    // event will not be triggered.
+    this.svgEventControl
+    .register('mousedown', (event) => {
+      if (event.bypass) {
+        return
+      }
+      if (!this.isDoorMode) {
+        return
+      }
+      if (this.doorPainter.isDrawing) {
+        const door = this.doorPainter.draw(event.target.id, event.offsetX, event.offsetY)
         this.elemEventControl.wrap(door)
         this.addDoor()
       }

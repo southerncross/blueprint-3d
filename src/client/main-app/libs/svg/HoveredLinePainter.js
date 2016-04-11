@@ -47,13 +47,43 @@ class HoveredLinePainter {
   draw(hoverElemId, x, y) {
     const { svg, drawingLine, drawingLineStyle, lineStyle } = this
 
+    const hoverElem = svg.select(`#${hoverElemId}`)
+
+    // Adjust position since usually the click position is not on line.
+    // hover line position
+    const hx1 = Number(hoverElem.attr('x1'))
+    const hy1 = Number(hoverElem.attr('y1'))
+    const hx2 = Number(hoverElem.attr('x2'))
+    const hy2 = Number(hoverElem.attr('y2'))
+    // target position
+    let tx = x
+    let ty = y
+
+    if (hx1 === hx2) {
+      // vertical line
+      tx = hx1
+    } else if (hy1 === hy2) {
+      // horizontal line
+      ty = hy1
+    } else {
+      // k, b of hover element
+      const k = (hy2 - hy1) / (hx2 - hx1)
+      const b = hy1 - k * hx1
+      // k2, b2 of perpendicular line
+      const k2 = -1 / k
+      const b2 = y - k2 * x
+
+      tx = (b2 - b) / (k - k2)
+      ty = k * tx + b
+    }
+
     if (drawingLine) {
       // Finish drawing.
       const line = drawingLine
       .attr(lineStyle)
       .attr({
-        x2: x,
-        y2: y
+        x2: tx,
+        y2: ty
       })
       .data('hoverElemId', hoverElemId)
       this.drawingLine = null
@@ -64,9 +94,8 @@ class HoveredLinePainter {
       return line
     } else {
       // Start drawing.
-      const hoverElem = svg.select(`#${hoverElemId}`)
       const strokeWidth = hoverElem.attr('strokeWidth')
-      this.drawingLine = svg.line(x, y, x, y)
+      this.drawingLine = svg.line(tx, ty, tx, ty)
       .attr(drawingLineStyle)
       .attr({
         class: this.className,
@@ -140,7 +169,7 @@ class HoveredLinePainter {
     //        o
     //     (tx, ty)
     const sx = Number(drawingLine.attr('x1'))
-    const sy = Number(drawingLine.attr('x1'))
+    const sy = Number(drawingLine.attr('y1'))
     let tx = mx
     let ty = my
 
