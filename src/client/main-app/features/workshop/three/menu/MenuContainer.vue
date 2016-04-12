@@ -66,6 +66,12 @@ export default {
       }
       this.mode = 'orbit'
       this.scene.setOrbitView()
+      this.scene.toggleAxes(true)
+      this.showAxes = true
+      this.scene.toggleGrid(true)
+      this.showGrid = true
+      this.scene.toggleSkybox(false)
+      this.showSkybox = false
     },
     enterRoamView() {
       if (this.mode === 'roam') {
@@ -73,6 +79,12 @@ export default {
       }
       this.mode = 'roam'
       this.scene.setRoamView()
+      this.scene.toggleAxes(false)
+      this.showAxes = false
+      this.scene.toggleGrid(false)
+      this.showGrid = false
+      this.scene.toggleSkybox(true)
+      this.showSkybox = true
     },
     toggleShowAxes() {
       this.showAxes = this.scene.toggleAxes()

@@ -133,8 +133,11 @@ export default {
         const doorBSP = new ThreeBSP(doorGeo)
         newBSP = wallBSP.subtract(doorBSP)
       }
-      const bump = new THREE.TextureLoader().load('/images/wall-texture.jpg')
-      const material = new THREE.MeshPhongMaterial({ bumpMap: bump, bumpScale: 0.1 })
+      const bumpTexture = new THREE.TextureLoader().load('/images/wall-texture.jpg')
+      bumpTexture.wrapS = THREE.RepeatWrapping
+      bumpTexture.wrapT = THREE.RepeatWrapping
+      bumpTexture.repeat.set(3, 3)
+      const material = new THREE.MeshPhongMaterial({ bumpMap: bumpTexture, bumpScale: 0.1 })
       const newMesh = newBSP.toMesh(material)
       this.scene.add(newMesh)
 

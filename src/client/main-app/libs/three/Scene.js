@@ -41,6 +41,9 @@ class Scene {
     this.setOrbitView = this.setOrbitView.bind(this)
     this.setRoamView = this.setRoamView.bind(this)
     this.toggleAnaglyphEffect = this.toggleAnaglyphEffect.bind(this)
+    this.toggleAxes = this.toggleAxes.bind(this)
+    this.toggleSkybox = this.toggleSkybox.bind(this)
+    this.toggleGrid = this.toggleGrid.bind(this)
 
     this.__render = this.__render.bind(this)
   }
@@ -109,13 +112,19 @@ class Scene {
     }
   }
 
-  toggleAnaglyphEffect() {
-    this.anaglyphEffect = !this.anaglyphEffect
+  toggleAnaglyphEffect(value) {
+    if (typeof value === 'undefined') {
+      value = !this.anaglyphEffect
+    }
+    this.anaglyphEffect = value
     return this.anaglyphEffect
   }
 
-  toggleAxes() {
-    this.config.showAxes = !this.config.showAxes
+  toggleAxes(value) {
+    if (typeof value === 'undefined') {
+      value = !this.config.showAxes
+    }
+    this.config.showAxes = value
     if (this.config.showAxes) {
       this.scene.add(this.axes)
     } else {
@@ -124,8 +133,11 @@ class Scene {
     return this.config.showAxes
   }
 
-  toggleSkybox() {
-    this.config.showSkybox = !this.config.showSkybox
+  toggleSkybox(value) {
+    if (typeof value === 'undefined') {
+      value = !this.config.showSkybox
+    }
+    this.config.showSkybox = value
     if (this.config.showSkybox) {
       this.scene.add(this.skybox)
     } else {
@@ -134,8 +146,11 @@ class Scene {
     return this.config.showSkybox
   }
 
-  toggleGrid() {
-    this.config.showGrid = !this.config.showGrid
+  toggleGrid(value) {
+    if (typeof value === 'undefined') {
+      value = !this.config.showGrid
+    }
+    this.config.showGrid = value
     if (this.config.showGrid) {
       this.scene.add(this.grid)
     } else {
@@ -197,16 +212,17 @@ class Scene {
     })
 
     const dirColor = '#ffffff'
-    const dirIntensity = 0.5
+    const dirIntensity = 0.3
     const directionalLight = new THREE.DirectionalLight(dirColor, dirIntensity)
-    directionalLight.position.set(1, 1, 1)
+    directionalLight.position.set(-1, 1, -0.2)
     this.scene.add(directionalLight)
     // this.scene.add(new THREE.DirectionalLightHelper(directionalLight, 100))
-
-    const anotherDirectionalLight = new THREE.DirectionalLight(dirColor, dirIntensity)
-    anotherDirectionalLight.position.set(1, 1, -1)
-    this.scene.add(anotherDirectionalLight)
-    // this.scene.add(new THREE.DirectionalLightHelper(anotherDirectionalLight, 100))
+    const directionalLight2 = new THREE.DirectionalLight(dirColor, 0.05)
+    directionalLight2.position.set(0.2, 0, 0.8)
+    this.scene.add(directionalLight2)
+    const directionalLight3 = new THREE.DirectionalLight(dirColor, 0.05)
+    directionalLight3.position.set(0.3, 0, 0.2)
+    this.scene.add(directionalLight3)
 
     // Control
     const directionalControl = {}
@@ -215,15 +231,13 @@ class Scene {
     const directionalFolder = this.gui.addFolder('directionalLight')
     directionalFolder.add(directionalControl, 'intensity', 0, 1.0).onChange((e) => {
       directionalLight.intensity = e
-      anotherDirectionalLight.intensity = e
     })
     directionalFolder.addColor(directionalControl, 'color').onChange((e) => {
       directionalLight.color = new THREE.Color(e)
-      anotherDirectionalLight.color = new THREE.Color(e)
     })
 
-    const hemiLight = new THREE.HemisphereLight(0x898989, 0x595959, 0.6)
-    hemiLight.position.set(0, 500, 0)
+    const hemiLight = new THREE.HemisphereLight(0xf2e9e1, 0x9b9b9b, 0.8)
+    hemiLight.position.set(-200, 500, -50)
     this.scene.add(hemiLight)
     // this.scene.add(new THREE.HemisphereLightHelper(hemiLight, 50))
 
@@ -271,7 +285,7 @@ class Scene {
   }
 
   __initSkybox() {
-    const size = 500
+    const size = 2000
     const loader = new THREE.CubeTextureLoader()
     loader.setPath('/images/')
     var textureCube = loader.load([
@@ -293,15 +307,54 @@ class Scene {
       side: THREE.BackSide
     })
     this.skybox = new THREE.Mesh(new THREE.CubeGeometry(size, size, size), material)
+
+    // var geometry = new THREE.SphereGeometry(3000, 60, 40)
+    // var uniforms = {
+    //   texture: { type: 't', value: new THREE.TextureLoader().load('/images/skydome.jpg') }
+    // }
+
+    // const skyVertex =
+    // `
+    //   varying vec2 vUV;
+
+    //   void main() {
+    //     vUV = uv;
+    //     vec4 pos = vec4(position, 1.0);
+    //     gl_Position = projectionMatrix * modelViewMatrix * pos;
+    //   }
+    // `
+
+    // const skyFragment =
+    // `
+    //   uniform sampler2D texture;
+    //   varying vec2 vUV;
+
+    //   void main() {
+    //     vec4 sample = texture2D(texture, vUV);
+    //     gl_FragColor = vec4(sample.xyz, sample.w);
+    //   }
+    // `
+
+    // var material = new THREE.ShaderMaterial({
+    //   uniforms: uniforms,
+    //   vertexShader: skyVertex,
+    //   fragmentShader: skyFragment
+    // })
+
+    // const skybox = new THREE.Mesh(geometry, material)
+    // skybox.scale.set(-1, 1, 1)
+    // skybox.rotation.order = 'XZY'
+    // skybox.renderOrder = 1000.0
+    // this.skybox = skybox
   }
 
   __initFloor() {
     const size = 500
     const floorGeo = new THREE.PlaneGeometry(size, size)
-    const texture = new THREE.TextureLoader().load('/images/ground-texture.jpg')
+    const texture = new THREE.TextureLoader().load('/images/floor-texture.jpg')
     texture.wrapS = THREE.RepeatWrapping
     texture.wrapT = THREE.RepeatWrapping
-    texture.repeat.set(20, 20)
+    texture.repeat.set(30, 30)
     const floorMat = new THREE.MeshLambertMaterial({ map: texture })
     this.floor = new THREE.Mesh(floorGeo, floorMat)
     this.floor.rotation.x = -0.5 * Math.PI
