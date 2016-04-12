@@ -4,7 +4,6 @@
     :scene.once="scene"></three-canvas>
   <menu-container
     class="edit__menu-container"
-    :mode="mode"
     :scene="scene"
     :set-mode.once="setMode"></menu-container>
 </div>
@@ -39,29 +38,11 @@ export default {
 
   data() {
     return {
-      mode: 'orbit',
       scene: new Scene()
     }
   },
 
   methods: {
-    setMode(nextMode) {
-      if (nextMode === this.mode) {
-        return
-      }
-      this.mode = nextMode
-      switch (nextMode) {
-        case 'orbit':
-          this.scene.setOrbitView()
-          break
-        case 'roam':
-          this.scene.setRoamView()
-          break
-        default:
-          break
-      }
-    },
-
     drawWalls() {
       const scale = 10
       const planeSize = 100
@@ -152,7 +133,9 @@ export default {
         const doorBSP = new ThreeBSP(doorGeo)
         newBSP = wallBSP.subtract(doorBSP)
       }
-      const newMesh = newBSP.toMesh(new THREE.MeshLambertMaterial({ color: 0xffffff }))
+      const bump = new THREE.TextureLoader().load('/images/wall-texture.jpg')
+      const material = new THREE.MeshPhongMaterial({ bumpMap: bump, bumpScale: 0.1 })
+      const newMesh = newBSP.toMesh(material)
       this.scene.add(newMesh)
 
       // const wallMat = new THREE.MeshLambertMaterial({ color: 0xffffff })

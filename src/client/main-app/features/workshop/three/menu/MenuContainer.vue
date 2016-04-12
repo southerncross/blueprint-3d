@@ -3,11 +3,11 @@
   <orbit-menu
     class="menu-item"
     :mode="mode"
-    :set-mode.once="setMode"></orbit-menu>
+    :enter-orbit.once="enterOrbitView"></orbit-menu>
   <roam-menu
     class="menu-item"
     :mode="mode"
-    :set-mode.once="setMode"></roam-menu>
+    :enter-roam.once="enterRoamView"></roam-menu>
   <util-switch
     class="menu-item"
     display="红蓝3D"
@@ -46,13 +46,12 @@ export default {
   },
 
   props: {
-    mode: String,
-    scene: Object,
-    setMode: Function
+    scene: Object
   },
 
   data() {
     return {
+      mode: 'orbit',
       showAxes: true,
       showGrid: true,
       showSkybox: false,
@@ -61,6 +60,20 @@ export default {
   },
 
   methods: {
+    enterOrbitView() {
+      if (this.mode === 'orbit') {
+        return
+      }
+      this.mode = 'orbit'
+      this.scene.setOrbitView()
+    },
+    enterRoamView() {
+      if (this.mode === 'roam') {
+        return
+      }
+      this.mode = 'roam'
+      this.scene.setRoamView()
+    },
     toggleShowAxes() {
       this.showAxes = this.scene.toggleAxes()
     },

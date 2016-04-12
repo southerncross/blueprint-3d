@@ -5,7 +5,7 @@
       class="btn-floating btn-large waves-effect waves-light tooltipped"
       data-position="right" data-delay="500" data-tooltip="上帝视角"
       :class="menuBtnClassName"
-      @click="setMode('orbit')"
+      @click="enterOrbit"
     >
       <i class="icon-public" :class="menuIconClassName"></i>
     </button>
@@ -19,7 +19,7 @@ export default {
 
   props: {
     mode: String,
-    setMode: Function
+    enterOrbit: Function
   },
 
   computed: {

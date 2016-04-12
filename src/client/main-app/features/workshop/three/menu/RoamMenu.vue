@@ -5,7 +5,7 @@
       class="btn-floating btn-large waves-effect waves-light tooltipped"
       data-position="right" data-delay="500" data-tooltip="漫游视角"
       :class="menuBtnClassName"
-      @click="setMode('roam')"
+      @click="enterRoam"
     >
       <i class="icon-accessibility" :class="menuIconClassName"></i>
     </button>
@@ -19,7 +19,7 @@ export default {
 
   props: {
     mode: String,
-    setMode: Function
+    enterRoam: Function
   },
 
   computed: {

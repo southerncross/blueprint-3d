@@ -23,6 +23,7 @@ class Scene {
     this.skybox = null
     this.grid = null
     this.axes = null
+    this.plane = null
     this.keepRendering = false
     // Debug boring
     this.controls = {}
@@ -71,6 +72,7 @@ class Scene {
     this.mode = 'orbit'
     // this.renderer.setSize(CANVAS_WIDTH, CANVAS_HEIGHT)
     // this.isFullscreen = false
+    this.scene.remove(this.floor)
 
     if (typeof callback !== 'function') {
       return
@@ -87,6 +89,7 @@ class Scene {
     this.mode = 'roam'
     // this.renderer.setSize(window.innerWidth, window.innerHeight)
     // this.isFullscreen = true
+    this.scene.add(this.floor)
 
     if (typeof callback !== 'function') {
       return
@@ -149,6 +152,7 @@ class Scene {
     this.__initAxes()
     this.__initGrid()
     this.__initSkybox()
+    this.__initFloor()
   }
 
   __initRenderer() {
@@ -289,6 +293,18 @@ class Scene {
       side: THREE.BackSide
     })
     this.skybox = new THREE.Mesh(new THREE.CubeGeometry(size, size, size), material)
+  }
+
+  __initFloor() {
+    const size = 500
+    const floorGeo = new THREE.PlaneGeometry(size, size)
+    const texture = new THREE.TextureLoader().load('/images/ground-texture.jpg')
+    texture.wrapS = THREE.RepeatWrapping
+    texture.wrapT = THREE.RepeatWrapping
+    texture.repeat.set(20, 20)
+    const floorMat = new THREE.MeshLambertMaterial({ map: texture })
+    this.floor = new THREE.Mesh(floorGeo, floorMat)
+    this.floor.rotation.x = -0.5 * Math.PI
   }
 
   __render() {
