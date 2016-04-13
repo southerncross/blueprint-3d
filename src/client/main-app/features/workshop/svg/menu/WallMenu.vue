@@ -16,7 +16,7 @@
         <button
           class="btn-floating btn-small waves-effect waves-light tooltipped"
           data-position="right" data-delay="0" data-tooltip="锁定"
-          @click="toggleWallLock"
+          @click="onToggleWallLock"
         >
           <i :class="lockIconClassName"></i>
         </button>
@@ -25,10 +25,15 @@
         <button
           class="btn-floating btn-small waves-effect waves-light tooltipped"
           data-position="right" data-delay="0" data-tooltip="可见性"
-          @click="toggleWallVisibility"
+          @click="onToggleWallVisibility"
         >
           <i :class="visibilityIconClassName"></i>
         </button>
+      </li>
+      <li>
+        <div class="range-field edit-menu__range">
+          <input type="range" min="0" max="100" :value="opacity" @input="changeOpacity"/>
+        </div>
       </li>
     </ul>
   </div>
@@ -60,6 +65,7 @@ export default {
 
   props: {
     mode: String,
+    svg: Object,
     elemEventControl: Object,
     svgEventControl: Object,
     wallPainter: Object,
@@ -84,6 +90,12 @@ export default {
     }
   },
 
+  data() {
+    return {
+      opacity: 100
+    }
+  },
+
   created() {
     this.svgEventControl
     .register('mousedown', (event) => {
@@ -99,10 +111,36 @@ export default {
       const wall = this.wallPainter.draw()
       this.elemEventControl.wrap(wall)
     })
+  },
+
+  methods: {
+    changeOpacity(event) {
+      this.opacity = event.target.value
+      this.svg.selectAll('.wall').forEach((wall) => {
+        wall.attr({ opacity: this.opacity / 100 })
+      })
+    },
+    onToggleWallLock() {
+      this.toggleWallLock()
+      this.svg.selectAll('.wall').forEach((wall) => {
+        wall.data('locked', this.locked)
+      })
+    },
+    onToggleWallVisibility() {
+      this.toggleWallVisibility()
+      console.error('boring', this.visibility)
+      this.svg.selectAll('.wall').forEach((wall) => {
+        wall.attr({ visibility: this.visibility })
+      })
+    }
   }
 }
 </script>
 
 <style lang="stylus">
-
+.edit-menu__range
+  transform rotate(90deg)
+  margin 10px 0 0 0
+  padding 0
+  width 50px
 </style>

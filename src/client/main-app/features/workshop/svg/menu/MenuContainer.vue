@@ -11,6 +11,7 @@
   <wall-menu
     class="menu-item"
     :mode="mode"
+    :svg.once="svg"
     :wall-painter="wallPainter"
     :set-mode.once="setMode"
     :svg-event-control.once="svgEventControl"

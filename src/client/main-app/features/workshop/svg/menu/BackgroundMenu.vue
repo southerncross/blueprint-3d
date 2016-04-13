@@ -23,7 +23,7 @@
         <button
           class="btn-floating btn-small waves-effect waves-light tooltipped"
           data-position="right" data-delay="0" data-tooltip="锁定"
-          @click="toggleBackgroundLock"
+          @click="onToggleBackgroundLock"
         >
           <i :class="lockIconClassName"></i>
         </button>
@@ -75,7 +75,6 @@ export default {
   props: {
     mode: String,
     svg: Object,
-    className: String,
     elemEventControl: Object,
     setMode: Function
   },
@@ -109,7 +108,7 @@ export default {
         return
       }
 
-      const elem = this.svg.select(`.${this.className}`)
+      const elem = this.svg.select('.background')
       if (elem) {
         elem.remove()
       }
@@ -118,8 +117,8 @@ export default {
       const desc = this.svg.select('desc')
       const newElem = this.svg.image(url)
       .attr({
-        class: this.className,
-        id: this.className,
+        class: 'background',
+        id: 'background',
         opacity: parseFloat(this.opacity)
       })
 
@@ -127,6 +126,13 @@ export default {
       this.updateBackground()
 
       desc.after(newElem)
+    },
+    onToggleBackgroundLock() {
+      this.toggleBackgroundLock()
+      const background = this.svg.select('.background')
+      if (background) {
+        background.data('locked', this.locked)
+      }
     }
   }
 }
