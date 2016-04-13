@@ -53,7 +53,7 @@ class HoveredLinePainter {
 
     const hoverElem = svg.select(`#${hoverElemId}`)
 
-    // Adjust position since usually the click position is not on line.
+    // Adjust position since usually the click position is not on the center.
     // hover line position
     const hx1 = Number(hoverElem.attr('x1'))
     const hy1 = Number(hoverElem.attr('y1'))
@@ -203,7 +203,7 @@ class HoveredLinePainter {
     }
 
     tx = constrain(tx, hx1, hx2)
-    ty = constrain(ty, hx1, hy2)
+    ty = constrain(ty, hy1, hy2)
 
     drawingLine.attr({
       x2: tx,
