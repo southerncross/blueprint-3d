@@ -10,11 +10,6 @@
     :enter-roam.once="enterRoamView"></roam-menu>
   <util-switch
     class="menu-item"
-    display="红蓝3D"
-    :status="anaglyphEffect"
-    :toggle.once="toggleAnaglyphEffect"></util-switch>
-  <util-switch
-    class="menu-item"
     display="坐标轴"
     :status="showAxes"
     :toggle.once="toggleShowAxes"></util-switch>
@@ -28,6 +23,16 @@
     display="立方贴图"
     :status="showSkybox"
     :toggle.once="toggleShowSkybox"></util-switch>
+  <util-switch
+    class="menu-item"
+    display="VR"
+    :status="stereoEffect"
+    :toggle.once="toggleStereoEffect"></util-switch>
+  <util-switch
+    class="menu-item"
+    display="红蓝3D"
+    :status="anaglyphEffect"
+    :toggle.once="toggleAnaglyphEffect"></util-switch>
 </ul>
 </template>
 
@@ -55,7 +60,8 @@ export default {
       showAxes: true,
       showGrid: true,
       showSkybox: false,
-      anaglyphEffect: false
+      anaglyphEffect: false,
+      stereoEffect: false
     }
   },
 
@@ -97,6 +103,15 @@ export default {
     },
     toggleAnaglyphEffect() {
       this.anaglyphEffect = this.scene.toggleAnaglyphEffect()
+      if (this.anaglyphEffect) {
+        this.stereoEffect = this.scene.toggleStereoEffect(false)
+      }
+    },
+    toggleStereoEffect() {
+      this.stereoEffect = this.scene.toggleStereoEffect()
+      if (this.stereoEffect) {
+        this.anaglyphEffect = this.scene.toggleAnaglyphEffect(false)
+      }
     }
   }
 }

@@ -19,6 +19,7 @@ class Scene {
     this.orbitControl = null
     this.moveControl = null
     this.anaglyphEffect = false
+    this.stereoEffect = false
     this.mode = 'orbit'
     this.skybox = null
     this.grid = null
@@ -55,6 +56,7 @@ class Scene {
   mount({ mountDom, width, height }) {
     this.renderer.setSize(width, height)
     this.anaglyphRenderer.setSize(width, height)
+    this.stereoRenderer.setSize(width, height)
     mountDom.appendChild(this.renderer.domElement)
   }
 
@@ -120,6 +122,19 @@ class Scene {
     return this.anaglyphEffect
   }
 
+  toggleStereoEffect(value) {
+    if (typeof value === 'undefined') {
+      value = !this.stereoEffect
+    }
+    this.stereoEffect = value
+    if (this.stereoEffect) {
+      this.stereoRenderer.init()
+    } else {
+      this.stereoRenderer.uninit()
+    }
+    return this.stereoEffect
+  }
+
   toggleAxes(value) {
     if (typeof value === 'undefined') {
       value = !this.config.showAxes
@@ -176,6 +191,7 @@ class Scene {
     renderer.shadowMap.enabled = true
     this.renderer = renderer
     this.anaglyphRenderer = new THREE.AnaglyphEffect(renderer)
+    this.stereoRenderer = new THREE.StereoEffect(renderer)
   }
 
   __initCamera() {
@@ -368,12 +384,16 @@ class Scene {
       moveControl,
       mode,
       keepRendering,
-      anaglyphEffect
+      anaglyphEffect,
+      stereoEffect
     } = this
 
     let renderer = this.renderer
     if (anaglyphEffect) {
       renderer = this.anaglyphRenderer
+    }
+    if (stereoEffect) {
+      renderer = this.stereoRenderer
     }
 
     switch (mode) {
