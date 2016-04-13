@@ -99,6 +99,8 @@ export default {
       this.elementUtilsType = null
       this.selectControl.reset()
       this.wallPainter.cancel()
+      this.windowPainter.cancel()
+      this.doorPainter.cancel()
     }
   },
 
