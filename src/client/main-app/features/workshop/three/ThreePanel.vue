@@ -4,8 +4,7 @@
     :scene.once="scene"></three-canvas>
   <menu-container
     class="edit__menu-container"
-    :scene="scene"
-    :set-mode.once="setMode"></menu-container>
+    :scene="scene"></menu-container>
 </div>
 </template>
 

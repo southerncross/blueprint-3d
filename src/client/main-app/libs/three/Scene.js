@@ -14,7 +14,7 @@ class Scene {
       showAxes: true,
       showSkybox: false,
       cameraName: 'orbit',
-      rendererName: 'stereo',
+      rendererName: 'normal',
       mountElm: null
     }, config)
     this.scene = new THREE.Scene()
@@ -68,8 +68,8 @@ class Scene {
     Object.keys(this.renderers).forEach((rendererName) => {
       this.renderers[rendererName].setSize(width, height)
     })
-    this.config.mountElem = mountDom
-    // mountDom.appendChild(this.renderer.domElement)
+    this.config.mountElm = mountDom
+    this.setRenderer(this.config.rendererName)
   }
 
   startRendering() {
@@ -82,9 +82,6 @@ class Scene {
   }
 
   setOrbitView(callback = () => {}) {
-    if (this.config.cameraName === 'orbit') {
-      return
-    }
     this.cameras.orbit.position.set(100, 100, 100)
     this.cameras.orbit.lookAt(new THREE.Vector3(0, 0, 0))
     this.moveControl.disable()
@@ -102,9 +99,6 @@ class Scene {
   }
 
   setRoamView(callback = () => {}) {
-    if (this.config.cameraName === 'roam') {
-      return
-    }
     this.cameras.roam.position.set(0, 0, 10)
     this.cameras.roam.lookAt(new THREE.Vector3(0, 0, 0))
     this.orbitControl.disable()
@@ -138,16 +132,12 @@ class Scene {
       return
     }
     const { config } = this
-    if (rendererName === config.rendererName) {
-      return
-    } else {
-      const { mountElm } = config
-      while (mountElm.firstChild) {
-        mountElm.removeChild(mountElm.firstChild)
-      }
-      mountElm.appendChild(this.renderers[rendererName].domElement)
-      config.rendererName = rendererName
+    const { mountElm } = config
+    while (mountElm.firstChild) {
+      mountElm.removeChild(mountElm.firstChild)
     }
+    mountElm.appendChild(this.renderers[rendererName].domElement)
+    config.rendererName = rendererName
   }
 
   toggleAnaglyphEffect(value) {
@@ -222,17 +212,19 @@ class Scene {
   }
 
   __initRenderer() {
-    this.renderers.normal = new THREE.WebGLRenderer()
-    this.renderer.normal.setClearColor(new THREE.Color(0xffffff, 1.0))
-    this.renderer.normal.shadowMap.enabled = false
+    const normal = new THREE.WebGLRenderer()
+    normal.setClearColor(new THREE.Color(0xffffff, 1.0))
+    normal.shadowMap.enabled = false
 
-    this.renderers.anaglyph = new THREE.WebGLRenderer()
-    this.renderer.anaglyph.setClearColor(new THREE.Color(0xffffff, 1.0))
-    this.renderer.anaglyph.shadowMap.enabled = true
+    const anaglyph = new THREE.WebGLRenderer()
+    anaglyph.setClearColor(new THREE.Color(0xffffff, 1.0))
+    anaglyph.shadowMap.enabled = true
 
-    this.renderers.stereo = new THREE.WebGLRenderer()
-    this.renderer.stereo.setClearColor(new THREE.Color(0xffffff, 1.0))
-    this.renderer.stereo.shadowMap.enabled = true
+    const stereo = new THREE.WebGLRenderer()
+    stereo.setClearColor(new THREE.Color(0xffffff, 1.0))
+    stereo.shadowMap.enabled = true
+
+    this.renderers = { normal, anaglyph, stereo }
   }
 
   __initCamera() {
@@ -246,12 +238,12 @@ class Scene {
   }
 
   __initControls() {
-    const moveControl = new MoveControl({ camera: this.camera })
+    const moveControl = new MoveControl({ camera: this.cameras.roam })
     moveControl.init()
     this.scene.add(moveControl.getObject())
     this.moveControl = moveControl
 
-    const orbitControl = new OrbitControl({ camera: this.camera })
+    const orbitControl = new OrbitControl({ camera: this.cameras.orbit })
     this.orbitControl = orbitControl
   }
 
@@ -432,7 +424,7 @@ class Scene {
     const renderer = this.renderers[config.rendererName]
     const camera = this.cameras[config.cameraName]
 
-    switch (config.rendererName) {
+    switch (config.cameraName) {
       case 'orbit':
         orbitControl.update()
         break
@@ -443,7 +435,9 @@ class Scene {
 
     if (keepRendering) {
       requestAnimationFrame(this.__render)
-      renderer.render(scene, camera)
+      if (renderer && camera) {
+        renderer.render(scene, camera)
+      }
     }
   }
 }
