@@ -5,22 +5,33 @@ import MoveControl from './MoveControl'
 import OrbitControl from './OrbitControl'
 import PointerLock from './PointerLock'
 
+const VALID_RENDERER_NAMES = ['normal', 'anaglyph', 'stereo']
+
 class Scene {
   constructor(config = {}) {
     this.config = Object.assign({
       showGrid: true,
       showAxes: true,
-      showSkybox: false
+      showSkybox: false,
+      cameraName: 'orbit',
+      rendererName: 'stereo',
+      mountElm: null
     }, config)
     this.scene = new THREE.Scene()
-    this.camera = null
-    this.renderer = null
+    this.cameras = {
+      orbit: null,
+      roam: null
+    }
+    this.renderers = {
+      normal: null,
+      anaglyph: null,
+      sterero: null
+    }
     this.clock = new THREE.Clock()
     this.orbitControl = null
     this.moveControl = null
     this.anaglyphEffect = false
     this.stereoEffect = false
-    this.mode = 'orbit'
     this.skybox = null
     this.grid = null
     this.axes = null
@@ -54,10 +65,11 @@ class Scene {
   }
 
   mount({ mountDom, width, height }) {
-    this.renderer.setSize(width, height)
-    this.anaglyphRenderer.setSize(width, height)
-    this.stereoRenderer.setSize(width, height)
-    mountDom.appendChild(this.renderer.domElement)
+    Object.keys(this.renderers).forEach((rendererName) => {
+      this.renderers[rendererName].setSize(width, height)
+    })
+    this.config.mountElem = mountDom
+    // mountDom.appendChild(this.renderer.domElement)
   }
 
   startRendering() {
@@ -70,11 +82,14 @@ class Scene {
   }
 
   setOrbitView(callback = () => {}) {
-    this.camera.position.set(100, 100, 100)
-    this.camera.lookAt(new THREE.Vector3(0, 0, 0))
+    if (this.config.cameraName === 'orbit') {
+      return
+    }
+    this.cameras.orbit.position.set(100, 100, 100)
+    this.cameras.orbit.lookAt(new THREE.Vector3(0, 0, 0))
     this.moveControl.disable()
     this.orbitControl.enable()
-    this.mode = 'orbit'
+    this.config.cameraName = 'orbit'
     // this.renderer.setSize(CANVAS_WIDTH, CANVAS_HEIGHT)
     // this.isFullscreen = false
     this.scene.remove(this.floor)
@@ -87,11 +102,14 @@ class Scene {
   }
 
   setRoamView(callback = () => {}) {
-    this.camera.position.set(0, 0, 10)
-    this.camera.lookAt(new THREE.Vector3(0, 0, 0))
+    if (this.config.cameraName === 'roam') {
+      return
+    }
+    this.cameras.roam.position.set(0, 0, 10)
+    this.cameras.roam.lookAt(new THREE.Vector3(0, 0, 0))
     this.orbitControl.disable()
     this.moveControl.enable()
-    this.mode = 'roam'
+    this.config.cameraName = 'roam'
     // this.renderer.setSize(window.innerWidth, window.innerHeight)
     // this.isFullscreen = true
     this.scene.add(this.floor)
@@ -111,6 +129,24 @@ class Scene {
     } catch (err) {
       console.error(err)
       PointerLock.removePointerLockListener(listener)
+    }
+  }
+
+  setRenderer(rendererName) {
+    if (VALID_RENDERER_NAMES.indexOf(rendererName) < 0) {
+      console.warn(`${rendererName} is not supported.`)
+      return
+    }
+    const { config } = this
+    if (rendererName === config.rendererName) {
+      return
+    } else {
+      const { mountElm } = config
+      while (mountElm.firstChild) {
+        mountElm.removeChild(mountElm.firstChild)
+      }
+      mountElm.appendChild(this.renderers[rendererName].domElement)
+      config.rendererName = rendererName
     }
   }
 
@@ -186,19 +222,27 @@ class Scene {
   }
 
   __initRenderer() {
-    const renderer = new THREE.WebGLRenderer()
-    renderer.setClearColor(new THREE.Color(0xffffff, 1.0))
-    renderer.shadowMap.enabled = true
-    this.renderer = renderer
-    this.anaglyphRenderer = new THREE.AnaglyphEffect(renderer)
-    this.stereoRenderer = new THREE.StereoEffect(renderer)
+    this.renderers.normal = new THREE.WebGLRenderer()
+    this.renderer.normal.setClearColor(new THREE.Color(0xffffff, 1.0))
+    this.renderer.normal.shadowMap.enabled = false
+
+    this.renderers.anaglyph = new THREE.WebGLRenderer()
+    this.renderer.anaglyph.setClearColor(new THREE.Color(0xffffff, 1.0))
+    this.renderer.anaglyph.shadowMap.enabled = true
+
+    this.renderers.stereo = new THREE.WebGLRenderer()
+    this.renderer.stereo.setClearColor(new THREE.Color(0xffffff, 1.0))
+    this.renderer.stereo.shadowMap.enabled = true
   }
 
   __initCamera() {
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 5000)
-    camera.position.set(100, 100, 100)
-    camera.lookAt(new THREE.Vector3(0, 0, 0))
-    this.camera = camera
+    this.cameras.orbit = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 5000)
+    this.cameras.orbit.position.set(100, 100, 100)
+    this.cameras.orbit.lookAt(new THREE.Vector3(0, 0, 0))
+
+    this.cameras.roam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 5000)
+    this.cameras.roam.position.set(100, 100, 100)
+    this.cameras.roam.lookAt(new THREE.Vector3(0, 0, 0))
   }
 
   __initControls() {
@@ -379,42 +423,27 @@ class Scene {
   __render() {
     const {
       scene,
-      camera,
+      config,
       orbitControl,
       moveControl,
-      mode,
-      keepRendering,
-      anaglyphEffect,
-      stereoEffect
+      keepRendering
     } = this
 
-    let renderer = this.renderer
-    if (anaglyphEffect) {
-      renderer = this.anaglyphRenderer
-    }
-    if (stereoEffect) {
-      renderer = this.stereoRenderer
+    const renderer = this.renderers[config.rendererName]
+    const camera = this.cameras[config.cameraName]
+
+    switch (config.rendererName) {
+      case 'orbit':
+        orbitControl.update()
+        break
+      case 'roam':
+        moveControl.move()
+        break
     }
 
-    switch (mode) {
-      case 'orbit': {
-        orbitControl.update()
-        if (keepRendering) {
-          requestAnimationFrame(this.__render)
-          renderer.render(scene, camera)
-        }
-        break
-      }
-      case 'roam': {
-        moveControl.move()
-        if (keepRendering) {
-          requestAnimationFrame(this.__render)
-          renderer.render(scene, camera)
-        }
-        break
-      }
-      default:
-        break
+    if (keepRendering) {
+      requestAnimationFrame(this.__render)
+      renderer.render(scene, camera)
     }
   }
 }
