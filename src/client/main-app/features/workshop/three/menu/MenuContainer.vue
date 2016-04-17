@@ -71,7 +71,7 @@ export default {
         return
       }
       this.mode = 'orbit'
-      this.scene.setOrbitView()
+      this.scene.setOrbitCamera()
       this.scene.toggleAxes(true)
       this.showAxes = true
       this.scene.toggleGrid(true)
@@ -84,7 +84,7 @@ export default {
         return
       }
       this.mode = 'roam'
-      this.scene.setRoamView()
+      this.scene.setRoamCamera()
       this.scene.toggleAxes(false)
       this.showAxes = false
       this.scene.toggleGrid(false)
@@ -102,15 +102,25 @@ export default {
       this.showSkybox = this.scene.toggleSkybox()
     },
     toggleAnaglyphEffect() {
-      this.anaglyphEffect = this.scene.toggleAnaglyphEffect()
+      const width = window.innerWidth
+      const height = window.innerHeight
+      this.anaglyphEffect = !this.anaglyphEffect
       if (this.anaglyphEffect) {
-        this.stereoEffect = this.scene.toggleStereoEffect(false)
+        this.stereoEffect = false
+        this.scene.setEffect('anaglyph', width, height)
+      } else {
+        this.scene.setEffect('normal', width, height)
       }
     },
     toggleStereoEffect() {
-      this.stereoEffect = this.scene.toggleStereoEffect()
+      const width = window.innerWidth
+      const height = window.innerHeight
+      this.stereoEffect = !this.stereoEffect
       if (this.stereoEffect) {
-        this.anaglyphEffect = this.scene.toggleAnaglyphEffect(false)
+        this.anaglyphEffect = false
+        this.scene.setEffect('stereo', width, height)
+      } else {
+        this.scene.setEffect('normal', width, height)
       }
     }
   }
