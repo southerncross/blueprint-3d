@@ -5,7 +5,7 @@
       <a v-link="{ name: 'home' }"><span class="icon-cube logo"></span></a>
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a v-link="{ name: 'gallery' }">我的作品</a></li>
-        <li><a v-link="{ name: 'edit', params: { id: 'new' } }">新建作品</a></li>
+        <li><a v-link="{ name: 'create' }">新建作品</a></li>
       </ul>
     </div>
   </nav>

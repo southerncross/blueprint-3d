@@ -62,6 +62,7 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin()
   ],
   externals: {
+    Materialize: 'Materialize',
     THREE: 'THREE',
     ThreeBSP: 'ThreeBSP',
     Snap: 'Snap',

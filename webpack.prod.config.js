@@ -83,6 +83,7 @@ module.exports = {
     new webpack.optimize.OccurenceOrderPlugin()
   ],
   externals: {
+    Materialize: 'Materialize',
     THREE: 'THREE',
     ThreeBSP: 'ThreeBSP',
     Snap: 'Snap',

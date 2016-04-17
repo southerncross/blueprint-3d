@@ -54,6 +54,8 @@
 </template>
 
 <script>
+import $ from 'jquery'
+
 import {
   removeBackground,
   removeWall,
@@ -140,7 +142,9 @@ export default {
           event.keyCode === 8 ||
           event.code === 'Delete' ||
           event.keyCode === 46) {
-        event.preventDefault()
+        if (event.which === 8 && !$(event.target).is('input, textarea')) {
+          event.preventDefault()
+        }
         this.selectControl.selectedElems.forEach((elem) => {
           switch (elem.attr('class')) {
             case 'background':

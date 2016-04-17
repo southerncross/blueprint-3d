@@ -32,6 +32,10 @@ router.map({
       '/edit/:id': {
         name: 'edit',
         component: Edit
+      },
+      '/create': {
+        name: 'create',
+        component: Edit
       }
     }
   },
