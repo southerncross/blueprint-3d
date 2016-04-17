@@ -1,5 +1,4 @@
 import THREE from 'THREE'
-import dat from 'dat'
 
 import MoveControl from './MoveControl'
 import OrbitControl from './OrbitControl'
@@ -35,9 +34,6 @@ class Scene {
     this.axes = null
     this.plane = null
     this.keepRendering = false
-    // Debug boring
-    this.controls = {}
-    this.gui = new dat.GUI()
 
     this.__init()
 
@@ -48,8 +44,6 @@ class Scene {
     this.setOrbitCamera = this.setOrbitCamera.bind(this)
     this.setRoamCamera = this.setRoamCamera.bind(this)
     this.setEffect = this.setEffect.bind(this)
-    // this.setRenderer = this.setRenderer.bind(this)
-    // this.toggleAnaglyphEffect = this.toggleAnaglyphEffect.bind(this)
     this.toggleAxes = this.toggleAxes.bind(this)
     this.toggleSkybox = this.toggleSkybox.bind(this)
     this.toggleGrid = this.toggleGrid.bind(this)
@@ -59,6 +53,10 @@ class Scene {
 
   add(mesh) {
     this.scene.add(mesh)
+  }
+
+  remove(mesh) {
+    this.scene.remove(mesh)
   }
 
   mount({ mountDom, width, height }) {
@@ -218,14 +216,6 @@ class Scene {
     const ambientLight = new THREE.AmbientLight(ambiColor)
     this.scene.add(ambientLight)
 
-    // Control
-    const ambientControl = {}
-    ambientControl.color = ambiColor
-    const ambientFolder = this.gui.addFolder('ambientLight')
-    ambientFolder.addColor(ambientControl, 'color').onChange((e) => {
-      ambientLight.color = new THREE.Color(e)
-    })
-
     const dirColor = '#ffffff'
     const dirIntensity = 0.3
     const directionalLight = new THREE.DirectionalLight(dirColor, dirIntensity)
@@ -239,46 +229,10 @@ class Scene {
     directionalLight3.position.set(0.3, 0, 0.2)
     this.scene.add(directionalLight3)
 
-    // Control
-    const directionalControl = {}
-    directionalControl.color = dirColor
-    directionalControl.intensity = dirIntensity
-    const directionalFolder = this.gui.addFolder('directionalLight')
-    directionalFolder.add(directionalControl, 'intensity', 0, 1.0).onChange((e) => {
-      directionalLight.intensity = e
-    })
-    directionalFolder.addColor(directionalControl, 'color').onChange((e) => {
-      directionalLight.color = new THREE.Color(e)
-    })
-
     const hemiLight = new THREE.HemisphereLight(0xf2e9e1, 0x9b9b9b, 0.8)
     hemiLight.position.set(-200, 500, -50)
     this.scene.add(hemiLight)
     // this.scene.add(new THREE.HemisphereLightHelper(hemiLight, 50))
-
-    // control
-    const hemiControl = {}
-    hemiControl.color = '#ffffff'
-    hemiControl.groundColor = '#ffffff'
-    hemiControl.x = 0
-    hemiControl.y = 500
-    hemiControl.z = 0
-    const hemiFolder = this.gui.addFolder('hemiLight')
-    hemiFolder.addColor(hemiControl, 'color').onChange((e) => {
-      hemiLight.color = new THREE.Color(e)
-    })
-    hemiFolder.addColor(hemiControl, 'groundColor').onChange((e) => {
-      hemiLight.groundColor = new THREE.Color(e)
-    })
-    hemiFolder.add(hemiControl, 'x', -500, 500).onChange((e) => {
-      hemiLight.position.x = e
-    })
-    hemiFolder.add(hemiControl, 'y', -500, 500).onChange((e) => {
-      hemiLight.position.y = e
-    })
-    hemiFolder.add(hemiControl, 'z', -500, 500).onChange((e) => {
-      hemiLight.position.z = e
-    })
   }
 
   __initAxes() {

@@ -11,6 +11,7 @@
 <script>
 import THREE from 'THREE'
 import ThreeBSP from 'ThreeBSP'
+import dat from 'dat'
 
 import Scene from '../../../libs/three/Scene'
 import ThreeCanvas from './ThreeCanvas'
@@ -37,23 +38,62 @@ export default {
 
   data() {
     return {
+      gui: new dat.GUI(),
       scene: new Scene(),
-      scale: 10,
-      planeSize: 100,
-      wallDepth: 1,
-      wallHeight: 35,
-      windowHeight: 15,
-      windowOffsetGround: 10,
-      doorHeight: 23,
-      offsetX: -window.innerWidth / 2,
-      offsetY: -window.innerHeight / 2,
-      walls: [],
-      windows: [],
-      doors: []
+      config: {
+        scale: 10,
+        planeSize: 100,
+        wallDepth: 1,
+        wallHeight: 35,
+        windowHeight: 15,
+        windowOffsetGround: 10,
+        doorHeight: 23,
+        offsetX: -window.innerWidth / 2,
+        offsetY: -window.innerHeight / 2
+      }
     }
   },
 
   methods: {
+    initGUI() {
+      const controls = this.config
+      this.gui.add(controls, 'scale', 1, 50).onChange((value) => {
+        this.clear()
+        this.config.scale = value
+        this.draw()
+      })
+      this.gui.add(controls, 'wallDepth', 1, 5).onChange((value) => {
+        this.clear()
+        this.config.wallDepth = value
+        this.draw()
+      })
+      this.gui.add(controls, 'wallHeight', 35, 50).onChange((value) => {
+        this.clear()
+        this.config.wallHeight = value
+        this.draw()
+      })
+      this.gui.add(controls, 'windowHeight', 10, 20).onChange((value) => {
+        this.clear()
+        this.config.windowHeight = value
+        this.draw()
+      })
+      this.gui.add(controls, 'windowOffsetGround', 5, 15).onChange((value) => {
+        this.clear()
+        this.config.windowOffsetGround = value
+        this.draw()
+      })
+      this.gui.add(controls, 'doorHeight', 20, 30).onChange((value) => {
+        this.clear()
+        this.config.doorHeight = value
+        this.draw()
+      })
+    },
+    clear() {
+      this.wallMeshes.forEach((mesh) => {
+        this.scene.remove(mesh)
+      })
+      this.wallMeshes = []
+    },
     createLineGeo(svgElem, { scale, depth, height, heightOffsetGround, offsetX, offsetY }) {
       const x1 = Number(svgElem.attr('x1')) / scale
       const y1 = Number(svgElem.attr('y1')) / scale
@@ -80,12 +120,7 @@ export default {
       return lineGeo
     },
     draw() {
-      const bumpTexture = new THREE.TextureLoader().load('/images/wall-texture.jpg')
-      bumpTexture.wrapS = THREE.RepeatWrapping
-      bumpTexture.wrapT = THREE.RepeatWrapping
-      bumpTexture.repeat.set(3, 3)
-      const material = new THREE.MeshPhongMaterial({ bumpMap: bumpTexture, bumpScale: 0.1 })
-
+      const material = this.wallMaterial
       const {
         scale,
         wallHeight,
@@ -95,7 +130,7 @@ export default {
         windowOffsetGround,
         offsetX,
         offsetY
-      } = this
+      } = this.config
 
       // const wallGeo = new THREE.Geometry()
       this.svg.selectAll('.wall').forEach((wallElem, idx) => {
@@ -136,12 +171,20 @@ export default {
         }
 
         const wallMesh = wallBSP.toMesh(material)
+        this.wallMeshes.push(wallMesh)
         this.scene.add(wallMesh)
       })
     }
   },
 
   ready() {
+    this.wallMeshes = []
+    const bumpTexture = new THREE.TextureLoader().load('/images/wall-texture.jpg')
+    bumpTexture.wrapS = THREE.RepeatWrapping
+    bumpTexture.wrapT = THREE.RepeatWrapping
+    bumpTexture.repeat.set(3, 3)
+    this.wallMaterial = new THREE.MeshPhongMaterial({ bumpMap: bumpTexture, bumpScale: 0.1 })
+    this.initGUI()
     this.draw()
   }
 }

@@ -128,7 +128,6 @@ export default {
     },
     onToggleWallVisibility() {
       this.toggleWallVisibility()
-      console.error('boring', this.visibility)
       this.svg.selectAll('.wall').forEach((wall) => {
         wall.attr({ visibility: this.visibility })
       })
