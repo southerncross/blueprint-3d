@@ -5,7 +5,7 @@ import MoveControl from './MoveControl'
 import OrbitControl from './OrbitControl'
 import PointerLock from './PointerLock'
 
-const VALID_RENDERER_NAMES = ['normal', 'anaglyph', 'stereo']
+const VALID_EFFECT_NAMES = ['normal', 'anaglyph', 'stereo']
 
 class Scene {
   constructor(config = {}) {
@@ -14,15 +14,15 @@ class Scene {
       showAxes: true,
       showSkybox: false,
       cameraName: 'orbit',
-      rendererName: 'normal',
-      mountElm: null
+      effectName: 'normal'
     }, config)
     this.scene = new THREE.Scene()
+    this.renderer = new THREE.WebGLRenderer()
     this.cameras = {
       orbit: null,
       roam: null
     }
-    this.renderers = {
+    this.effects = {
       normal: null,
       anaglyph: null,
       sterero: null
@@ -30,8 +30,6 @@ class Scene {
     this.clock = new THREE.Clock()
     this.orbitControl = null
     this.moveControl = null
-    this.anaglyphEffect = false
-    this.stereoEffect = false
     this.skybox = null
     this.grid = null
     this.axes = null
@@ -40,9 +38,6 @@ class Scene {
     // Debug boring
     this.controls = {}
     this.gui = new dat.GUI()
-    // gui.add(this.controls, 'message')
-    // gui.add(this.controls, 'speed', -5, 5)
-    // gui.addColor(this.controls, 'color')
 
     this.__init()
 
@@ -50,9 +45,11 @@ class Scene {
     this.mount = this.mount.bind(this)
     this.startRendering = this.startRendering.bind(this)
     this.stopRendering = this.stopRendering.bind(this)
-    this.setOrbitView = this.setOrbitView.bind(this)
-    this.setRoamView = this.setRoamView.bind(this)
-    this.toggleAnaglyphEffect = this.toggleAnaglyphEffect.bind(this)
+    this.setOrbitCamera = this.setOrbitCamera.bind(this)
+    this.setRoamCamera = this.setRoamCamera.bind(this)
+    this.setEffect = this.setEffect.bind(this)
+    // this.setRenderer = this.setRenderer.bind(this)
+    // this.toggleAnaglyphEffect = this.toggleAnaglyphEffect.bind(this)
     this.toggleAxes = this.toggleAxes.bind(this)
     this.toggleSkybox = this.toggleSkybox.bind(this)
     this.toggleGrid = this.toggleGrid.bind(this)
@@ -65,11 +62,8 @@ class Scene {
   }
 
   mount({ mountDom, width, height }) {
-    Object.keys(this.renderers).forEach((rendererName) => {
-      this.renderers[rendererName].setSize(width, height)
-    })
-    this.config.mountElm = mountDom
-    this.setRenderer(this.config.rendererName)
+    this.renderer.setSize(width, height)
+    mountDom.appendChild(this.renderer.domElement)
   }
 
   startRendering() {
@@ -81,7 +75,7 @@ class Scene {
     this.keepRendering = false
   }
 
-  setOrbitView(callback = () => {}) {
+  setOrbitCamera(callback = () => {}) {
     this.cameras.orbit.position.set(100, 100, 100)
     this.cameras.orbit.lookAt(new THREE.Vector3(0, 0, 0))
     this.moveControl.disable()
@@ -98,7 +92,7 @@ class Scene {
     callback()
   }
 
-  setRoamView(callback = () => {}) {
+  setRoamCamera(callback = () => {}) {
     this.cameras.roam.position.set(0, 0, 10)
     this.cameras.roam.lookAt(new THREE.Vector3(0, 0, 0))
     this.orbitControl.disable()
@@ -126,39 +120,13 @@ class Scene {
     }
   }
 
-  setRenderer(rendererName) {
-    if (VALID_RENDERER_NAMES.indexOf(rendererName) < 0) {
-      console.warn(`${rendererName} is not supported.`)
+  setEffect(effectName, width, height) {
+    if (VALID_EFFECT_NAMES.indexOf(effectName) < 0) {
+      console.warn(`${effectName} is not supported.`)
       return
     }
-    const { config } = this
-    const { mountElm } = config
-    while (mountElm.firstChild) {
-      mountElm.removeChild(mountElm.firstChild)
-    }
-    mountElm.appendChild(this.renderers[rendererName].domElement)
-    config.rendererName = rendererName
-  }
-
-  toggleAnaglyphEffect(value) {
-    if (typeof value === 'undefined') {
-      value = !this.anaglyphEffect
-    }
-    this.anaglyphEffect = value
-    return this.anaglyphEffect
-  }
-
-  toggleStereoEffect(value) {
-    if (typeof value === 'undefined') {
-      value = !this.stereoEffect
-    }
-    this.stereoEffect = value
-    if (this.stereoEffect) {
-      this.stereoRenderer.init()
-    } else {
-      this.stereoRenderer.uninit()
-    }
-    return this.stereoEffect
+    this.config.effectName = effectName
+    this.effects[effectName].setSize(width, height)
   }
 
   toggleAxes(value) {
@@ -203,6 +171,7 @@ class Scene {
   __init() {
     this.__initRenderer()
     this.__initCamera()
+    this.__initEffect()
     this.__initControls()
     this.__initLight()
     this.__initAxes()
@@ -212,19 +181,10 @@ class Scene {
   }
 
   __initRenderer() {
-    const normal = new THREE.WebGLRenderer()
-    normal.setClearColor(new THREE.Color(0xffffff, 1.0))
-    normal.shadowMap.enabled = false
-
-    const anaglyph = new THREE.WebGLRenderer()
-    anaglyph.setClearColor(new THREE.Color(0xffffff, 1.0))
-    anaglyph.shadowMap.enabled = true
-
-    const stereo = new THREE.WebGLRenderer()
-    stereo.setClearColor(new THREE.Color(0xffffff, 1.0))
-    stereo.shadowMap.enabled = true
-
-    this.renderers = { normal, anaglyph, stereo }
+    const renderer = new THREE.WebGLRenderer()
+    renderer.setClearColor(new THREE.Color(0xffffff, 1.0))
+    renderer.shadowMap.enabled = false
+    this.renderer = renderer
   }
 
   __initCamera() {
@@ -235,6 +195,12 @@ class Scene {
     this.cameras.roam = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 5000)
     this.cameras.roam.position.set(100, 100, 100)
     this.cameras.roam.lookAt(new THREE.Vector3(0, 0, 0))
+  }
+
+  __initEffect() {
+    this.effects.normal = this.renderer
+    this.effects.stereo = new THREE.StereoEffect(this.renderer)
+    this.effects.anaglyph = new THREE.AnaglyphEffect(this.renderer)
   }
 
   __initControls() {
@@ -248,9 +214,6 @@ class Scene {
   }
 
   __initLight() {
-    // const cube = new THREE.Mesh(new THREE.BoxGeometry(30, 30, 30), new THREE.MeshLambertMaterial({ color: '#ffffff' }))
-    // this.scene.add(cube)
-
     const ambiColor = '#0c0c0c'
     const ambientLight = new THREE.AmbientLight(ambiColor)
     this.scene.add(ambientLight)
@@ -359,45 +322,6 @@ class Scene {
       side: THREE.BackSide
     })
     this.skybox = new THREE.Mesh(new THREE.CubeGeometry(size, size, size), material)
-
-    // var geometry = new THREE.SphereGeometry(3000, 60, 40)
-    // var uniforms = {
-    //   texture: { type: 't', value: new THREE.TextureLoader().load('/images/skydome.jpg') }
-    // }
-
-    // const skyVertex =
-    // `
-    //   varying vec2 vUV;
-
-    //   void main() {
-    //     vUV = uv;
-    //     vec4 pos = vec4(position, 1.0);
-    //     gl_Position = projectionMatrix * modelViewMatrix * pos;
-    //   }
-    // `
-
-    // const skyFragment =
-    // `
-    //   uniform sampler2D texture;
-    //   varying vec2 vUV;
-
-    //   void main() {
-    //     vec4 sample = texture2D(texture, vUV);
-    //     gl_FragColor = vec4(sample.xyz, sample.w);
-    //   }
-    // `
-
-    // var material = new THREE.ShaderMaterial({
-    //   uniforms: uniforms,
-    //   vertexShader: skyVertex,
-    //   fragmentShader: skyFragment
-    // })
-
-    // const skybox = new THREE.Mesh(geometry, material)
-    // skybox.scale.set(-1, 1, 1)
-    // skybox.rotation.order = 'XZY'
-    // skybox.renderOrder = 1000.0
-    // this.skybox = skybox
   }
 
   __initFloor() {
@@ -421,7 +345,7 @@ class Scene {
       keepRendering
     } = this
 
-    const renderer = this.renderers[config.rendererName]
+    const renderer = this.effects[config.effectName]
     const camera = this.cameras[config.cameraName]
 
     switch (config.cameraName) {
