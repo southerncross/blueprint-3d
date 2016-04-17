@@ -46,69 +46,38 @@ export default {
       windowOffsetGround: 10,
       doorHeight: 23,
       offsetX: -window.innerWidth / 2,
-      offsetY: -window.innerHeight / 2
+      offsetY: -window.innerHeight / 2,
+      walls: [],
+      windows: [],
+      doors: []
     }
   },
 
   methods: {
-    createWallGeo(wallElem) {
-      const { scale, offsetX, offsetY, wallHeight, planeSize } = this
-      let depth = this.wallDepth
-      let width = this.wallDepth
-      const x1 = Number(wallElem.attr('x1')) + offsetX
-      const y1 = Number(wallElem.attr('y1')) + offsetY
-      const x2 = Number(wallElem.attr('x2')) + offsetX
-      const y2 = Number(wallElem.attr('y2')) + offsetY
-      const x = (x1 + x2) / 2 / scale
-      const y = (y1 + y2) / 2 / scale
-      if (x1 === x2) {
-        depth = Math.abs(y1 - y2) / scale + width
-      } else {
-        width = Math.abs(x1 - x2) / scale + depth
-      }
-      const wallGeo = new THREE.BoxGeometry(width, wallHeight, depth)
-      wallGeo.translate(x - planeSize / 2 / scale, wallHeight / 2, y - planeSize / 2 / scale)
-      return wallGeo
-    },
-    createWindowGeo(windowElem) {
-      const { scale, offsetX, offsetY, windowHeight, windowOffsetGround, planeSize } = this
-      let depth = this.wallDepth
-      let width = this.wallDepth
-      const x1 = Number(windowElem.attr('x1')) + offsetX
-      const y1 = Number(windowElem.attr('y1')) + offsetY
-      const x2 = Number(windowElem.attr('x2')) + offsetX
-      const y2 = Number(windowElem.attr('y2')) + offsetY
-      const x = (x1 + x2) / 2 / scale
-      const y = (y1 + y2) / 2 / scale
-      if (x1 === x2) {
-        depth = Math.abs(y1 - y2) / scale + width
-      } else {
-        width = Math.abs(x1 - x2) / scale + depth
-      }
+    createLineGeo(svgElem, { scale, depth, height, heightOffsetGround, offsetX, offsetY }) {
+      const x1 = Number(svgElem.attr('x1')) / scale
+      const y1 = Number(svgElem.attr('y1')) / scale
+      const x2 = Number(svgElem.attr('x2')) / scale
+      const y2 = Number(svgElem.attr('y2')) / scale
+      // center point
+      const length = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) + depth
 
-      const windowGeo = new THREE.BoxGeometry(width, windowHeight, depth)
-      windowGeo.translate(x - planeSize / 2 / scale, windowHeight / 2 + windowOffsetGround, y - planeSize / 2 / scale)
-      return windowGeo
-    },
-    createDoorGeo(doorElem) {
-      const { scale, offsetX, offsetY, doorHeight, planeSize } = this
-      let depth = this.wallDepth
-      let width = this.wallDepth
-      const x1 = Number(doorElem.attr('x1')) + offsetX
-      const y1 = Number(doorElem.attr('y1')) + offsetY
-      const x2 = Number(doorElem.attr('x2')) + offsetX
-      const y2 = Number(doorElem.attr('y2')) + offsetY
-      const x = (x1 + x2) / 2 / scale
-      const y = (y1 + y2) / 2 / scale
+      let theta = 0
       if (x1 === x2) {
-        depth = Math.abs(y1 - y2) / scale + width
+        theta = 0.5 * Math.PI // It's pretty weird because we can not use 90 deg directly.
       } else {
-        width = Math.abs(x1 - x2) / scale + depth
+        theta = -Math.atan((y1 - y2) / (x1 - x2))
       }
+      const localX = (x1 + x2) / 2 + offsetX / scale
+      const localZ = (y1 + y2) / 2 + offsetY / scale
+      const localY = height / 2 + (heightOffsetGround || 0)
 
-      const doorGeo = new THREE.BoxGeometry(width, doorHeight, depth)
-      doorGeo.translate(x - planeSize / 2 / scale, doorHeight / 2, y - planeSize / 2 / scale)
-      return doorGeo
+      // const material = new THREE.MeshPhongMaterial({ color: 0xffffff })
+      const lineGeo = new THREE.BoxGeometry(length, height, depth)
+      lineGeo.rotateY(theta)
+      lineGeo.translate(localX, localY, localZ)
+
+      return lineGeo
     },
     draw() {
       const bumpTexture = new THREE.TextureLoader().load('/images/wall-texture.jpg')
@@ -117,9 +86,24 @@ export default {
       bumpTexture.repeat.set(3, 3)
       const material = new THREE.MeshPhongMaterial({ bumpMap: bumpTexture, bumpScale: 0.1 })
 
+      const {
+        scale,
+        wallHeight,
+        wallDepth,
+        doorHeight,
+        windowHeight,
+        windowOffsetGround,
+        offsetX,
+        offsetY
+      } = this
+
       // const wallGeo = new THREE.Geometry()
       this.svg.selectAll('.wall').forEach((wallElem, idx) => {
-        const wallGeo = this.createWallGeo(wallElem)
+        const wallGeo = this.createLineGeo(wallElem, {
+          depth: wallDepth,
+          height: wallHeight,
+          scale, offsetX, offsetY
+        })
 
         let wallBSP = new ThreeBSP(wallGeo)
 
@@ -131,11 +115,20 @@ export default {
               return
             }
             if (elem.attr('class') === 'window') {
-              const windowGeo = this.createWindowGeo(elem)
+              const windowGeo = this.createLineGeo(elem, {
+                depth: wallDepth,
+                height: windowHeight,
+                heightOffsetGround: windowOffsetGround,
+                scale, offsetX, offsetY
+              })
               const windowBSP = new ThreeBSP(windowGeo)
               wallBSP = wallBSP.subtract(windowBSP)
             } else if (elem.attr('class') === 'door') {
-              const doorGeo = this.createDoorGeo(elem)
+              const doorGeo = this.createLineGeo(elem, {
+                depth: wallDepth,
+                height: doorHeight,
+                scale, offsetX, offsetY
+              })
               const doorBSP = new ThreeBSP(doorGeo)
               wallBSP = wallBSP.subtract(doorBSP)
             }
