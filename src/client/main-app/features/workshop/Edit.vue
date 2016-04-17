@@ -52,7 +52,7 @@ export default {
     toggleMode() {
       this.mode = this.mode === 'svg' ? 'three' : 'svg'
 
-      // debug boring
+      // Remove dat.GUI when switching between svg mode and three mode
       if (this.mode === 'svg') {
         $('.dg.main.a').remove()
       }

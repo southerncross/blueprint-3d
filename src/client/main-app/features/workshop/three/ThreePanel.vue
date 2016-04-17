@@ -40,51 +40,68 @@ export default {
     return {
       gui: new dat.GUI(),
       scene: new Scene(),
-      config: {
+      offsetX: -window.innerWidth / 2,
+      offsetY: -window.innerHeight / 2
+    }
+  },
+
+  methods: {
+    initGUI() {
+      this.config = {
         scale: 10,
         planeSize: 100,
         wallDepth: 1,
         wallHeight: 35,
         windowHeight: 15,
         windowOffsetGround: 10,
-        doorHeight: 23,
-        offsetX: -window.innerWidth / 2,
-        offsetY: -window.innerHeight / 2
+        doorHeight: 23
       }
-    }
-  },
 
-  methods: {
-    initGUI() {
-      const controls = this.config
-      this.gui.add(controls, 'scale', 1, 50).onChange((value) => {
+      let meta = this.svg.select('blueprint-meta')
+      if (meta) {
+        Object.keys(this.config).forEach((key) => {
+          if (meta.attr(key)) {
+            this.config[key] = Number(meta.attr(key))
+          }
+        })
+      } else {
+        meta = this.svg.el('blueprint-meta', this.config)
+        meta.toDefs()
+      }
+      this.gui.add(this.config, 'scale', 1, 50).onChange((value) => {
         this.clear()
         this.config.scale = value
+        meta.attr('scale', value)
         this.draw()
       })
-      this.gui.add(controls, 'wallDepth', 1, 5).onChange((value) => {
+      this.gui.add(this.config, 'wallDepth', 1, 5).onChange((value) => {
         this.clear()
         this.config.wallDepth = value
+        meta.attr('wallDepth', value)
         this.draw()
       })
-      this.gui.add(controls, 'wallHeight', 35, 50).onChange((value) => {
+      this.gui.add(this.config, 'wallHeight', 35, 50).onChange((value) => {
         this.clear()
         this.config.wallHeight = value
+        meta.attr('wallHeight', value)
         this.draw()
       })
-      this.gui.add(controls, 'windowHeight', 10, 20).onChange((value) => {
+      this.gui.add(this.config, 'windowHeight', 10, 20).onChange((value) => {
         this.clear()
         this.config.windowHeight = value
+        meta.attr('windowHeight', value)
         this.draw()
       })
-      this.gui.add(controls, 'windowOffsetGround', 5, 15).onChange((value) => {
+      this.gui.add(this.config, 'windowOffsetGround', 5, 15).onChange((value) => {
         this.clear()
         this.config.windowOffsetGround = value
+        meta.attr('windowOffsetGround', value)
         this.draw()
       })
-      this.gui.add(controls, 'doorHeight', 20, 30).onChange((value) => {
+      this.gui.add(this.config, 'doorHeight', 20, 30).onChange((value) => {
         this.clear()
         this.config.doorHeight = value
+        meta.attr('doorHeight', value)
         this.draw()
       })
     },
@@ -127,10 +144,9 @@ export default {
         wallDepth,
         doorHeight,
         windowHeight,
-        windowOffsetGround,
-        offsetX,
-        offsetY
+        windowOffsetGround
       } = this.config
+      const { offsetX, offsetY } = this
 
       // const wallGeo = new THREE.Geometry()
       this.svg.selectAll('.wall').forEach((wallElem, idx) => {
@@ -179,11 +195,13 @@ export default {
 
   ready() {
     this.wallMeshes = []
+
     const bumpTexture = new THREE.TextureLoader().load('/images/wall-texture.jpg')
     bumpTexture.wrapS = THREE.RepeatWrapping
     bumpTexture.wrapT = THREE.RepeatWrapping
     bumpTexture.repeat.set(3, 3)
     this.wallMaterial = new THREE.MeshPhongMaterial({ bumpMap: bumpTexture, bumpScale: 0.1 })
+
     this.initGUI()
     this.draw()
   }
