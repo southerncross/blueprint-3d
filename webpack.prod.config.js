@@ -61,7 +61,7 @@ module.exports = {
       stylus: ExtractTextPlugin.extract('css!stylus')
     }
   },
-  devtool: 'eval-source-map',
+  // devtool: 'eval-source-map',
   eslint: {
     formatter: require('eslint-friendly-formatter')
   },

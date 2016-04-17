@@ -54,7 +54,7 @@ module.exports = {
       }
     ]
   },
-  devtool: 'eval-source-map',
+  devtool: '#eval-source-map',
   eslint: {
     formatter: require('eslint-friendly-formatter')
   },
