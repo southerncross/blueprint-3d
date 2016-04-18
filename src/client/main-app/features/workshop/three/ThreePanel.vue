@@ -12,6 +12,7 @@
 import THREE from 'THREE'
 import ThreeBSP from 'ThreeBSP'
 import dat from 'dat'
+import { kebabCase } from 'lodash/string'
 
 import Scene from '../../../libs/three/Scene'
 import ThreeCanvas from './ThreeCanvas'
@@ -60,12 +61,16 @@ export default {
       let meta = this.svg.select('blueprint-meta')
       if (meta) {
         Object.keys(this.config).forEach((key) => {
-          if (meta.attr(key)) {
-            this.config[key] = Number(meta.attr(key))
+          if (meta.attr(kebabCase(key))) {
+            this.config[key] = Number(meta.attr(kebabCase(key)))
           }
         })
       } else {
-        meta = this.svg.el('blueprint-meta', this.config)
+        const kebabConfig = {}
+        Object.keys(this.config).forEach((key) => {
+          kebabConfig[kebabCase(key)] = this.config[key]
+        })
+        meta = this.svg.el('blueprint-meta', kebabConfig)
         meta.toDefs()
       }
       this.gui.add(this.config, 'scale', 1, 50).onChange((value) => {
@@ -77,31 +82,31 @@ export default {
       this.gui.add(this.config, 'wallDepth', 1, 5).onChange((value) => {
         this.clear()
         this.config.wallDepth = value
-        meta.attr('wallDepth', value)
+        meta.attr('wall-depth', value)
         this.draw()
       })
       this.gui.add(this.config, 'wallHeight', 35, 50).onChange((value) => {
         this.clear()
         this.config.wallHeight = value
-        meta.attr('wallHeight', value)
+        meta.attr('wall-height', value)
         this.draw()
       })
       this.gui.add(this.config, 'windowHeight', 10, 20).onChange((value) => {
         this.clear()
         this.config.windowHeight = value
-        meta.attr('windowHeight', value)
+        meta.attr('window-height', value)
         this.draw()
       })
       this.gui.add(this.config, 'windowOffsetGround', 5, 15).onChange((value) => {
         this.clear()
         this.config.windowOffsetGround = value
-        meta.attr('windowOffsetGround', value)
+        meta.attr('window-offset-ground', value)
         this.draw()
       })
       this.gui.add(this.config, 'doorHeight', 20, 30).onChange((value) => {
         this.clear()
         this.config.doorHeight = value
-        meta.attr('doorHeight', value)
+        meta.attr('door-height', value)
         this.draw()
       })
     },

@@ -11,7 +11,8 @@
   <svg-panel
     v-show="showSvgPanel()"
     transition="fade"
-    :svg.once="svg"></svg-panel>
+    :svg.once="svg"
+    :elem-event-control.once="elemEventControl"></svg-panel>
   <three-panel
     v-if="showThreePanel()"
     transition="fade"
@@ -20,7 +21,7 @@
   <div class="edit__save">
     <a v-if="savable"
       class="waves-effect waves-teal btn-flat"
-      @click="saveWork">
+      @click="openSaveModal">
       <span class="icon-save"></span>保存
     </a>
     <span v-else
@@ -55,7 +56,7 @@
     <div class="modal-footer">
       <button
         class="modal-action modal-close waves-effect waves-green btn-flat"
-        @click="createWork">确认</button>
+        @click="saveWork">确认</button>
     </div>
   </div>
 </div>
@@ -65,6 +66,7 @@
 import Snap from 'Snap'
 import $ from 'jquery'
 
+import EventControl from '../../libs/svg/EventControl'
 import SvgPanel from './svg/SvgPanel'
 import ThreePanel from './three/ThreePanel'
 import { makeId, localStorageAvailable } from '../../libs/utils'
@@ -84,6 +86,7 @@ export default {
   data() {
     return {
       mode: 'svg',
+      elemEventControl: new EventControl(), // we have to put it here because we will use it to wrap loaded elements
       svg: new Snap('100%', '100%'),
       work: {
         name: '',
@@ -113,15 +116,11 @@ export default {
         $('.dg.main.a').remove()
       }
     },
-    saveWork() {
-      if (this.$route.params.id) {
-
-      } else {
-        $('#save-modal').openModal()
-      }
+    openSaveModal() {
+      $('#save-modal').openModal()
     },
-    createWork() {
-      const id = makeId()
+    saveWork() {
+      const id = this.$route.params.id || makeId()
       this.work.id = id
       const works = JSON.parse(window.localStorage.getItem('blueprintWorks')) || {}
       works[id] = {
@@ -146,10 +145,59 @@ export default {
       const works = JSON.parse(window.localStorage.getItem('blueprintWorks')) || {}
       if (works[this.$route.params.id]) {
         this.work = works[this.$route.params.id]
+        const fragment = Snap.parse(this.work.svg)
+        // Restore meta data
+        fragment.selectAll('blueprint-meta').forEach((meta) => {
+          this.svg.append(meta)
+        })
+        this.svg.selectAll('blueprint-meta').forEach((meta) => {
+          meta.toDefs()
+        })
+        // Restore walls
+        fragment.selectAll('.wall').forEach((wall) => {
+          this.svg.append(wall)
+        })
+        this.svg.selectAll('.wall').forEach((wall) => {
+          this.elemEventControl.wrap(wall)
+        })
+        // Restore windows
+        fragment.selectAll('.window').forEach((_window) => {
+          this.svg.append(_window)
+        })
+        this.svg.selectAll('.window').forEach((_window) => {
+          // Don't forget to restore hoveredLineIds because three canvas need it to render correctly.
+          const hoverWallId = _window.attr('hover-elem-id')
+          const hoverWall = this.svg.select(`#${hoverWallId}`)
+          if (hoverWall) {
+            const hoveredLineIds = hoverWall.data('hoveredLineIds') || []
+            hoveredLineIds.push(_window.attr('id'))
+            hoverWall.data('hoveredLineIds', hoveredLineIds)
+            this.elemEventControl.wrap(_window)
+          }
+        })
+        // Restore doors
+        fragment.selectAll('.door').forEach((door) => {
+          this.svg.append(door)
+        })
+        this.svg.selectAll('.door').forEach((door) => {
+          const hoverWallId = door.attr('hover-elem-id')
+          const hoverWall = this.svg.select(`#${hoverWallId}`)
+          if (hoverWall) {
+            const hoveredLineIds = hoverWall.data('hoveredLineIds') || []
+            hoveredLineIds.push(door.attr('id'))
+            hoverWall.data('hoveredLineIds', hoveredLineIds)
+            this.elemEventControl.wrap(door)
+          }
+        })
       } else {
         this.$route.router.go({ name: 'new' })
       }
     }
+  },
+
+  beforeDestroy() {
+    // Remove annoying dat.GUI
+    $('.dg.main.a').remove()
   }
 }
 </script>

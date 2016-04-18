@@ -96,23 +96,6 @@ export default {
     }
   },
 
-  created() {
-    this.svgEventControl
-    .register('mousedown', (event) => {
-      if (event.bypass) {
-        return
-      }
-      if (!this.isWallMode) {
-        return
-      }
-      if (this.wallPainter.isDrawing) {
-        this.addWall()
-      }
-      const wall = this.wallPainter.draw()
-      this.elemEventControl.wrap(wall)
-    })
-  },
-
   methods: {
     changeOpacity(event) {
       this.opacity = event.target.value
@@ -132,6 +115,23 @@ export default {
         wall.attr({ visibility: this.visibility })
       })
     }
+  },
+
+  created() {
+    this.svgEventControl
+    .register('mousedown', (event) => {
+      if (event.bypass) {
+        return
+      }
+      if (!this.isWallMode) {
+        return
+      }
+      if (this.wallPainter.isDrawing) {
+        this.addWall()
+      }
+      const wall = this.wallPainter.draw()
+      this.elemEventControl.wrap(wall)
+    })
   }
 }
 </script>

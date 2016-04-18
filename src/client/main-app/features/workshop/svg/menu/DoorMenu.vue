@@ -120,6 +120,11 @@ export default {
         }
       }
     })
+
+    // Wrap initial doors
+    this.svg.selectAll('.door').forEach((door) => {
+      this.elemEventControl.wrap(door)
+    })
   }
 }
 </script>

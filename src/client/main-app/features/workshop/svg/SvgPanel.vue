@@ -42,7 +42,8 @@ export default {
   },
 
   props: {
-    svg: Object
+    svg: Object,
+    elemEventControl: Object
   },
 
   data() {
@@ -51,7 +52,6 @@ export default {
       selectControl: new SelectControl({
         svg: this.svg
       }),
-      elemEventControl: new EventControl(),
       svgEventControl: new EventControl(),
       wallPainter: new ConnectedLinePainter({
         svg: this.svg,

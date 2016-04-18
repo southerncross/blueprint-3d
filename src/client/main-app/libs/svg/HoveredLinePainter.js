@@ -12,6 +12,7 @@ class HoveredLinePainter {
   constructor({ svg, style, drawingStyle, className }) {
     this.drawingLine = null
     this.hoverElemId = null
+    this.hoverElem = null
     this.svg = svg
     this.drawingLineStyle = drawingStyle
     this.lineStyle = style
@@ -89,7 +90,7 @@ class HoveredLinePainter {
         x2: tx,
         y2: ty
       })
-      .data('hoverElemId', hoverElemId)
+      .attr({ 'hover-elem-id': this.hoverElem.attr('id') })
       this.drawingLine = null
       const hoveredLineIds = this.hoverElem.data('hoveredLineIds') || []
       hoveredLineIds.push(line.attr('id'))
