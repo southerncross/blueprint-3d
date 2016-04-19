@@ -4,6 +4,9 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 const state = {
+  user: {
+    username: ''
+  },
   background: {
     count: 0,
     lock: false,
@@ -28,6 +31,14 @@ const state = {
 }
 
 const mutations = {
+  // Account
+  LOGIN (state, user) {
+    state.user = user
+  },
+  LOGOUT (state) {
+    state.user = { username: '' }
+  },
+
   // Background
   UPDATE_BACKGROUND (state) {
     state.background.count = 1

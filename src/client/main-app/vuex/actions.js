@@ -1,3 +1,7 @@
+// User
+export const login = makeAction('LOGIN')
+export const logout = makeAction('LOGOUT')
+
 // Background
 export const updateBackground = makeAction('UPDATE_BACKGROUND')
 export const removeBackground = makeAction('REMOVE_BACKGROUND')
