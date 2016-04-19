@@ -17,7 +17,7 @@ function login(req, res, next) {
       if (error) {
         return next(error)
       }
-      res.redirect('/')
+      res.status(200).json(user)
     })
   })(req, res, next)
 }
@@ -25,7 +25,7 @@ function login(req, res, next) {
 function logout(req, res) {
   req.logout()
   res.clearCookie('user_email')
-  res.redirect('/login')
+  res.status(200).json()
 }
 
 export default {
