@@ -3,10 +3,11 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+// Get login user
+let user = window['blueprint-3d'] ? window['blueprint-3d'].data : {}
+
 const state = {
-  user: {
-    username: ''
-  },
+  user,
   background: {
     count: 0,
     lock: false,
@@ -36,7 +37,7 @@ const mutations = {
     state.user = user
   },
   LOGOUT (state) {
-    state.user = { username: '' }
+    state.user = {}
   },
 
   // Background

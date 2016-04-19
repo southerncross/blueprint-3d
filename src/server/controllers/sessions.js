@@ -1,4 +1,5 @@
 import passport from 'passport'
+import _ from 'lodash'
 
 import log from '../log'
 
@@ -17,7 +18,15 @@ function login(req, res, next) {
       if (error) {
         return next(error)
       }
-      res.status(200).json(user)
+      const pickedUser = _.pick(req.user, [
+        'name',
+        'lastName',
+        'firstName',
+        'email',
+        'avatar',
+        'phone'
+      ])
+      res.status(200).json(pickedUser)
     })
   })(req, res, next)
 }

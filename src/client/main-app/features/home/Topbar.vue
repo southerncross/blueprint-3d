@@ -4,7 +4,8 @@
     <a v-link="{ name: 'home' }"><span class="icon-cube logo"></span></a>
     <ul id="nav-mobile" class="right hide-on-med-and-down">
       <li><a v-link="{ name: 'workshop' }">工作台</a></li>
-      <li><a @click="openLoginModal">登陆</a></li>
+      <li v-if="hasLogin"><a>{{ user.name }}</a></li>
+      <li v-else><a @click="openLoginModal">登陆</a></li>
     </ul>
   </div>
   <!-- Modal Structure -->
@@ -46,7 +47,8 @@ export default {
 
   vuex: {
     getters: {
-      username: state => state.user.username
+      hasLogin: state => Object.keys(state.user).length > 0,
+      user: state => state.user
     },
     actions: {
       login,
