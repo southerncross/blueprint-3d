@@ -3,12 +3,22 @@
   <div class="nav-wrapper cyan">
     <a v-link="{ name: 'home' }"><span class="icon-cube logo"></span></a>
     <ul id="nav-mobile" class="right hide-on-med-and-down">
-      <li><a v-link="{ name: 'workshop' }">工作台</a></li>
-      <li v-if="hasLogin"><a>{{ user.name }}</a></li>
-      <li v-else><a @click="openLoginModal">登陆</a></li>
+      <li>
+        <a v-link="{ name: 'workshop' }">工作台</a>
+      </li>
+      <li v-if="hasLogin">
+        <a class="dropdown-button" data-activates="logout">{{ user.name }}</a>
+      </li>
+      <li v-else>
+        <a @click="openLoginModal">登陆</a>
+      </li>
     </ul>
   </div>
-  <!-- Modal Structure -->
+  <!-- Logout panel -->
+  <ul id='logout' class='dropdown-content'>
+    <li><a @click="requestLogout">登出</a></li>
+  </ul>
+  <!-- Login modal -->
   <div id="login" class="modal topbar__login">
     <div class="modal-content">
       <h4>登陆</h4>
@@ -96,8 +106,11 @@ export default {
 .nav-wrapper
   padding 0 2%
 
-.topbar__login
-  color color-grey-darken-4
-  input[type=email]&__input , input[type=password]&__input
-    width 90%
+.topbar
+  &__login
+    color color-grey-darken-4
+    input[type=email]&__input , input[type=password]&__input
+      width 90%
+  &__logout
+    background-color red
 </style>
