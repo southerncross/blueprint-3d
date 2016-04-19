@@ -30,6 +30,7 @@
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-util": "^3.0.7",
+    "moment": "^2.13.0",
     "run-sequence": "^1.1.5",
     "stats.js": "0.0.14-master",
     "stylus-loader": "^1.5.1",

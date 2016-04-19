@@ -65,6 +65,8 @@
 <script>
 import Snap from 'Snap'
 import $ from 'jquery'
+import Materialize from 'Materialize'
+import moment from 'moment'
 
 import EventControl from '../../libs/svg/EventControl'
 import SvgPanel from './svg/SvgPanel'
@@ -91,7 +93,9 @@ export default {
       work: {
         name: '',
         description: ''
-      }
+      },
+      autoSaveInterval: 1000 * 60,
+      savedAt: null
     }
   },
 
@@ -130,10 +134,25 @@ export default {
         svg: this.svg.toString()
       }
       window.localStorage.setItem('blueprintWorks', JSON.stringify(works))
-      this.$route.router.go({
-        name: 'edit',
-        params: { id }
-      })
+      if (!this.$route.params.id) {
+        this.$route.router.go({
+          name: 'edit',
+          params: { id }
+        })
+      } else {
+        this.saveAt = moment()
+      }
+    },
+    autoSave() {
+      if (!this.$route.params.id) {
+        return
+      }
+      const nextSaveMoment = moment(this.saveAt).add(this.autoSaveInterval, 'ms')
+      if (!this.saveAt || moment().isAfter(nextSaveMoment)) {
+        this.saveWork()
+        Materialize.toast(`已自动保存: ${this.saveAt.format('LT')}`, 1500, 'rounded')
+      }
+      setTimeout(this.autoSave, this.autoSaveInterval)
     }
   },
 
@@ -193,6 +212,8 @@ export default {
         this.$route.router.go({ name: 'new' })
       }
     }
+
+    setTimeout(this.autoSave, this.autoSaveInterval)
   },
 
   beforeDestroy() {
