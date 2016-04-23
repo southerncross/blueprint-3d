@@ -27,10 +27,10 @@ router.get('/*', (req, res) => {
 router.post('/login', sessions.login)
 router.post('/logout', sessions.logout)
 
-router.post('/api/blueprints', blueprints.saveGalleryAPI)
+router.post('/api/blueprints', blueprints.saveBlueprintAPI)
 router.get('/api/blueprints', blueprints.getBlueprintsAPI)
 
-router.put('/api/share-gallery/:galleryId', blueprints.shareGalleryAPI)
-router.put('/api/deshare-gallery/:galleryId', blueprints.deshareGalleryAPI)
+router.put('/api/share-gallery/:galleryId', blueprints.shareBlueprintAPI)
+router.put('/api/deshare-gallery/:galleryId', blueprints.deshareBlueprintAPI)
 
 export default router
