@@ -24,8 +24,9 @@ router.get('/*', (req, res) => {
   }
 })
 
-router.post('/login', sessions.login)
-router.post('/logout', sessions.logout)
+router.post('/login', sessions.loginAPI)
+router.post('/logout', sessions.logoutAPI)
+router.get('/api/users', sessions.getUserInfoAPI)
 
 router.post('/api/blueprints', blueprints.saveBlueprintAPI)
 router.get('/api/blueprints', blueprints.getBlueprintsAPI)

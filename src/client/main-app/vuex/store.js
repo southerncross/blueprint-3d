@@ -28,16 +28,26 @@ const state = {
     count: 0,
     lock: false,
     visible: true
+  },
+  blueprints: {
+    entities: {}
   }
 }
 
 const mutations = {
   // Account
   LOGIN (state, user) {
-    state.user = user
+    state.user = user || {}
   },
   LOGOUT (state) {
     state.user = {}
+  },
+
+  UPDATE_BLUEPRINTS (state, blueprints) {
+    state.blueprints.entities = blueprints
+  },
+  UPDAET_ONE_BLUEPRINT (state, blueprint) {
+    state.blueprints.entities[blueprint.id] = blueprint
   },
 
   // Background

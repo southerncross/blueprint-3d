@@ -3,7 +3,7 @@ import _ from 'lodash'
 
 import log from '../log'
 
-function login(req, res, next) {
+function loginAPI(req, res, next) {
   passport.authenticate('local', {
     badRequestMessage: '请填写邮箱/密码'
   }, (err, user, info) => {
@@ -31,13 +31,19 @@ function login(req, res, next) {
   })(req, res, next)
 }
 
-function logout(req, res) {
+function logoutAPI(req, res) {
   req.logout()
   res.clearCookie('user_email')
   res.status(200).json()
 }
 
+function getUserInfoAPI(req, res) {
+  const { user } = req
+  console.log('boring', user)
+}
+
 export default {
-  login,
-  logout
+  loginAPI,
+  logoutAPI,
+  getUserInfoAPI
 }

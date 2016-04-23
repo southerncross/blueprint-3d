@@ -2,6 +2,10 @@
 export const login = makeAction('LOGIN')
 export const logout = makeAction('LOGOUT')
 
+// Blueprint
+export const fetchBlueprints = makeAction('UPDATE_BLUEPRINTS')
+export const fetchOneBlueprint = makeAction('UPDATE_ONE_BLUEPRINT')
+
 // Background
 export const updateBackground = makeAction('UPDATE_BACKGROUND')
 export const removeBackground = makeAction('REMOVE_BACKGROUND')

@@ -1,45 +1,45 @@
 <template>
-<div class="navbar-fixed workshop__top-bar">
-  <nav>
+<div>
+  <nav class="navbar-fixed topbar">
     <div class="nav-wrapper cyan">
       <a v-link="{ name: 'home' }"><span class="icon-cube logo"></span></a>
       <ul id="nav-mobile" class="right hide-on-med-and-down">
         <li><a v-link="{ name: 'gallery' }">我的作品</a></li>
         <li><a v-link="{ name: 'create' }">新建作品</a></li>
-        <li v-if="hasLogin">
+        <li v-show="hasLogin">
           <a class="dropdown-button" data-activates="logout">{{ user.name }}</a>
+          <!-- Logout panel -->
+          <ul id='logout' class='dropdown-content'>
+            <li><a @click="requestLogout">登出</a></li>
+          </ul>
         </li>
         <li v-else>
           <a @click="openLoginModal">登陆</a>
         </li>
       </ul>
     </div>
-    <!-- Logout panel -->
-    <ul id='logout' class='dropdown-content'>
-      <li><a @click="requestLogout">登出</a></li>
-    </ul>
-    <!-- Login modal -->
-    <div id="login" class="modal topbar__login">
-      <div class="modal-content">
-        <h4>登陆</h4>
-        <form>
-          <div class="input-field">
-            <input placeholder="请输入邮箱" id="login-email" type="email"
-              class="validate topbar__login__input" v-model="email">
-            <label for="login-email">邮箱</label>
-          </div>
-          <div class="input-field">
-            <input placeholder="请输入密码" id="login-password" type="password"
-              class="validate topbar__login__input" v-model="password">
-            <label for="login-password">密码</label>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button class="modal-action modal-close waves-effect waves-green btn-flat" @click="requestLogin">登陆</button>
-      </div>
-    </div>
   </nav>
+  <!-- Login modal -->
+  <div id="login" class="modal topbar__login">
+    <div class="modal-content">
+      <h4>登陆</h4>
+      <form>
+        <div class="input-field">
+          <input placeholder="请输入邮箱" id="login-email" type="email"
+            class="validate topbar__login__input" v-model="email">
+          <label for="login-email">邮箱</label>
+        </div>
+        <div class="input-field">
+          <input placeholder="请输入密码" id="login-password" type="password"
+            class="validate topbar__login__input" v-model="password">
+          <label for="login-password">密码</label>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-action modal-close waves-effect waves-green btn-flat" @click="requestLogin">登陆</button>
+    </div>
+  </div>
 </div>
 </template>
 
@@ -50,7 +50,8 @@ import Materialize from 'Materialize'
 
 import {
   login,
-  logout
+  logout,
+  fetchBlueprints
 } from '../../vuex/actions'
 
 export default {
@@ -63,7 +64,8 @@ export default {
     },
     actions: {
       login,
-      logout
+      logout,
+      fetchBlueprints
     }
   },
 
@@ -78,6 +80,26 @@ export default {
     openLoginModal() {
       $('#login').openModal()
     },
+    requestUserInfo() {
+      request.get('/api/users')
+      .end((err, res) => {
+        if (err || !res || !res.ok) {
+          console.error(err)
+          return
+        }
+        this.login(res.body)
+      })
+    },
+    requestBlueprints() {
+      request.get('/api/blueprints')
+      .end((err, res) => {
+        if (err || !res || !res.ok) {
+          console.error(err)
+          return
+        }
+        this.fetchBlueprints(res.body)
+      })
+    },
     requestLogin() {
       request.post('/login')
       .send({ email: this.email, password: this.password })
@@ -87,25 +109,28 @@ export default {
           return
         } else {
           this.login(res.body)
+          this.fetchBlueprints()
         }
       })
     },
     requestLogout() {
       this.logout()
     }
+  },
+
+  ready() {
+    this.requestUserInfo()
+    this.requestBlueprints()
   }
 }
 </script>
 
 <style lang="stylus">
+@require '../../../palette'
+
 .logo
   font-size x-large
   vertical-align middle
-
-.workshop__top-bar
-  position fixed
-  left 0
-  top 0
 
 .nav-wrapper
   padding 0 2%
