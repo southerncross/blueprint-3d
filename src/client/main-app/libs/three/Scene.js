@@ -257,7 +257,7 @@ class Scene {
     const size = 2000
     const loader = new THREE.CubeTextureLoader()
     loader.setPath('/images/')
-    var textureCube = loader.load([
+    const textureCube = loader.load([
       'posx.jpg',
       'negx.jpg',
       'posy.jpg',
@@ -266,9 +266,9 @@ class Scene {
       'negz.jpg'
     ])
 
-    var shader = THREE.ShaderLib['cube']
+    const shader = THREE.ShaderLib['cube']
     shader.uniforms['tCube'].value = textureCube
-    var material = new THREE.ShaderMaterial({
+    const material = new THREE.ShaderMaterial({
       fragmentShader: shader.fragmentShader,
       vertexShader: shader.vertexShader,
       uniforms: shader.uniforms,

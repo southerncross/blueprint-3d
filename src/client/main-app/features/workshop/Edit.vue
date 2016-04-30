@@ -19,16 +19,11 @@
     :svg.once="svg"></three-panel>
 
   <div class="edit__save">
-    <a v-if="savable"
+    <a
       class="waves-effect waves-teal btn-flat"
       @click="openSaveModal">
       <span class="icon-save"></span>保存
     </a>
-    <span v-else
-      class="tooltipped"
-      data-position="left" data-delay="50" data-tooltip="您的浏览器不支持本地存储">
-      <span class="icon-report_problem"></span>无法保存
-    </span>
   </div>
 
   <!-- Modal Structure -->
@@ -71,7 +66,7 @@ import moment from 'moment'
 import EventControl from '../../libs/svg/EventControl'
 import SvgPanel from './svg/SvgPanel'
 import ThreePanel from './three/ThreePanel'
-import { makeId, localStorageAvailable } from '../../libs/utils'
+import { makeId } from '../../libs/utils'
 
 export default {
   name: 'Edit',
@@ -96,12 +91,6 @@ export default {
       },
       autoSaveInterval: 1000 * 60,
       savedAt: null
-    }
-  },
-
-  computed: {
-    savable() {
-      return localStorageAvailable()
     }
   },
 
@@ -160,7 +149,7 @@ export default {
     // Init materializeCss tooltip
     $('.tooltipped').tooltip()
 
-    if (this.$route.params.id && this.savable) {
+    if (this.$route.params.id) {
       const works = JSON.parse(window.localStorage.getItem('blueprintWorks')) || {}
       if (works[this.$route.params.id]) {
         this.work = works[this.$route.params.id]

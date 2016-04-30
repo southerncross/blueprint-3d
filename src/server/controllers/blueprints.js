@@ -1,5 +1,12 @@
+import bookshelf from 'bookshelf'
+import qiniu from 'qiniu'
+
+import config from '../configs'
 import Blueprint from '../models/Blueprint'
 import AccessToken from '../models/AccessToken'
+
+qiniu.conf.ACCESS_KEY = config.qiniu.accessKey
+qiniu.conf.SECRET_KEY = config.qiniu.secretKey
 
 function saveBlueprintAPI(req, res) {
   const userId = req.user.id
@@ -7,6 +14,39 @@ function saveBlueprintAPI(req, res) {
   new Blueprint({ user_id: userId, name, url, description })
   .save()
   .then((blueprint) => res.status(200).json(blueprint.serialize()))
+  .catch((err) => res.status(403).json({ message: err }))
+}
+
+function uploadHelper(blueprint) {
+  const key = `${blueprint.id}.svg`
+  const uptoken = new qiniu.rs.PutPolicy(`${config.qiniu.bucketName}:${key}`).token()
+  const extra = new qiniu.io.PutExtra()
+
+  return new Promise((resolve, reject) => {
+    qiniu.io.put(uptoken, key, blueprint.svg, extra, function(err, ret) {
+      if (err) {
+        reject(err)
+        return
+      }
+      resolve(ret)
+    })
+  })
+}
+
+function saveBlueprintsAPI(req, res) {
+  const userId = req.user.id
+  const { blueprints } = req.body
+  const Blueprints = bookshelf.Collection.extend({
+    model: Blueprint
+  })
+
+  const collection = Blueprints.forge(blueprints)
+  Promise.all(collection.invoke('save'))
+  .then((data) => {
+    console.log('boring', data)
+    // collection models should now be saved...
+  })
+  .then(() => res.status(200).json())
   .catch((err) => res.status(403).json({ message: err }))
 }
 
@@ -78,6 +118,7 @@ function renderSharePage(req, res) {
 
 export default {
   saveBlueprintAPI,
+  saveBlueprintsAPI,
   getBlueprintsAPI,
   shareBlueprintAPI,
   deshareBlueprintAPI,

@@ -80,16 +80,6 @@ export default {
     openLoginModal() {
       $('#login').openModal()
     },
-    requestUserInfo() {
-      request.get('/api/users')
-      .end((err, res) => {
-        if (err || !res || !res.ok) {
-          console.error(err)
-          return
-        }
-        this.login(res.body)
-      })
-    },
     requestBlueprints() {
       request.get('/api/blueprints')
       .end((err, res) => {
@@ -119,7 +109,6 @@ export default {
   },
 
   ready() {
-    this.requestUserInfo()
     this.requestBlueprints()
   }
 }
