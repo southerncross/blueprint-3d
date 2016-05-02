@@ -126,44 +126,43 @@ export default {
       $('#save-modal').openModal()
     },
     saveBlueprint() {
-      function __save(blueprint) {
+      const saveHelper = (blueprint) => {
         // Notify vuex to update
         this.replaceBlueprints(blueprint)
         // Update latest save operation timestamp
         this.saveAt = moment()
         this.gotoBlueprintEditPage(blueprint.localId)
       }
-      this.blueprint.localId = this.$route.params.localId || makeId()
+      const localId = this.$route.params.localId || makeId()
+      this.blueprint.localId = localId
       // We can not use Object.assign directly because Vue.js has wrap the
       // object with observable properties.
-      const blueprint = {
-        localId: this.blueprint.localId,
+      const editingBlueprint = {
+        id: this.blueprint.id,
+        localId,
         name: this.blueprint.name,
         description: this.blueprint.description,
+        svgKey: this.blueprint.svgKey,
         svg: this.svg.toString()
-      }
-      if (this.blueprint.id) {
-        blueprint.id = this.blueprint.id
       }
 
       if (this.hasLogin) {
         // If user has login, save blueprint remotely
         // But if we failed to save at server, then just save at localStorage
-        request.saveBlueprints(blueprint)
+        request.saveBlueprints(editingBlueprint)
         .then((savedBlueprint) => {
-          console.error('boring what', savedBlueprint)
           // Set id here in case blueprint has no id before.
           this.blueprint.id = savedBlueprint.id
-          __save(savedBlueprint)
+          saveHelper(savedBlueprint)
           Materialize.toast('保存成功', 2000)
         })
         .catch((err) => {
-          __save(blueprint)
+          saveHelper(editingBlueprint)
           Materialize.toast(`同步失败(${err})，修改已保存在本地`, 2000)
         })
       } else {
         // If use has not login, save blueprint locally
-        __save(blueprint)
+        saveHelper(editingBlueprint)
         Materialize.toast('保存成功', 2000)
       }
     },
@@ -185,7 +184,7 @@ export default {
       if (this.$route.params.localId !== localId) {
         this.$route.router.go({
           name: 'edit',
-          params: { id: localId }
+          params: { localId }
         })
       }
     },

@@ -16,8 +16,6 @@ function saveBlueprints(blueprints) {
     blueprints = [blueprints]
   }
 
-  console.error('boring', blueprints)
-
   return new Promise((resolve, reject) => {
     request
     .post('/api/blueprints')
