@@ -6,6 +6,14 @@ Vue.use(Vuex)
 // Get login user
 let user = window['blueprint-3d'] ? window['blueprint-3d'].data : {}
 
+function getLocalBlueprintEntities() {
+  return JSON.parse(window.localStorage.getItem('localBlueprintEntities') || '{}')
+}
+
+function setLocalBlueprintEntities(localBlueprintEntities) {
+  window.localStorage.setItem('localBlueprintEntities', JSON.stringify(localBlueprintEntities))
+}
+
 const state = {
   user,
   background: {
@@ -29,8 +37,9 @@ const state = {
     lock: false,
     visible: true
   },
-  blueprints: {
-    entities: {}
+  blueprint: {
+    localEntities: getLocalBlueprintEntities(), // key: localId
+    remoteEntities: {} // key: localId
   }
 }
 
@@ -43,11 +52,50 @@ const mutations = {
     state.user = {}
   },
 
-  UPDATE_BLUEPRINTS (state, blueprints) {
-    state.blueprints.entities = blueprints
+  REPLACE_BLUEPRINTS (state, blueprints) {
+    if (!Array.isArray(blueprints)) {
+      blueprints = [blueprints]
+    }
+    let localModified = false
+    blueprints.forEach((blueprint) => {
+      if (blueprint.id) {
+        state.blueprint.remoteEntities[blueprint.localId] = blueprint
+      } else {
+        localModified = true
+        state.blueprint.localEntities[blueprint.localId] = blueprint
+      }
+    })
+    if (localModified) {
+      // Store local entities into localStorage
+      setLocalBlueprintEntities(state.blueprint.localEntities)
+    }
+    state.blueprint = Object.assign({}, state.blueprint)
   },
-  UPDAET_ONE_BLUEPRINT (state, blueprint) {
-    state.blueprints.entities[blueprint.id] = blueprint
+  DELETE_BLUEPRINTS (state, blueprints) {
+    if (!Array.isArray(blueprints)) {
+      blueprints = [blueprints]
+    }
+    // Delete blueprint locally and remotely if it has id.
+    blueprints.forEach((blueprint) => {
+      delete state.blueprint.localEntities[blueprint.localId]
+      if (blueprint.id) {
+        delete state.blueprint.remoteEntities[blueprint.localId]
+      }
+    })
+    // Store local entities into localStorage
+    setLocalBlueprintEntities(state.blueprint.localEntities)
+    state.blueprint = Object.assign({}, state.blueprint)
+  },
+  SYNC_BLUEPRINTS (state, blueprints) {
+    if (!Array.isArray(blueprints)) {
+      blueprints = [blueprints]
+    }
+    blueprints.forEach((blueprint) => {
+      delete state.blueprint.localEntities[blueprint.localId]
+    })
+    // Store local entities into localStorage
+    setLocalBlueprintEntities(state.blueprint.localEntities)
+    state.blueprint = Object.assign({}, state.blueprint)
   },
 
   // Background

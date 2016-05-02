@@ -1,14 +1,30 @@
 <template>
 <div class="gallery">
-  <ul v-if="mergedBlueprints.length > 0">
-    <li v-for="blueprint in mergedBlueprints">
-      <div>{{ blueprint.name }}</div>
-      <div>{{ blueprint.description }}</div>
-      <a class="waves-effect waves-teal btn-flat" v-link="{ name: 'edit', params: { id: blueprint.id }}"><span class="icon-edit"></span></a>
-      <button class="waves-effect waves-teal btn-flat" @click="deleteBlueprint(blueprint.id)"><span class="icon-delete"></span></button>
-    </li>
-  </ul>
-  <div v-else>
+  <div v-show="remoteBlueprints.length > 0">
+    <div>云端图样</div>
+    <ul>
+      <li v-for="blueprint in remoteBlueprints">
+        <div>{{ blueprint.name }}</div>
+        <div>{{ blueprint.description }}</div>
+        <a class="waves-effect waves-teal btn-flat" v-link="{ name: 'edit', params: { id: blueprint.localId }}"><span class="icon-edit"></span></a>
+        <button class="waves-effect waves-teal btn-flat" @click="requestDelete(blueprint)"><span class="icon-delete"></span></button>
+      </li>
+    </ul>
+  </div>
+
+  <div v-show="localBlueprints.length > 0">
+    <div>本地图样</div>
+    <ul>
+      <li v-for="blueprint in localBlueprints">
+        <div>{{ blueprint.name }}</div>
+        <div>{{ blueprint.description }}</div>
+        <a class="waves-effect waves-teal btn-flat" v-link="{ name: 'edit', params: { id: blueprint.localId }}"><span class="icon-edit"></span></a>
+        <button class="waves-effect waves-teal btn-flat" @click="requestDelete(blueprint)"><span class="icon-delete"></span></button>
+      </li>
+    </ul>
+  </div>
+
+  <div v-show="remoteBlueprints.length === 0 && localBlueprints.length === 0">
     还没有任何作品<a v-link="{ name: 'create' }">现在去创建</a>
   </div>
 
@@ -20,7 +36,7 @@
     <div class="modal-footer">
       <button
         class="modal-action modal-close waves-effect waves-green btn-flat"
-        @click="syncBlueprints">确认</button>
+        @click="requestSync">确认</button>
       <button
         class="modal-action modal-close waves-effect waves-green btn-flat"
         @click="closeSyncModal">取消</button>
@@ -30,56 +46,72 @@
 </template>
 
 <script>
-import request from 'superagent'
 import $ from 'jquery'
 import Materialize from 'Materialize'
+
+import request from '../../requests/requests'
+import {
+  replaceBlueprints,
+  syncBlueprints,
+  deleteBlueprints
+} from '../../vuex/actions'
 
 export default {
   name: 'Gallery',
 
   vuex: {
+    actions: {
+      replaceBlueprints,
+      syncBlueprints,
+      deleteBlueprints
+    },
     getters: {
-      remoetBlueprintEntities: state => state.blueprints.entities,
-      remoteBlueprints: state => Object.keys(state.blueprints.entities).map(key => state.blueprints.entities[key]),
+      remoteBlueprints: state => Object.keys(state.blueprint.remoteEntities).map(key => state.blueprint.remoteEntities[key]),
+      localBlueprints: state => Object.keys(state.blueprint.localEntities).map(key => state.blueprint.localEntities[key]),
       hasLogin: state => Object.keys(state.user).length > 0
     }
   },
 
-  data() {
-    const entities = JSON.parse(window.localStorage.getItem('blueprintWorks')) || {}
-    const localBlueprints = Object.keys(entities).map((id) => entities[id])
-
-    const mergedEntities = Object.assign({}, entities, this.remoetBlueprintEntities)
-    const mergedBlueprints = Object.keys(mergedEntities).map((id) => mergedEntities[id])
-
-    return {
-      localBlueprints,
-      mergedBlueprints
-    }
-  },
-
   methods: {
-    deleteBlueprint(id) {
-      const entities = JSON.parse(window.localStorage.getItem('blueprintWorks')) || {}
-      if (!entities[id]) {
-        return
-      }
-      delete entities[id]
-      this.localBlueprints = Object.keys(entities).map((id) => entities[id])
-      window.localStorage.setItem('blueprintWorks', JSON.stringify(entities))
-      Materialize.toast('删除成功', 2000)
-    },
-    syncBlueprints() {
-      request
-      .post('/api/blueprints')
-      .send(({ blueprints: this.localBlueprints }))
-      .end((err, res) => {
-        if (err || !res || !res.ok) {
+    requestDelete(blueprint) {
+      if (this.hasLogin && blueprint.id) {
+        // Delete blueprint remotely
+        request.deleteBlueprint(blueprint)
+        .then(() => {
+          this.deleteBlueprints(blueprint)
+          Materialize.toast('删除成功', 200)
+        })
+        .catch((err) => {
           console.log(err)
-          Materialize.toast(`同步失败：${err}`, 3000, 'rounded')
-          return
-        }
+          Materialize.toast(`删除失败: ${err}`)
+        })
+      } else {
+        // Delete blueprint locally
+        this.deleteBlueprints(blueprint)
+        Materialize.toast('删除成功', 2000)
+      }
+    },
+    requestSync() {
+      request.saveBlueprints(this.localBlueprints)
+      .then((savedBlueprints) => {
+        this.syncBlueprints(this.localBlueprints)
         Materialize.toast('同步成功', 3000, 'rounded')
+      })
+      .catch((err) => {
+        Materialize.toast(`同步失败：${err}`, 3000, 'rounded')
+      })
+    },
+    requestFetch() {
+      request.fetchBlueprints()
+      .then((blueprints) => {
+        this.replaceBlueprints(blueprints)
+        // Prompt user that he/she has some blueprints need to be synced.
+        if (this.localBlueprints.length > 0) {
+          $('#sync-modal').openModal()
+        }
+      })
+      .catch((err) => {
+        console.error(err)
       })
     },
     closeSyncModal() {
@@ -88,9 +120,8 @@ export default {
   },
 
   ready() {
-    console.error('boring', this.hasLogin, this.remoteBlueprints.length, this.localBlueprints.length)
-    if (this.hasLogin && this.remoteBlueprints.length !== this.localBlueprints.length) {
-      $('#sync-modal').openModal()
+    if (this.hasLogin) {
+      this.requestFetch()
     }
   }
 }

@@ -18,9 +18,9 @@ if (env === 'development') {
       password: ''
     },
     qiniu: {
-      accessKey: '',
-      secretKey: '',
-      bucketName: ''
+      accessKey: 'S8nv08l-SfPpmxm_ZBtss2oAcI9gYovLghE45fQK',
+      secretKey: 'LFxD04qdQ1ZQ_b6zcDrQPG0bTGTzWUmLHwN69hAy',
+      bucket: 'blueprint-dev'
     }
   }
 } else if (env === 'production') {
@@ -36,7 +36,7 @@ if (env === 'development') {
     qiniu: {
       accessKey: process.env.QINIU_ACCESS_KEY,
       secretKey: process.env.QINIU_SECRET_KEY,
-      bucketName: process.env.QINIU_BUCKET_NAME
+      bucket: process.env.QINIU_BUCKET
     }
   }
 }

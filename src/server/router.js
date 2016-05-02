@@ -6,8 +6,7 @@ import blueprints from './controllers/blueprints'
 
 const router = express.Router()
 
-/* GET home page. */
-router.get('/*', (req, res) => {
+function renderMainApp(req, res) {
   if (req.user) {
     const user = _.pick(req.user, [
       'name',
@@ -22,13 +21,18 @@ router.get('/*', (req, res) => {
   } else {
     res.render('main-app', { data: {} })
   }
-})
+}
 
-router.post('/login', sessions.loginAPI)
-router.post('/logout', sessions.logoutAPI)
+/* GET home page. */
+router.get('/$', renderMainApp)
+router.get('/home*', renderMainApp)
+router.get('/workshop*', renderMainApp)
+
+router.post('/api/login', sessions.loginAPI)
+router.post('/api/logout', sessions.logoutAPI)
 router.get('/api/users', sessions.getUserInfoAPI)
 
-router.post('/api/blueprints', blueprints.saveBlueprintAPI)
+router.post('/api/blueprints', blueprints.saveBlueprintsAPI)
 router.get('/api/blueprints', blueprints.getBlueprintsAPI)
 
 router.put('/api/share-gallery/:galleryId', blueprints.shareBlueprintAPI)

@@ -38,8 +38,6 @@ function logoutAPI(req, res) {
 }
 
 function getUserInfoAPI(req, res) {
-  const { user } = req
-  console.log('boring', user)
 }
 
 export default {

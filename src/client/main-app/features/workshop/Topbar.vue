@@ -50,8 +50,7 @@ import Materialize from 'Materialize'
 
 import {
   login,
-  logout,
-  fetchBlueprints
+  logout
 } from '../../vuex/actions'
 
 export default {
@@ -64,8 +63,7 @@ export default {
     },
     actions: {
       login,
-      logout,
-      fetchBlueprints
+      logout
     }
   },
 
@@ -80,18 +78,8 @@ export default {
     openLoginModal() {
       $('#login').openModal()
     },
-    requestBlueprints() {
-      request.get('/api/blueprints')
-      .end((err, res) => {
-        if (err || !res || !res.ok) {
-          console.error(err)
-          return
-        }
-        this.fetchBlueprints(res.body)
-      })
-    },
     requestLogin() {
-      request.post('/login')
+      request.post('/api/login')
       .send({ email: this.email, password: this.password })
       .end((err, res) => {
         if (err || !res || !res.ok) {
@@ -99,17 +87,18 @@ export default {
           return
         } else {
           this.login(res.body)
-          this.fetchBlueprints()
         }
       })
     },
     requestLogout() {
-      this.logout()
+      request.post('/api/logout')
+      .end((err, res) => {
+        if (err || !res || !res.ok) {
+          return
+        }
+        this.logout()
+      })
     }
-  },
-
-  ready() {
-    this.requestBlueprints()
   }
 }
 </script>

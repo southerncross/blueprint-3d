@@ -1,25 +1,15 @@
-import bookshelf from 'bookshelf'
 import qiniu from 'qiniu'
 
-import config from '../configs'
+import configs from '../configs'
 import Blueprint from '../models/Blueprint'
 import AccessToken from '../models/AccessToken'
 
-qiniu.conf.ACCESS_KEY = config.qiniu.accessKey
-qiniu.conf.SECRET_KEY = config.qiniu.secretKey
-
-function saveBlueprintAPI(req, res) {
-  const userId = req.user.id
-  const { name, url, description } = req.body
-  new Blueprint({ user_id: userId, name, url, description })
-  .save()
-  .then((blueprint) => res.status(200).json(blueprint.serialize()))
-  .catch((err) => res.status(403).json({ message: err }))
-}
+qiniu.conf.ACCESS_KEY = configs.qiniu.accessKey
+qiniu.conf.SECRET_KEY = configs.qiniu.secretKey
 
 function uploadHelper(blueprint) {
   const key = `${blueprint.id}.svg`
-  const uptoken = new qiniu.rs.PutPolicy(`${config.qiniu.bucketName}:${key}`).token()
+  const uptoken = new qiniu.rs.PutPolicy(`${configs.qiniu.bucket}:${key}`).token()
   const extra = new qiniu.io.PutExtra()
 
   return new Promise((resolve, reject) => {
@@ -35,18 +25,35 @@ function uploadHelper(blueprint) {
 
 function saveBlueprintsAPI(req, res) {
   const userId = req.user.id
-  const { blueprints } = req.body
-  const Blueprints = bookshelf.Collection.extend({
-    model: Blueprint
+  const { blueprints = [] } = req.body
+
+  if (blueprints.length === 0) {
+    res.status(403).json({ message: '缺少图样' })
+    return
+  }
+  const savePromises = blueprints.map((blueprint) => {
+    const newBlueprint = Object.assign({}, blueprint)
+    delete newBlueprint.svg
+    newBlueprint.userId = userId
+    return new Blueprint(newBlueprint).save()
   })
 
-  const collection = Blueprints.forge(blueprints)
-  Promise.all(collection.invoke('save'))
-  .then((data) => {
-    console.log('boring', data)
-    // collection models should now be saved...
+  let savedBlueprints = null
+
+  Promise.all(savePromises)
+  .then((models) => {
+    return models.map((model) => model.toJSON())
   })
-  .then(() => res.status(200).json())
+  .then((_savedBlueprints) => {
+    _savedBlueprints.forEach((_savedBlueprint) => {
+      const tmp = blueprints.find((_blueprint) => _blueprint.localId === _savedBlueprint.localId)
+      tmp.id = _savedBlueprint.id
+    })
+    return Promise.all(blueprints.map(uploadHelper))
+  })
+  .then(() => {
+    res.status(200).json(savedBlueprints)
+  })
   .catch((err) => res.status(403).json({ message: err }))
 }
 
@@ -54,8 +61,12 @@ function getBlueprintsAPI(req, res) {
   const userId = req.user.id
   new Blueprint({ user_id: userId })
   .fetchAll()
-  .then((blueprints) => blueprints.fetch({ withRelated: ['blueprints', 'accessToken'] }))
-  .then((blueprints) => res.status(200).json(blueprints.toJSON()))
+  .then((blueprints) => {
+    return blueprints.fetch({ withRelated: ['accessToken'] })
+  })
+  .then((blueprints) => {
+    res.status(200).json(blueprints.toJSON())
+  })
   .catch((err) => res.status(403).json({ message: err }))
 }
 
@@ -117,7 +128,6 @@ function renderSharePage(req, res) {
 }
 
 export default {
-  saveBlueprintAPI,
   saveBlueprintsAPI,
   getBlueprintsAPI,
   shareBlueprintAPI,
