@@ -87,21 +87,20 @@ function getBlueprintByLocalIdAPI(req, res) {
 
 function shareBlueprintAPI(req, res) {
   const userId = req.user.id
-  const { blueprintId } = req.params
+  const { localId } = req.params
 
-  new Blueprint({ id: blueprintId, user_id: userId })
+  new Blueprint({ localId, userId })
   .fetch({ withRelated: 'accessToken' })
   .then((blueprint) => {
     if (!blueprint) {
       throw new Error('找不到图样')
     }
     if (!blueprint.related('accessToken').get('token')) {
-      return new AccessToken({ blueprint_id: blueprintId, valid: true })
-      .save()
+      return new AccessToken({ blueprintId: blueprint.get('id'), valid: true }).save()
     } else {
       return new AccessToken({
         token: blueprint.related('accessToken').get('token'),
-        blueprint_id: blueprintId,
+        blueprintId: blueprint.get('id'),
         valid: true
       })
       .save()
@@ -113,9 +112,9 @@ function shareBlueprintAPI(req, res) {
 
 function deshareBlueprintAPI(req, res) {
   const userId = req.user.id
-  const { blueprintId } = req.params
+  const { localId } = req.params
 
-  new Blueprint({ id: blueprintId, user_id: userId })
+  new Blueprint({ localId, userId })
   .fetch({ withRelated: 'accessToken' })
   .then((blueprint) => {
     if (!blueprint) {
@@ -126,7 +125,7 @@ function deshareBlueprintAPI(req, res) {
     }
     return new AccessToken({
       token: blueprint.related('accessToken').get('token'),
-      blueprint_id: blueprintId, valid: false
+      blueprintId: blueprint.get('id'), valid: false
     })
     .save()
     .then((accessToken) => res.status(200).json(accessToken.toJSON()))
@@ -134,7 +133,7 @@ function deshareBlueprintAPI(req, res) {
   .catch((err) => res.status(403).json({ message: err }))
 }
 
-function renderSharePage(req, res) {
+function renderShareApp(req, res) {
   const blueprintId = req.user.blueprint.id
 
   new Blueprint({ id: blueprintId })
@@ -148,5 +147,5 @@ export default {
   getBlueprintByLocalIdAPI,
   shareBlueprintAPI,
   deshareBlueprintAPI,
-  renderSharePage
+  renderShareApp
 }

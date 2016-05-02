@@ -79,6 +79,34 @@ function fetchBlueprintByLocalId(localId) {
   })
 }
 
+function shareBlueprint(blueprint) {
+  return new Promise((resolve, reject) => {
+    request
+    .put(`/api/share-blueprint/${blueprint.localId}`)
+    .end((err, res) => {
+      if (err || !res || !res.ok) {
+        reject(err || DEFAULT_ERROR)
+      } else {
+        resolve(res.body)
+      }
+    })
+  })
+}
+
+function deshareBlueprint(blueprint) {
+  return new Promise((resolve, reject) => {
+    request
+    .put(`/api/deshare-blueprint/${blueprint.localId}`)
+    .end((err, res) => {
+      if (err || !res || !res.ok) {
+        reject(err || DEFAULT_ERROR)
+      } else {
+        resolve(res.body)
+      }
+    })
+  })
+}
+
 function fetchSvgFragment(blueprint) {
   return new Promise((resolve, reject) => {
     if (blueprint.svg) {
@@ -100,5 +128,7 @@ export default {
   deleteBlueprint,
   fetchBlueprints,
   fetchBlueprintByLocalId,
+  shareBlueprint,
+  deshareBlueprint,
   fetchSvgFragment
 }

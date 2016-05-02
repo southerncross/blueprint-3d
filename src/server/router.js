@@ -27,6 +27,7 @@ function renderMainApp(req, res) {
 router.get('/$', renderMainApp)
 router.get('/home*', renderMainApp)
 router.get('/workshop*', renderMainApp)
+router.get('/share*', blueprints.renderShareApp)
 
 router.post('/api/login', sessions.loginAPI)
 router.post('/api/logout', sessions.logoutAPI)
@@ -36,7 +37,7 @@ router.post('/api/blueprints', blueprints.saveBlueprintsAPI)
 router.get('/api/blueprints', blueprints.getBlueprintsAPI)
 router.get('/api/blueprint/:localId', blueprints.getBlueprintByLocalIdAPI)
 
-router.put('/api/share-gallery/:galleryId', blueprints.shareBlueprintAPI)
-router.put('/api/deshare-gallery/:galleryId', blueprints.deshareBlueprintAPI)
+router.put('/api/share-blueprint/:localId', blueprints.shareBlueprintAPI)
+router.put('/api/deshare-blueprint/:localId', blueprints.deshareBlueprintAPI)
 
 export default router

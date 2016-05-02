@@ -6,8 +6,21 @@
       <li v-for="blueprint in remoteBlueprints">
         <div>{{ blueprint.name }}</div>
         <div>{{ blueprint.description }}</div>
-        <a class="waves-effect waves-teal btn-flat" v-link="{ name: 'edit', params: { localId: blueprint.localId }}"><span class="icon-edit"></span></a>
-        <button class="waves-effect waves-teal btn-flat" @click="requestDelete(blueprint)"><span class="icon-delete"></span></button>
+        <a
+          class="waves-effect waves-teal btn-flat"
+          v-link="{ name: 'edit', params: { localId: blueprint.localId }}">
+          <span class="icon-edit"></span></a>
+        <button
+          class="waves-effect waves-teal btn-flat"
+          @click="requestDelete(blueprint)"><span class="icon-delete"></span></button>
+        <button
+          v-if="blueprint.accessToken && blueprint.accessToken.valid"
+          class="waves-effect waves-teal btn-flat"
+          @click="requestDeshare(blueprint)"><span class="icon-visibility"></span></button>
+        <button
+          v-else
+          class="waves-effect waves-teal btn-flat"
+          @click="requestShare(blueprint)"><span class="icon-visibility_off"></span></button>
       </li>
     </ul>
   </div>
@@ -112,6 +125,28 @@ export default {
       })
       .catch((err) => {
         console.error(err)
+      })
+    },
+    requestShare(blueprint) {
+      request.shareBlueprint(blueprint)
+      .then((accessToken) => {
+        blueprint.accessToken = accessToken
+        this.replaceBlueprints(blueprint)
+        Materialize.toast('操作成功', 2000)
+      })
+      .catch((err) => {
+        Materialize.toast(`操作失败: ${err}`, 2000)
+      })
+    },
+    requestDeshare(blueprint) {
+      request.deshareBlueprint(blueprint)
+      .then((accessToken) => {
+        blueprint.accessToken = accessToken
+        this.replaceBlueprints(blueprint)
+        Materialize.toast('操作成功', 2000)
+      })
+      .catch((err) => {
+        Materialize.toast(`操作失败: ${err}`, 2000)
       })
     },
     closeSyncModal() {
