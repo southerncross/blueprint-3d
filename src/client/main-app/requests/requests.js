@@ -1,6 +1,8 @@
 import request from 'superagent'
 import Snap from 'Snap'
 
+import { getLocalBlueprintEntities } from '../libs/utils'
+
 const DEFAULT_ERROR = '未知错误'
 
 /**
@@ -58,16 +60,37 @@ function fetchBlueprints() {
   })
 }
 
+function fetchBlueprintByLocalId(localId) {
+  return new Promise((resolve, reject) => {
+    request
+    .get(`/api/blueprint/${localId}`)
+    .end((err, res) => {
+      if (err || !res || !res.ok) {
+        reject(err || DEFAULT_ERROR)
+      } else if (res.body) {
+        resolve(res.body)
+      } else {
+        const blueprint = getLocalBlueprintEntities()[localId]
+        if (blueprint) {
+          resolve(blueprint)
+        } else {
+          reject('找不到图样')
+        }
+      }
+    })
+  })
+}
+
 function fetchSvgFragment(blueprint) {
   return new Promise((resolve, reject) => {
     if (blueprint.svg) {
       resolve(Snap.parse(blueprint.svg))
     } else {
-      Snap.load(`http://7xrvhn.com1.z0.glb.clouddn.com/${blueprint.id}.svg`, (svg) => {
+      Snap.load(`http://7xrvhn.com1.z0.glb.clouddn.com/${blueprint.svgKey}`, (svg) => {
         if (!svg) {
           reject('加载失败')
         } else {
-          resolve(Snap.parse(svg.toString()))
+          resolve(Snap.parse(svg.node.innerHTML))
         }
       })
     }
@@ -78,5 +101,6 @@ export default {
   saveBlueprints,
   deleteBlueprint,
   fetchBlueprints,
+  fetchBlueprintByLocalId,
   fetchSvgFragment
 }

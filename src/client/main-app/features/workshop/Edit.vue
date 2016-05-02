@@ -133,7 +133,7 @@ export default {
         this.saveAt = moment()
         this.gotoBlueprintEditPage(blueprint.localId)
       }
-      this.blueprint.localId = this.$route.params.id || makeId()
+      this.blueprint.localId = this.$route.params.localId || makeId()
       // We can not use Object.assign directly because Vue.js has wrap the
       // object with observable properties.
       const blueprint = {
@@ -151,6 +151,7 @@ export default {
         // But if we failed to save at server, then just save at localStorage
         request.saveBlueprints(blueprint)
         .then((savedBlueprint) => {
+          console.error('boring what', savedBlueprint)
           // Set id here in case blueprint has no id before.
           this.blueprint.id = savedBlueprint.id
           __save(savedBlueprint)
@@ -167,13 +168,13 @@ export default {
       }
     },
     autoSave() {
-      if (!this.$route.params.id) {
+      if (!this.$route.params.localId) {
         return
       }
       const nextSaveMoment = moment(this.saveAt).add(this.autoSaveInterval, 'ms')
       if (!this.saveAt || moment().isAfter(nextSaveMoment)) {
         // Dirty check
-        const blueprint = this.localEntities[this.$route.params.id] || this.remoteEntities[this.$route.params.id]
+        const blueprint = this.localEntities[this.$route.params.localId] || this.remoteEntities[this.$route.params.localId]
         if (blueprint.svg !== this.svg.toString()) {
           this.saveBlueprint()
         }
@@ -181,12 +182,25 @@ export default {
       setTimeout(this.autoSave, this.autoSaveInterval)
     },
     gotoBlueprintEditPage(localId) {
-      if (this.$route.params.id !== localId) {
+      if (this.$route.params.localId !== localId) {
         this.$route.router.go({
           name: 'edit',
           params: { id: localId }
         })
       }
+    },
+    initBlueprint(blueprint) {
+      this.blueprint = Object.assign({}, blueprint)
+      request.fetchSvgFragment(this.blueprint)
+      .then((fragment) => {
+        this.loadFromFragment(fragment)
+        this.wrapSvgElements()
+        setTimeout(this.autoSave, this.autoSaveInterval)
+      })
+      .catch((err) => {
+        console.log(err)
+        Materialize.toast(`加载失败: ${err}`, 200)
+      })
     },
     loadFromFragment(fragment) {
       // Restore meta data
@@ -241,27 +255,26 @@ export default {
     // Init materializeCss tooltip
     $('.tooltipped').tooltip()
 
-    const localId = this.$route.params.id
-    const blueprint = this.localEntities[localId] || this.remoteEntities[localId]
-    if (blueprint) {
-      // Prefer editing local blueprint then remote blueprint
-      this.blueprint = Object.assign({}, blueprint)
-      request.fetchSvgFragment(this.blueprint)
-      .then((fragment) => {
-        this.loadFromFragment(fragment)
-        this.wrapSvgElements()
-      })
-      .catch(() => {
-        Materialize.toast('读取数据失败，请刷新页面重试', 200)
-      })
-    } else {
-      // No blueprint was found, go to create page.
-      if (this.$route.name !== 'create') {
-        this.$route.router.go({ name: 'create' })
+    const localId = this.$route.params.localId
+    if (this.hasLogin && localId) {
+      if (this.localEntities[localId] || this.remoteEntities[localId]) {
+        const blueprint = this.localEntities[localId] || this.remoteEntities[localId]
+        this.initBlueprint(blueprint)
+      } else {
+        request.fetchBlueprintByLocalId(localId)
+        .then((blueprint) => {
+          this.replaceBlueprints(blueprint)
+          this.initBlueprint(blueprint)
+        })
+        .catch((err) => {
+          console.log(err)
+          Materialize.toast(`加载失败: ${err}`, 200)
+        })
       }
+    } else if (this.$route.name !== 'create') {
+      // Redirect to create page.
+      this.$route.router.go({ name: 'create' })
     }
-
-    setTimeout(this.autoSave, this.autoSaveInterval)
   },
 
   beforeDestroy() {

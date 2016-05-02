@@ -25,11 +25,11 @@ router.map({
         name: 'gallery',
         component: Gallery
       },
-      '/view/:id': {
+      '/view/:localId': {
         name: 'view',
         component: View
       },
-      '/edit/:id': {
+      '/edit/:localId': {
         name: 'edit',
         component: Edit
       },

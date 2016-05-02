@@ -64,3 +64,11 @@ export function isLineSelected(line, bbox) {
 
   return false
 }
+
+export function getLocalBlueprintEntities() {
+  return JSON.parse(window.localStorage.getItem('localBlueprintEntities') || '{}')
+}
+
+export function setLocalBlueprintEntities(localBlueprintEntities) {
+  window.localStorage.setItem('localBlueprintEntities', JSON.stringify(localBlueprintEntities))
+}

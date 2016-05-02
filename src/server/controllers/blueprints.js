@@ -1,4 +1,5 @@
 import qiniu from 'qiniu'
+import uuid from 'node-uuid'
 
 import configs from '../configs'
 import Blueprint from '../models/Blueprint'
@@ -8,7 +9,8 @@ qiniu.conf.ACCESS_KEY = configs.qiniu.accessKey
 qiniu.conf.SECRET_KEY = configs.qiniu.secretKey
 
 function uploadHelper(blueprint) {
-  const key = `${blueprint.id}.svg`
+  blueprint.svgKey = blueprint.svgKey || `${uuid.v4()}.svg`
+  const key = blueprint.svgKey
   const uptoken = new qiniu.rs.PutPolicy(`${configs.qiniu.bucket}:${key}`).token()
   const extra = new qiniu.io.PutExtra()
 
@@ -18,9 +20,15 @@ function uploadHelper(blueprint) {
         reject(err)
         return
       }
-      resolve(ret)
+      resolve(ret.key)
     })
   })
+}
+
+function saveHelper(blueprint) {
+  const _blueprint = Object.assign({}, blueprint)
+  delete _blueprint.svg
+  return new Blueprint(_blueprint).save()
 }
 
 function saveBlueprintsAPI(req, res) {
@@ -31,16 +39,12 @@ function saveBlueprintsAPI(req, res) {
     res.status(403).json({ message: '缺少图样' })
     return
   }
-  const savePromises = blueprints.map((blueprint) => {
-    const newBlueprint = Object.assign({}, blueprint)
-    delete newBlueprint.svg
-    newBlueprint.userId = userId
-    return new Blueprint(newBlueprint).save()
+  blueprints.forEach((blueprint) => {
+    blueprint.userId = userId
   })
 
-  let savedBlueprints = null
-
-  Promise.all(savePromises)
+  Promise.all(blueprints.map(uploadHelper))
+  .then(() => Promise.all(blueprints.map(saveHelper)))
   .then((models) => {
     return models.map((model) => model.toJSON())
   })
@@ -51,8 +55,8 @@ function saveBlueprintsAPI(req, res) {
     })
     return Promise.all(blueprints.map(uploadHelper))
   })
-  .then(() => {
-    res.status(200).json(savedBlueprints)
+  .then((ret) => {
+    res.status(200).json(blueprints)
   })
   .catch((err) => res.status(403).json({ message: err }))
 }
@@ -66,6 +70,17 @@ function getBlueprintsAPI(req, res) {
   })
   .then((blueprints) => {
     res.status(200).json(blueprints.toJSON())
+  })
+  .catch((err) => res.status(403).json({ message: err }))
+}
+
+function getBlueprintByLocalIdAPI(req, res) {
+  const userId = req.user.id
+  const { localId } = req.params
+  new Blueprint({ userId, localId })
+  .fetch()
+  .then((model) => {
+    res.status(200).json(model && model.toJSON())
   })
   .catch((err) => res.status(403).json({ message: err }))
 }
@@ -130,6 +145,7 @@ function renderSharePage(req, res) {
 export default {
   saveBlueprintsAPI,
   getBlueprintsAPI,
+  getBlueprintByLocalIdAPI,
   shareBlueprintAPI,
   deshareBlueprintAPI,
   renderSharePage

@@ -34,6 +34,7 @@ router.get('/api/users', sessions.getUserInfoAPI)
 
 router.post('/api/blueprints', blueprints.saveBlueprintsAPI)
 router.get('/api/blueprints', blueprints.getBlueprintsAPI)
+router.get('/api/blueprint/:localId', blueprints.getBlueprintByLocalIdAPI)
 
 router.put('/api/share-gallery/:galleryId', blueprints.shareBlueprintAPI)
 router.put('/api/deshare-gallery/:galleryId', blueprints.deshareBlueprintAPI)

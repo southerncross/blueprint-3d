@@ -1,18 +1,12 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import { getLocalBlueprintEntities, setLocalBlueprintEntities } from '../libs/utils'
+
 Vue.use(Vuex)
 
 // Get login user
 let user = window['blueprint-3d'] ? window['blueprint-3d'].data : {}
-
-function getLocalBlueprintEntities() {
-  return JSON.parse(window.localStorage.getItem('localBlueprintEntities') || '{}')
-}
-
-function setLocalBlueprintEntities(localBlueprintEntities) {
-  window.localStorage.setItem('localBlueprintEntities', JSON.stringify(localBlueprintEntities))
-}
 
 const state = {
   user,

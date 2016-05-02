@@ -6,7 +6,7 @@
       <li v-for="blueprint in remoteBlueprints">
         <div>{{ blueprint.name }}</div>
         <div>{{ blueprint.description }}</div>
-        <a class="waves-effect waves-teal btn-flat" v-link="{ name: 'edit', params: { id: blueprint.localId }}"><span class="icon-edit"></span></a>
+        <a class="waves-effect waves-teal btn-flat" v-link="{ name: 'edit', params: { localId: blueprint.localId }}"><span class="icon-edit"></span></a>
         <button class="waves-effect waves-teal btn-flat" @click="requestDelete(blueprint)"><span class="icon-delete"></span></button>
       </li>
     </ul>
@@ -18,7 +18,7 @@
       <li v-for="blueprint in localBlueprints">
         <div>{{ blueprint.name }}</div>
         <div>{{ blueprint.description }}</div>
-        <a class="waves-effect waves-teal btn-flat" v-link="{ name: 'edit', params: { id: blueprint.localId }}"><span class="icon-edit"></span></a>
+        <a class="waves-effect waves-teal btn-flat" v-link="{ name: 'edit', params: { localId: blueprint.localId }}"><span class="icon-edit"></span></a>
         <button class="waves-effect waves-teal btn-flat" @click="requestDelete(blueprint)"><span class="icon-delete"></span></button>
       </li>
     </ul>
