@@ -137,6 +137,7 @@ function renderShareApp(req, res) {
   const blueprintId = req.user.blueprint.id
 
   new Blueprint({ id: blueprintId })
+  .fetch({ withRelated: 'accessToken' })
   .then((blueprint) => res.render('share-app', { data: blueprint }))
   .catch((err) => res.status(403).json({ message: err }))
 }

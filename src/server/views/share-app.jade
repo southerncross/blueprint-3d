@@ -1,0 +1,20 @@
+extends layout
+
+block append head
+  link(rel='stylesheet', href='/stylesheets/share-app.css', type='text/css')
+  title 图样
+
+block content
+  div#app
+
+  input#init-data(type='hidden' value=JSON.stringify(data))
+  script.
+    window['blueprint-3d'] = window['blueprint-3d'] || {}
+    window['blueprint-3d'].data = JSON.parse(document.getElementById('init-data').value)
+
+  script(src='/javascripts/three.min.js')
+  script(src='/javascripts/ThreeCSG.min.js')
+  script(src='/javascripts/AnaglyphEffect.js')
+  script(src='/javascripts/StereoEffect.js')
+  script(src='/javascripts/snap.svg-min.js')
+  script(src='/javascripts/share-app.js')

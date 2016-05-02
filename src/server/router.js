@@ -1,4 +1,5 @@
 import express from 'express'
+import passport from 'passport'
 import _ from 'lodash'
 
 import sessions from './controllers/sessions'
@@ -27,7 +28,9 @@ function renderMainApp(req, res) {
 router.get('/$', renderMainApp)
 router.get('/home*', renderMainApp)
 router.get('/workshop*', renderMainApp)
-router.get('/share*', blueprints.renderShareApp)
+router.get('/share*', passport.authenticate('bearer', {
+  session: false
+}), blueprints.renderShareApp)
 
 router.post('/api/login', sessions.loginAPI)
 router.post('/api/logout', sessions.logoutAPI)
