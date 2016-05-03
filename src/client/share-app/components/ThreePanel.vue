@@ -8,6 +8,7 @@
 <script>
 import THREE from 'THREE'
 import ThreeBSP from 'ThreeBSP'
+import { kebabCase } from 'lodash/string'
 
 import Scene from '../../main-app/libs/three/Scene'
 import ThreeCanvas from '../../main-app/features/workshop/three/ThreeCanvas'
@@ -31,13 +32,33 @@ export default {
     }
   },
 
+  watch: {
+    svg: function(val, oldVal) {
+      if (!oldVal && val) {
+        const config = {
+          scale: 10,
+          planeSize: 100,
+          wallDepth: 1,
+          wallHeight: 35,
+          windowHeight: 15,
+          windowOffsetGround: 10,
+          doorHeight: 23
+        }
+
+        let meta = val.select('blueprint-meta')
+        if (meta) {
+          Object.keys(config).forEach((key) => {
+            if (meta.attr(kebabCase(key))) {
+              config[key] = Number(meta.attr(kebabCase(key)))
+            }
+          })
+        }
+        this.draw(config)
+      }
+    }
+  },
+
   methods: {
-    clear() {
-      this.wallMeshes.forEach((mesh) => {
-        this.scene.remove(mesh)
-      })
-      this.wallMeshes = []
-    },
     createLineGeo(svgElem, { scale, depth, height, heightOffsetGround, offsetX, offsetY }) {
       const x1 = Number(svgElem.attr('x1')) / scale
       const y1 = Number(svgElem.attr('y1')) / scale
@@ -63,7 +84,7 @@ export default {
 
       return lineGeo
     },
-    draw() {
+    draw(config) {
       const material = this.wallMaterial
       const {
         scale,
@@ -72,7 +93,7 @@ export default {
         doorHeight,
         windowHeight,
         windowOffsetGround
-      } = this.config
+      } = config
       const { offsetX, offsetY } = this
 
       // const wallGeo = new THREE.Geometry()
@@ -128,8 +149,6 @@ export default {
     bumpTexture.wrapT = THREE.RepeatWrapping
     bumpTexture.repeat.set(3, 3)
     this.wallMaterial = new THREE.MeshPhongMaterial({ bumpMap: bumpTexture, bumpScale: 0.1 })
-
-    this.draw()
   }
 }
 </script>

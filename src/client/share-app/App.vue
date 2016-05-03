@@ -1,6 +1,6 @@
 <template>
   <div class="app full-height">
-    <three-panel :svg.once="svg"></three-panel>
+    <three-panel :svg="svg"></three-panel>
   </div>
 </template>
 
