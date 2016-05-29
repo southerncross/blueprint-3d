@@ -1,5 +1,5 @@
 [Unit]
-Description=Gallery-3d App Service
+Description=Blueprint-3d App Service
 
 [Service]
 PIDFile=/opt/pids/blueprint-3d.pid

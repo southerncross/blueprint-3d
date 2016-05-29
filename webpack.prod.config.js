@@ -75,11 +75,11 @@ module.exports = {
     }),
     // extract css into its own file
     new ExtractTextPlugin('../stylesheets/[name].css'),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
-    }),
+    // new webpack.optimize.UglifyJsPlugin({
+    //   compress: {
+    //     warnings: false
+    //   }
+    // }),
     // optimize module ids by occurence count
     new webpack.optimize.OccurenceOrderPlugin()
   ],
@@ -88,6 +88,7 @@ module.exports = {
     THREE: 'THREE',
     ThreeBSP: 'ThreeBSP',
     Snap: 'Snap',
-    jquery: 'jQuery'
+    jquery: 'jQuery',
+    dat: 'dat'
   }
 }
