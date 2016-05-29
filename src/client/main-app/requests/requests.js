@@ -112,11 +112,19 @@ function fetchSvgFragment(blueprint) {
     if (blueprint.svg) {
       resolve(Snap.parse(blueprint.svg))
     } else {
-      Snap.load(`http://7xrvhn.com1.z0.glb.clouddn.com/${blueprint.svgKey}`, (svg) => {
-        if (!svg) {
-          reject('加载失败')
+      request
+      .get(`/api/third-party-storage/download-url/${blueprint.svgKey}`)
+      .end((err, res) => {
+        if (err || !res || !res.ok) {
+          reject(err || DEFAULT_ERROR)
         } else {
-          resolve(Snap.parse(svg.node.innerHTML))
+          Snap.load(res.body.url, (svg) => {
+            if (!svg) {
+              reject('加载失败')
+            } else {
+              resolve(Snap.parse(svg.node.innerHTML))
+            }
+          })
         }
       })
     }

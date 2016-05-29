@@ -21,6 +21,10 @@
           v-else
           class="waves-effect waves-teal btn-flat"
           @click="requestShare(blueprint)"><span class="icon-visibility_off"></span></button>
+        <div v-if="blueprint.shareLink">
+          <a
+            v-link="blueprint.shareLink">{{blueprint.shareLink}}</a>
+        </div>
       </li>
     </ul>
   </div>

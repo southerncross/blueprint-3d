@@ -4,6 +4,7 @@ import _ from 'lodash'
 
 import sessions from './controllers/sessions'
 import blueprints from './controllers/blueprints'
+import thirdPartyStorage from './controllers/thirdPartyStorage.js'
 
 const router = express.Router()
 
@@ -42,5 +43,7 @@ router.get('/api/blueprint/:localId', blueprints.getBlueprintByLocalIdAPI)
 
 router.put('/api/share-blueprint/:localId', blueprints.shareBlueprintAPI)
 router.put('/api/deshare-blueprint/:localId', blueprints.deshareBlueprintAPI)
+
+router.get('/api/third-party-storage/download-url/:key', thirdPartyStorage.getDownloadUrlAPI)
 
 export default router

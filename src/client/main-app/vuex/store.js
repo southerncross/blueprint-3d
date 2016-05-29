@@ -53,6 +53,9 @@ const mutations = {
     let localModified = false
     blueprints.forEach((blueprint) => {
       if (blueprint.id) {
+        if (blueprint.accessToken && blueprint.accessToken.valid) {
+          blueprint.shareLink = `${window.location.origin}/share?access_token=${blueprint.accessToken.token}`
+        }
         state.blueprint.remoteEntities[blueprint.localId] = blueprint
       } else {
         localModified = true

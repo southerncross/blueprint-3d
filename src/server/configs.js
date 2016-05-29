@@ -20,7 +20,8 @@ if (env === 'development') {
     qiniu: {
       accessKey: 'S8nv08l-SfPpmxm_ZBtss2oAcI9gYovLghE45fQK',
       secretKey: 'LFxD04qdQ1ZQ_b6zcDrQPG0bTGTzWUmLHwN69hAy',
-      bucket: 'blueprint-dev'
+      bucket: 'blueprint-dev',
+      domain: '7xrvhn.com1.z0.glb.clouddn.com'
     }
   }
 } else if (env === 'production') {
@@ -36,7 +37,8 @@ if (env === 'development') {
     qiniu: {
       accessKey: process.env.QINIU_ACCESS_KEY,
       secretKey: process.env.QINIU_SECRET_KEY,
-      bucket: process.env.QINIU_BUCKET
+      bucket: process.env.QINIU_BUCKET,
+      domain: process.env.QINIU_DOMAIN
     }
   }
 }
