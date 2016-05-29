@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import request from 'superagent'
 import Snap from 'Snap'
 
 import ThreePanel from './components/ThreePanel'
@@ -23,35 +24,40 @@ export default {
     }
   },
 
-  methods: {
-
-  },
-
   ready() {
-    Snap.load(`http://7xrvhn.com1.z0.glb.clouddn.com/${this.blueprint.svgKey}`, (svg) => {
-      if (!svg) {
-        console.log('加载失败')
+    request
+    .get(`/api/third-party-storage/download-url/${this.blueprint.svgKey}`)
+    .end((err, res) => {
+      if (err || !res || !res.ok) {
+        console.log('获取SVG链接失败')
         return
       }
-      this.svg = svg
-      svg.selectAll('.window').forEach((_window) => {
-        // Don't forget to restore hoveredLineIds because three canvas need it to render correctly.
-        const hoverWallId = _window.attr('hover-elem-id')
-        const hoverWall = this.svg.select(`#${hoverWallId}`)
-        if (hoverWall) {
-          const hoveredLineIds = hoverWall.data('hoveredLineIds') || []
-          hoveredLineIds.push(_window.attr('id'))
-          hoverWall.data('hoveredLineIds', hoveredLineIds)
+
+      Snap.load(`http://7xrvhn.com1.z0.glb.clouddn.com/${this.blueprint.svgKey}`, (svg) => {
+        if (!svg) {
+          console.log('加载失败')
+          return
         }
-      })
-      svg.selectAll('.door').forEach((door) => {
-        const hoverWallId = door.attr('hover-elem-id')
-        const hoverWall = this.svg.select(`#${hoverWallId}`)
-        if (hoverWall) {
-          const hoveredLineIds = hoverWall.data('hoveredLineIds') || []
-          hoveredLineIds.push(door.attr('id'))
-          hoverWall.data('hoveredLineIds', hoveredLineIds)
-        }
+        this.svg = svg
+        svg.selectAll('.window').forEach((_window) => {
+          // Don't forget to restore hoveredLineIds because three canvas need it to render correctly.
+          const hoverWallId = _window.attr('hover-elem-id')
+          const hoverWall = this.svg.select(`#${hoverWallId}`)
+          if (hoverWall) {
+            const hoveredLineIds = hoverWall.data('hoveredLineIds') || []
+            hoveredLineIds.push(_window.attr('id'))
+            hoverWall.data('hoveredLineIds', hoveredLineIds)
+          }
+        })
+        svg.selectAll('.door').forEach((door) => {
+          const hoverWallId = door.attr('hover-elem-id')
+          const hoverWall = this.svg.select(`#${hoverWallId}`)
+          if (hoverWall) {
+            const hoveredLineIds = hoverWall.data('hoveredLineIds') || []
+            hoveredLineIds.push(door.attr('id'))
+            hoverWall.data('hoveredLineIds', hoveredLineIds)
+          }
+        })
       })
     })
   }
