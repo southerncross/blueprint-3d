@@ -33,7 +33,7 @@ export default {
         return
       }
 
-      Snap.load(`http://7xrvhn.com1.z0.glb.clouddn.com/${this.blueprint.svgKey}`, (svg) => {
+      Snap.load(res.body.url, (svg) => {
         if (!svg) {
           console.log('加载失败')
           return
