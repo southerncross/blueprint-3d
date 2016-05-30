@@ -30,7 +30,7 @@ body
 
 // Debug boring
 .dg.ac
-  top 100px
+  top 100px !important
   & .cr.string input[type=text]
     height auto
   & .cr.number input[type=text]
