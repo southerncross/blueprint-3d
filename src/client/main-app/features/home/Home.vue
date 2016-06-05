@@ -1,26 +1,20 @@
 <template>
 <div class="home">
   <topbar></topbar>
-  <content-image></content-image>
-  <content-feature></content-feature>
-  <bottom></bottom>
+  <content></content>
 </div>
 </template>
 
 <script>
 import Topbar from './Topbar'
-import ContentImage from './ContentImage'
-import ContentFeature from './ContentFeature'
-import Bottom from './Bottom'
+import Content from './Content'
 
 export default {
   name: 'Home',
 
   components: {
     Topbar,
-    ContentImage,
-    ContentFeature,
-    Bottom
+    Content
   }
 }
 </script>
@@ -28,5 +22,5 @@ export default {
 <style lang="stylus">
   .home
     height 100vh
-    overflow-y auto
+    overflow-y hidden
 </style>

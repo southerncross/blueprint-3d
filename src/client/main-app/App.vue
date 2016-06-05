@@ -25,8 +25,10 @@ export default {
 </script>
 
 <style lang="stylus">
+
 body
   overflow hidden
+  font-family 'Lantinghei SC', 'Open Sans', Arial, 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif
 
 // Debug boring
 .dg.ac
