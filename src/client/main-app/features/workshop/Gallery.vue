@@ -26,6 +26,7 @@
               v-else
               class="waves-effect waves-teal btn-flat gallery__item__content__action"
               @click="requestShare(blueprint)"><span class="icon-visibility_off"></span></button>
+            <button class="waves-effect waves-teal btn-flat gallery__item__content__action" @click="downloadBlueprint(blueprint)"><span class="icon-file_download"></span></button>
             <button
               class="waves-effect waves-teal btn-flat gallery__item__content__action"
               @click="requestDelete(blueprint)"><span class="icon-delete"></span></button>
@@ -54,6 +55,7 @@
           </div>
           <div class="gallery__item__content">
             <a class="waves-effect waves-teal btn-flat gallery__item__content__action" v-link="{ name: 'edit', params: { localId: blueprint.localId }}"><span class="icon-edit"></span></a>
+            <button class="waves-effect waves-teal btn-flat gallery__item__content__action" @click="downloadBlueprint(blueprint)"><span class="icon-file_download"></span></button>
             <button class="waves-effect waves-teal btn-flat gallery__item__content__action" @click="requestDelete(blueprint)"><span class="icon-delete"></span></button>
           </div>
         </div>
@@ -90,6 +92,7 @@ import moment from 'moment'
 import 'moment/locale/zh-cn'
 
 import request from '../../requests/requests'
+import exportBlueprint from '../../libs/exportBlueprint'
 import {
   replaceBlueprints,
   syncBlueprints,
@@ -181,6 +184,12 @@ export default {
     },
     formatDate(date) {
       return moment(date).format('L')
+    },
+    downloadBlueprint(blueprint) {
+      exportBlueprint(JSON.parse(JSON.stringify(blueprint)))
+      .catch((err) => {
+        Materialize.toast(`离线导出失败: ${err}`)
+      })
     }
   },
 

@@ -89,6 +89,8 @@ module.exports = {
     ThreeBSP: 'ThreeBSP',
     Snap: 'Snap',
     jquery: 'jQuery',
-    dat: 'dat'
+    dat: 'dat',
+    JSZip: 'JSZip',
+    saveAs: 'saveAs'
   }
 }

@@ -39,6 +39,7 @@ export default {
           return
         }
         this.svg = svg
+        console.log('boring svg', JSON.parse(JSON.stringify(svg)))
         svg.selectAll('.window').forEach((_window) => {
           // Don't forget to restore hoveredLineIds because three canvas need it to render correctly.
           const hoverWallId = _window.attr('hover-elem-id')
