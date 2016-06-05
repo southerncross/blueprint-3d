@@ -25,12 +25,12 @@
       <h4>登陆</h4>
       <form>
         <div class="input-field">
-          <input placeholder="请输入邮箱" id="login-email" type="email"
+          <input id="login-email" type="email"
             class="validate topbar__login__input" v-model="email">
           <label for="login-email">邮箱</label>
         </div>
         <div class="input-field">
-          <input placeholder="请输入密码" id="login-password" type="password"
+          <input id="login-password" type="password"
             class="validate topbar__login__input" v-model="password">
           <label for="login-password">密码</label>
         </div>
