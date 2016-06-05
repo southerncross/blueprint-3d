@@ -1,47 +1,68 @@
 <template>
 <div class="gallery">
   <div v-show="remoteBlueprints.length > 0">
-    <div>云端图样</div>
-    <ul>
-      <li v-for="blueprint in remoteBlueprints">
-        <div>{{ blueprint.name }}</div>
-        <div>{{ blueprint.description }}</div>
-        <a
-          class="waves-effect waves-teal btn-flat"
-          v-link="{ name: 'edit', params: { localId: blueprint.localId }}">
-          <span class="icon-edit"></span></a>
-        <button
-          class="waves-effect waves-teal btn-flat"
-          @click="requestDelete(blueprint)"><span class="icon-delete"></span></button>
-        <button
-          v-if="blueprint.accessToken && blueprint.accessToken.valid"
-          class="waves-effect waves-teal btn-flat"
-          @click="requestDeshare(blueprint)"><span class="icon-visibility"></span></button>
-        <button
-          v-else
-          class="waves-effect waves-teal btn-flat"
-          @click="requestShare(blueprint)"><span class="icon-visibility_off"></span></button>
-        <div v-if="blueprint.shareLink">
-          <a
-            v-link="blueprint.shareLink">{{blueprint.shareLink}}</a>
+    <div class="gallery__title">
+      <span class="icon-cloud_queue"></span>
+      云端图样({{remoteBlueprints.length}})
+    </div>
+    <div class="row">
+      <div class="col s12 m3" v-for="blueprint in remoteBlueprints">
+        <div class="gallery__item card">
+          <div class="gallery__item__title__container">
+            <div class="gallery__item__title">{{ blueprint.name }}</div>
+            <div class="gallery__item__title__sub">{{ blueprint.description }}</div>
+            <div class="gallery__item__title__created-at">创建于{{formatDate(blueprint.createdAt)}}</div>
+          </div>
+          <div class="gallery__item__content">
+            <a
+              class="waves-effect waves-teal btn-flat gallery__item__content__action"
+              v-link="{ name: 'edit', params: { localId: blueprint.localId }}">
+              <span class="icon-edit"></span></a>
+            <button
+              v-if="blueprint.accessToken && blueprint.accessToken.valid"
+              class="waves-effect waves-teal btn-flat gallery__item__content__action"
+              @click="requestDeshare(blueprint)"><span class="icon-visibility"></span></button>
+            <button
+              v-else
+              class="waves-effect waves-teal btn-flat gallery__item__content__action"
+              @click="requestShare(blueprint)"><span class="icon-visibility_off"></span></button>
+            <button
+              class="waves-effect waves-teal btn-flat gallery__item__content__action"
+              @click="requestDelete(blueprint)"><span class="icon-delete"></span></button>
+          </div>
+          <div class="gallery__item__share-link__container" v-if="blueprint.shareLink">
+            <a class="gallery__item__share-link" target="_blank" v-link="blueprint.shareLink">
+              {{blueprint.shareLink}}
+            </a>
+          </div>
         </div>
-      </li>
-    </ul>
+      </div>
+    </div>
   </div>
 
   <div v-show="localBlueprints.length > 0">
-    <div>本地图样</div>
-    <ul>
-      <li v-for="blueprint in localBlueprints">
-        <div>{{ blueprint.name }}</div>
-        <div>{{ blueprint.description }}</div>
-        <a class="waves-effect waves-teal btn-flat" v-link="{ name: 'edit', params: { localId: blueprint.localId }}"><span class="icon-edit"></span></a>
-        <button class="waves-effect waves-teal btn-flat" @click="requestDelete(blueprint)"><span class="icon-delete"></span></button>
-      </li>
-    </ul>
+    <div class="gallery__title">
+      <span class="icon-local_bar"></span>
+      本地图样({{localBlueprints.length}})
+    </div>
+    <div class="row">
+      <div class="col s12 m3" v-for="blueprint in localBlueprints">
+        <div class="gallery__item card">
+          <div class="gallery__item__title__container">
+            <div class="gallery__item__title">{{ blueprint.name }}</div>
+            <div class="gallery__item__title__sub">{{ blueprint.description }}</div>
+          </div>
+          <div class="gallery__item__content">
+            <a class="waves-effect waves-teal btn-flat gallery__item__content__action" v-link="{ name: 'edit', params: { localId: blueprint.localId }}"><span class="icon-edit"></span></a>
+            <button class="waves-effect waves-teal btn-flat gallery__item__content__action" @click="requestDelete(blueprint)"><span class="icon-delete"></span></button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div v-show="remoteBlueprints.length === 0 && localBlueprints.length === 0">
+  <div class="gallery__empty-hint__container" v-show="remoteBlueprints.length === 0 && localBlueprints.length === 0">
+    <div class="gallery__empty-hint__icon"><span class="icon-shocked"></span></div>
     还没有任何作品<a v-link="{ name: 'create' }">现在去创建</a>
   </div>
 
@@ -65,6 +86,8 @@
 <script>
 import $ from 'jquery'
 import Materialize from 'Materialize'
+import moment from 'moment'
+import 'moment/locale/zh-cn'
 
 import request from '../../requests/requests'
 import {
@@ -155,6 +178,9 @@ export default {
     },
     closeSyncModal() {
       $('#sync-modal').closeModal()
+    },
+    formatDate(date) {
+      return moment(date).format('L')
     }
   },
 
@@ -167,7 +193,52 @@ export default {
 </script>
 
 <style lang="stylus">
+@import '../../../palette'
+
+.icon-delete
+  color color-red
+
 .gallery
-  margin-top 20%
-  margin-left 5%
+  margin 5%
+  &__title
+    margin-top 20px
+    margin-bottom 20px
+    font-size 1.5rem
+  &__item
+    margin 5px
+    &__title
+      &__container
+        padding 20px
+      &
+        margin-bottom 2px
+        font-size 1.2rem
+      &__created-at
+        color color-grey
+    &__content
+      padding 20px
+      &__action
+        display inline-block
+        width 30px
+        height 30px
+        padding 0
+        line-height 30px
+        text-align center
+    &__share-link
+      &__container
+        padding 20px
+        border-top 1px solid color-grey-lighten-2
+      &
+        display inline-block
+        width 100%
+        overflow hidden
+        text-overflow ellipsis
+        white-space nowrap
+  &__empty-hint
+    &__container
+      width 400px
+      margin auto
+      font-size 1.3rem
+      text-align center
+    &__icon
+      font-size 4rem
 </style>

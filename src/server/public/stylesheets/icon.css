@@ -1,10 +1,10 @@
 @font-face {
     font-family: 'blueprint-3d';
-    src:    url('/font/blueprint-3d.eot?f942rx');
-    src:    url('/font/blueprint-3d.eot?f942rx#iefix') format('embedded-opentype'),
-        url('/font/blueprint-3d.ttf?f942rx') format('truetype'),
-        url('/font/blueprint-3d.woff?f942rx') format('woff'),
-        url('/font/blueprint-3d.svg?f942rx#blueprint-3d') format('svg');
+    src:    url('/font/blueprint-3d.eot?mrw3qw');
+    src:    url('/font/blueprint-3d.eot?mrw3qw#iefix') format('embedded-opentype'),
+        url('/font/blueprint-3d.ttf?mrw3qw') format('truetype'),
+        url('/font/blueprint-3d.woff?mrw3qw') format('woff'),
+        url('/font/blueprint-3d.svg?mrw3qw#blueprint-3d') format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -24,8 +24,17 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-shocked:before {
+    content: "\e9f1";
+}
 .icon-wink2:before {
     content: "\e9e8";
+}
+.icon-cloud_queue:before {
+    content: "\e2c2";
+}
+.icon-local_bar:before {
+    content: "\e540";
 }
 .icon-accessibility:before {
     content: "\e84e";
