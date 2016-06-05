@@ -2,7 +2,7 @@
 <div class="content">
   <div class="content__title__container">
     <div class="content__title">图样3D</div>
-    <div class="content__title__sub">让虚拟展示从此不再困难</div>
+    <div class="content__title__sub">人人都能制作虚拟展示</div>
     <a class="btn waves-effect waves-light white grey-text darken-4-text content__title__start" v-link="{ name: 'create' }">
       Let's have fun!<span class="icon-wink2 content__title__start__icon"></span>
     </a>
