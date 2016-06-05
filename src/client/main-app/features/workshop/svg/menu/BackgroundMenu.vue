@@ -6,7 +6,7 @@
       :class="menuBtnClassName"
       data-position="right" data-delay="500" data-tooltip="背景"
       @click="setMode('background')">
-      <i class="icon-now_wallpaper" :class="menuIconClassName"></i>
+      <i class="icon-image" :class="menuIconClassName"></i>
     </button>
   </div>
   <div class="collapsible-body edit-menu__body">
